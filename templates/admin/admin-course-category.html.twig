@@ -1,4 +1,4 @@
-﻿{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}admin-course-category{% endblock %}
 
@@ -77,7 +77,7 @@
 	</script>
 
 	<!-- Favicon -->
-	<link rel="shortcut icon" href="assets/images/favicon.ico">
+	<link rel="shortcut icon" href="/assets/images/favicon.ico">
 
 	<!-- Google Font -->
 	<link rel="preconnect" href="https://fonts.googleapis.com/">
@@ -85,13 +85,13 @@
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&amp;family=Roboto:wght@400;500;700&amp;display=swap">
 
 	<!-- Plugins CSS -->
-	<link rel="stylesheet" type="text/css" href="assets/vendor/font-awesome/css/all.min.css">
-	<link rel="stylesheet" type="text/css" href="assets/vendor/bootstrap-icons/bootstrap-icons.css">
-	<link rel="stylesheet" type="text/css" href="assets/vendor/choices/css/choices.min.css">
-	<link rel="stylesheet" type="text/css" href="assets/vendor/overlay-scrollbar/css/overlayscrollbars.min.css">
+	<link rel="stylesheet" type="text/css" href="/assets/vendor/font-awesome/css/all.min.css">
+	<link rel="stylesheet" type="text/css" href="/assets/vendor/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" type="text/css" href="/assets/vendor/choices/css/choices.min.css">
+	<link rel="stylesheet" type="text/css" href="/assets/vendor/overlay-scrollbar/css/overlayscrollbars.min.css">
 
 	<!-- Theme CSS -->
-	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/style.css">
 
 </head>
 
@@ -107,7 +107,7 @@
 	<!-- Navbar brand for xl START -->
 	<div class="d-flex align-items-center">
 		<a class="navbar-brand" href="{{ path("app_home") }}">
-			<img class="navbar-brand-item" src="assets/images/logo-light.svg" alt="">
+			<img class="navbar-brand-item" src="/assets/images/logo-light.svg" alt="">
 		</a>
 	</div>
 	<!-- Navbar brand for xl END -->
@@ -138,7 +138,7 @@
 				</li>
 
 				<!-- Menu item 3 -->
-				<li class="nav-item"> <a class="nav-link" href="{{ path('admin_students') }}"><i class="fas fa-user-graduate fa-fw me-2"></i>Students</a></li>
+				<li class="nav-item"> <a class="nav-link" href="{{ path('admin_student_list') }}"><i class="fas fa-user-graduate fa-fw me-2"></i>Students</a></li>
 
 				<!-- Menu item 4 -->
 				<li class="nav-item">
@@ -150,7 +150,7 @@
 						<li class="nav-item"> <a class="nav-link" href="{{ path('instructor_list') }}">Instructors</a></li>
 						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_instructor_detail', {'id': 1}) }}">Instructor Detail</a></li>
 						<li class="nav-item"> 
-							<a class="nav-link" href="{{ path('admin_instructor_requests') }}">Instructor requests
+							<a class="nav-link" href="{{ path('admin_instructor_request') }}">Instructor requests
 								<span class="badge text-bg-success rounded-circle ms-2">2</span>
 							</a>
 						</li>
@@ -158,13 +158,13 @@
 				</li>
 				
 				<!-- Menu item 5 -->
-				<li class="nav-item"> <a class="nav-link" href="{{ path('admin_reviews') }}"><i class="far fa-comment-dots fa-fw me-2"></i>Reviews</a></li>
+				<li class="nav-item"> <a class="nav-link" href="{{ path('admin_review') }}"><i class="far fa-comment-dots fa-fw me-2"></i>Reviews</a></li>
 
 				<!-- Menu item 6 -->
-				<li class="nav-item"> <a class="nav-link" href="{{ path('admin_earnings') }}"><i class="far fa-chart-bar fa-fw me-2"></i>Earnings</a></li>
+				<li class="nav-item"> <a class="nav-link" href="{{ path('admin_earning') }}"><i class="far fa-chart-bar fa-fw me-2"></i>Earnings</a></li>
 
 				<!-- Menu item 7 -->
-				<li class="nav-item"> <a class="nav-link" href="{{ path('admin_settings') }}"><i class="fas fa-user-cog fa-fw me-2"></i>Admin Settings</a></li>
+				<li class="nav-item"> <a class="nav-link" href="{{ path('admin_setting') }}"><i class="fas fa-user-cog fa-fw me-2"></i>Admin Settings</a></li>
 
 				<!-- Menu item 8 -->
 				<li class="nav-item">
@@ -194,7 +194,7 @@
 			<!-- Sidebar footer START -->
 			<div class="px-3 mt-auto pt-3">
 				<div class="d-flex align-items-center justify-content-between text-primary-hover">
-						<a class="h5 mb-0 text-body" href="{{ path('admin_settings') }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Settings">
+						<a class="h5 mb-0 text-body" href="{{ path('admin_setting') }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Settings">
 							<i class="bi bi-gear-fill"></i>
 						</a>
 						<a class="h5 mb-0 text-body" href="{{ path("app_home") }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Home">
@@ -222,8 +222,8 @@
 				<!-- Logo START -->
 				<div class="d-flex align-items-center d-xl-none">
 					<a class="navbar-brand" href="{{ path("app_home") }}">
-						<img class="light-mode-item navbar-brand-item h-30px" src="assets/images/logo-mobile.svg" alt="">
-						<img class="dark-mode-item navbar-brand-item h-30px" src="assets/images/logo-mobile-light.svg" alt="">
+	<img class="light-mode-item navbar-brand-item h-30px" src="/assets/images/logo-mobile.svg" alt="">
+					<img class="dark-mode-item navbar-brand-item h-30px" src="/assets/images/logo-mobile-light.svg" alt="">
 					</a>
 				</div>
 				<!-- Logo END -->
@@ -292,7 +292,10 @@
 											<li>
 												<a href="#" class="list-group-item-action border-0 border-bottom d-flex p-3">
 													<div class="me-3">
-<!-- Static list removed - add dynamic content --></div>
+														<div class="avatar avatar-md">
+															<img class="avatar-img rounded-circle" src="/assets/images/avatar/08.jpg" alt="avatar">
+														</div>
+													</div>
 													<div>
 														<p class="text-body small m-0">Congratulate <b>Joan Wallace</b> for graduating from <b>Microverse university</b></p>
 														<u class="small">Say congrats</u>
@@ -304,7 +307,10 @@
 											<li>
 												<a href="#" class="list-group-item-action border-0 border-bottom d-flex p-3">
 													<div class="me-3">
-<!-- Static list removed - add dynamic content --></div>
+														<div class="avatar avatar-md">
+															<img class="avatar-img rounded-circle" src="/assets/images/avatar/02.jpg" alt="avatar">
+														</div>
+													</div>
 													<div>
 														<h6 class="mb-1">Larry Lawson Added a new course</h6>
 														<p class="small text-body m-0">What's new! Find out about new features</p>
@@ -317,7 +323,10 @@
 											<li>
 												<a href="#" class="list-group-item-action border-0 border-bottom d-flex p-3">
 													<div class="me-3">
-<!-- Static list removed - add dynamic content --></div>
+														<div class="avatar avatar-md">
+															<img class="avatar-img rounded-circle" src="/assets/images/avatar/05.jpg" alt="avatar">
+														</div>
+													</div>
 													<div>
 														<h6 class="mb-1">New request to apply for Instructor</h6>
 														<u class="small">View detail</u>
@@ -329,7 +338,10 @@
 											<li>
 												<a href="#" class="list-group-item-action border-0 border-bottom d-flex p-3">
 													<div class="me-3">
-<!-- Static list removed - add dynamic content --></div>
+														<div class="avatar avatar-md">
+															<img class="avatar-img rounded-circle" src="/assets/images/avatar/03.jpg" alt="avatar">
+														</div>
+													</div>
 													<div>
 														<h6 class="mb-1">Update v2.3 completed successfully</h6>
 														<p class="small text-body m-0">What's new! Find out about new features</p>
@@ -353,16 +365,17 @@
 						<li class="nav-item ms-2 ms-md-3 dropdown">
 							<!-- Avatar -->
 							<a class="avatar avatar-sm p-0" href="#" id="profileDropdown" role="button" data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown" aria-expanded="false">
-								<img class="avatar-img rounded-circle" src="assets/images/avatar/01.jpg" alt="avatar">
-							</a>
-
+						<img class="avatar-img rounded-circle" src="/assets/images/avatar/01.jpg" alt="avatar">
 							<!-- Profile dropdown START -->
 							<ul class="dropdown-menu dropdown-animation dropdown-menu-end shadow pt-3" aria-labelledby="profileDropdown">
 								<!-- Profile info -->
 								<li class="px-3">
 									<div class="d-flex align-items-center">
 										<!-- Avatar -->
-<!-- Static list removed - add dynamic content --><div>
+										<div class="avatar me-3 mb-3">
+											<img class="avatar-img rounded-circle shadow" src="/assets/images/avatar/01.jpg" alt="avatar">
+										</div>
+										<div>
 											<a class="h6 mt-2 mt-sm-0" href="#">Lori Ferguson</a>
 											<p class="small m-0">example@gmail.com</p>
 										</div>
@@ -488,7 +501,7 @@
 									<div class="d-flex align-items-center position-relative">
 										<!-- Image -->
 										<div class="w-60px">
-											<img src="assets/images/courses/4by3/08.jpg" class="rounded" alt="">
+											<img src="/assets/images/courses/4by3/08.jpg" class="rounded" alt="">
 										</div>
 										<!-- Title -->
 										<h6 class="table-responsive-title mb-0 ms-2">	
@@ -501,7 +514,10 @@
 								<td>
 									<div class="d-flex align-items-center">
 										<!-- Avatar -->
-<!-- Static list removed - add dynamic content --><!-- Info -->
+										<div class="avatar avatar-xs flex-shrink-0">
+											<img class="avatar-img rounded-circle" src="/assets/images/avatar/09.jpg" alt="avatar">
+										</div>
+										<!-- Info -->
 										<div class="ms-2">
 											<h6 class="mb-0 fw-light">Lori Stevens</h6>
 										</div>
@@ -536,7 +552,7 @@
 									<div class="d-flex align-items-center position-relative">
 										<!-- Image -->
 										<div class="w-60px">
-											<img src="assets/images/courses/4by3/10.jpg" class="rounded" alt="">
+											<img src="/assets/images/courses/4by3/10.jpg" class="rounded" alt="">
 										</div>
 										<!-- Title -->
 										<h6 class="table-responsive-title mb-0 ms-2">	
@@ -549,7 +565,10 @@
 								<td>
 									<div class="d-flex align-items-center">
 										<!-- Avatar -->
-<!-- Static list removed - add dynamic content --><!-- Info -->
+										<div class="avatar avatar-xs flex-shrink-0">
+											<img class="avatar-img rounded-circle" src="/assets/images/avatar/04.jpg" alt="avatar">
+										</div>
+										<!-- Info -->
 										<div class="ms-2">
 											<h6 class="mb-0 fw-light">Billy Vasquez</h6>
 										</div>
@@ -584,7 +603,7 @@
 									<div class="d-flex align-items-center position-relative">
 										<!-- Image -->
 										<div class="w-60px">
-											<img src="assets/images/courses/4by3/02.jpg" class="rounded" alt="">
+											<img src="/assets/images/courses/4by3/02.jpg" class="rounded" alt="">
 										</div>
 										<!-- Title -->
 										<h6 class="table-responsive-title mb-0 ms-2">	
@@ -597,7 +616,10 @@
 								<td>
 									<div class="d-flex align-items-center">
 										<!-- Avatar -->
-<!-- Static list removed - add dynamic content --><!-- Info -->
+										<div class="avatar avatar-xs flex-shrink-0">
+											<img class="avatar-img rounded-circle" src="/assets/images/avatar/05.jpg" alt="avatar">
+										</div>
+										<!-- Info -->
 										<div class="ms-2">
 											<h6 class="mb-0 fw-light">Carolyn Ortiz</h6>
 										</div>
@@ -632,7 +654,7 @@
 									<div class="d-flex align-items-center position-relative">
 										<!-- Image -->
 										<div class="w-60px">
-											<img src="assets/images/courses/4by3/04.jpg" class="rounded" alt="">
+											<img src="/assets/images/courses/4by3/04.jpg" class="rounded" alt="">
 										</div>
 										<!-- Title -->
 										<h6 class="table-responsive-title mb-0 ms-2">	
@@ -645,7 +667,10 @@
 								<td>
 									<div class="d-flex align-items-center">
 										<!-- Avatar -->
-<!-- Static list removed - add dynamic content --><!-- Info -->
+										<div class="avatar avatar-xs flex-shrink-0">
+											<img class="avatar-img rounded-circle" src="/assets/images/avatar/06.jpg" alt="avatar">
+										</div>
+										<!-- Info -->
 										<div class="ms-2">
 											<h6 class="mb-0 fw-light">Frances Guerrero</h6>
 										</div>
@@ -680,7 +705,7 @@
 									<div class="d-flex align-items-center position-relative">
 										<!-- Image -->
 										<div class="w-60px">
-											<img src="assets/images/courses/4by3/09.jpg" class="rounded" alt="">
+											<img src="/assets/images/courses/4by3/09.jpg" class="rounded" alt="">
 										</div>
 										<!-- Title -->
 										<h6 class="table-responsive-title mb-0 ms-2">	
@@ -693,7 +718,10 @@
 								<td>
 									<div class="d-flex align-items-center">
 										<!-- Avatar -->
-<!-- Static list removed - add dynamic content --><!-- Info -->
+										<div class="avatar avatar-xs flex-shrink-0">
+											<img class="avatar-img rounded-circle" src="/assets/images/avatar/08.jpg" alt="avatar">
+										</div>
+										<!-- Info -->
 										<div class="ms-2">
 											<h6 class="mb-0 fw-light">Samuel Bishop</h6>
 										</div>
@@ -728,7 +756,7 @@
 									<div class="d-flex align-items-center position-relative">
 										<!-- Image -->
 										<div class="w-60px">
-											<img src="assets/images/courses/4by3/11.jpg" class="rounded" alt="">
+											<img src="/assets/images/courses/4by3/11.jpg" class="rounded" alt="">
 										</div>
 										<!-- Title -->
 										<h6 class="table-responsive-title mb-0 ms-2">	
@@ -741,7 +769,10 @@
 								<td>
 									<div class="d-flex align-items-center">
 										<!-- Avatar -->
-<!-- Static list removed - add dynamic content --><!-- Info -->
+										<div class="avatar avatar-xs flex-shrink-0">
+											<img class="avatar-img rounded-circle" src="/assets/images/avatar/02.jpg" alt="avatar">
+										</div>
+										<!-- Info -->
 										<div class="ms-2">
 											<h6 class="mb-0 fw-light">Dennis Barrett</h6>
 										</div>
@@ -776,7 +807,7 @@
 									<div class="d-flex align-items-center position-relative">
 										<!-- Image -->
 										<div class="w-60px">
-											<img src="assets/images/courses/4by3/12.jpg" class="rounded" alt="">
+											<img src="/assets/images/courses/4by3/12.jpg" class="rounded" alt="">
 										</div>
 										<!-- Title -->
 										<h6 class="table-responsive-title mb-0 ms-2">	
@@ -789,7 +820,10 @@
 								<td>
 									<div class="d-flex align-items-center">
 										<!-- Avatar -->
-<!-- Static list removed - add dynamic content --><!-- Info -->
+										<div class="avatar avatar-xs flex-shrink-0">
+											<img class="avatar-img rounded-circle" src="/assets/images/avatar/03.jpg" alt="avatar">
+										</div>
+										<!-- Info -->
 										<div class="ms-2">
 											<h6 class="mb-0 fw-light">Joan Wallace</h6>
 										</div>
@@ -860,23 +894,20 @@
 <div class="back-top"><i class="bi bi-arrow-up-short position-absolute top-50 start-50 translate-middle"></i></div>
 
 <!-- Bootstrap JS -->
-<script src="assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Vendors -->
-<script src="assets/vendor/choices/js/choices.min.js"></script>
-<script src="assets/vendor/overlay-scrollbar/js/overlayscrollbars.min.js"></script>
+<script src="/assets/vendor/choices/js/choices.min.js"></script>
+<script src="/assets/vendor/overlay-scrollbar/js/overlayscrollbars.min.js"></script>
 
 <!-- Template Functions -->
-<script src="assets/js/functions.js"></script>
+<script src="/assets/js/functions.js"></script>
 
 </body>
 
 <!-- Mirrored from eduport.webestica.com/admin-course-category.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 07 Nov 2023 13:17:01 GMT -->
 </html>
 {% endblock %}
-
-
-
 
 
 
