@@ -5,8 +5,10 @@ namespace App\Controller\Instructor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/instructor/quiz')]
+#[IsGranted('ROLE_INSTRUCTOR')]
 class QuizController extends AbstractController
 {
     #[Route('', name: 'instructor_quiz_list', methods: ['GET'])]

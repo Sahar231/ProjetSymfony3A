@@ -5,8 +5,10 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/instructor', name: 'instructor_')]
+#[IsGranted('ROLE_INSTRUCTOR')]
 class InstructorController extends AbstractController
 {
     #[Route('/dashboard', name: 'dashboard')]

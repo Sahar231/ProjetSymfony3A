@@ -21,6 +21,13 @@ final class FormationController extends AbstractController
             'formations' => $formationRepository->findAll(),
         ]);
     }
+     #[Route('/added', name: 'app_formation_added', methods: ['GET'])]
+    public function IndexUser(FormationRepository $formationRepository): Response
+    {
+        return $this->render('formation/index.html.twig', [
+            'formations' => $this->getUser()->getFormations(),
+        ]);
+    }
      #[Route('/back', name: 'app_formation_indexBack', methods: ['GET'])]
     public function indexBack(FormationRepository $formationRepository): Response
     {

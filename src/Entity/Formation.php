@@ -34,11 +34,26 @@ class Formation
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $supportFile = null;
+
+    #[ORM\Column]
+    private bool $isArchived = false;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $duration = null;
+
     /**
      * @var Collection<int, Quiz>
      */
     #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'Formation', orphanRemoval: true)]
     private Collection $quizzes;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'formations')]
+    private Collection $users;
 
   
 
@@ -119,11 +134,48 @@ class Formation
         return $this;
     }
 
+    public function getSupportFile(): ?string
+    {
+        return $this->supportFile;
+    }
+
+    public function setSupportFile(?string $supportFile): static
+    {
+        $this->supportFile = $supportFile;
+
+        return $this;
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->isArchived;
+    }
+
+    public function setArchived(bool $isArchived): static
+    {
+        $this->isArchived = $isArchived;
+
+        return $this;
+    }
+
+    public function getDuration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(?int $duration): static
+    {
+        $this->duration = $duration;
+
+        return $this;
+    }
+
     public function __construct()
   {
     $this->createdAt = new \DateTimeImmutable();
     $this->isApproved = false;
     $this->quizzes = new ArrayCollection();
+    $this->users = new ArrayCollection();
   }
 
     /**
@@ -151,6 +203,33 @@ class Formation
             if ($quiz->getFormation() === $this) {
                 $quiz->setFormation(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->addFormation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        if ($this->users->removeElement($user)) {
+            $user->removeFormation($this);
         }
 
         return $this;

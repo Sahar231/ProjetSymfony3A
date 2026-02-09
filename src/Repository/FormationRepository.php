@@ -16,6 +16,23 @@ class FormationRepository extends ServiceEntityRepository
         parent::__construct($registry, Formation::class);
     }
 
+    /**
+     * Find approved formations that are not archived
+     * Used for displaying formations to students
+     */
+    public function findApprovedAndNotArchived(): array
+    {
+        return $this->createQueryBuilder('f')
+            ->andWhere('f.isApproved = :approved')
+            ->andWhere('f.isArchived = :archived')
+            ->setParameter('approved', true)
+            ->setParameter('archived', false)
+            ->orderBy('f.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 //    /**
 //     * @return Formation[] Returns an array of Formation objects
 //     */

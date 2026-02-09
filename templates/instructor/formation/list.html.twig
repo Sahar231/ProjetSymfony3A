@@ -148,32 +148,64 @@
 								<tr>
 									<th>ID</th>
 									<th>Title</th>
-									<th>Students</th>
-									<th>Duration</th>
+									<th>Status</th>
+									<th>Support File</th>
+									<th>Created</th>
 									<th>Actions</th>
 								</tr>
 							</thead>
 							<tbody>
-								<tr>
-									<td>1</td>
-									<td>Web Development Basics</td>
-									<td>45</td>
-									<td>12 weeks</td>
-									<td>
-										<a href="#" class="btn btn-sm btn-info">Edit</a>
-										<a href="#" class="btn btn-sm btn-danger">Delete</a>
-									</td>
-								</tr>
-								<tr>
-									<td>2</td>
-									<td>Advanced JavaScript</td>
-									<td>32</td>
-									<td>8 weeks</td>
-									<td>
-										<a href="#" class="btn btn-sm btn-info">Edit</a>
-										<a href="#" class="btn btn-sm btn-danger">Delete</a>
-									</td>
-								</tr>
+								{% if formations|length > 0 %}
+									{% for formation in formations %}
+										<tr>
+											<td>{{ formation.id }}</td>
+											<td>{{ formation.title }}</td>
+											<td>
+												{% if formation.isArchived %}
+													<span class="badge bg-secondary">Archived</span>
+												{% elseif formation.isApproved %}
+													<span class="badge bg-success">Approved</span>
+												{% else %}
+													<span class="badge bg-warning">Pending</span>
+												{% endif %}
+											</td>
+											<td>
+												{% if formation.supportFile %}
+													<a href="{{ formation.supportFile }}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Download support file">
+														<i class="bi bi-download me-1"></i>Download
+													</a>
+												{% else %}
+													<span class="text-muted">-</span>
+												{% endif %}
+											</td>
+											<td>{{ formation.createdAt|date('d/m/Y') }}</td>
+											<td>
+												<a href="#" class="btn btn-sm btn-info">Edit</a>
+												{% if not formation.isArchived %}
+													<form method="POST" action="{{ path('instructor_formation_archive', {id: formation.id}) }}" style="display:inline;">
+														<button type="submit" class="btn btn-sm btn-warning" title="Archive this formation">
+															<i class="bi bi-archive me-1"></i>Archive
+														</button>
+													</form>
+												{% else %}
+													<form method="POST" action="{{ path('instructor_formation_unarchive', {id: formation.id}) }}" style="display:inline;">
+														<button type="submit" class="btn btn-sm btn-success" title="Unarchive this formation">
+															<i class="bi bi-arrow-counterclockwise me-1"></i>Unarchive
+														</button>
+													</form>
+												{% endif %}
+												<a href="#" class="btn btn-sm btn-danger">Delete</a>
+											</td>
+										</tr>
+									{% endfor %}
+								{% else %}
+									<tr>
+										<td colspan="6" class="text-center py-4">
+											<p class="text-muted mb-2">No formations yet</p>
+											<a href="{{ path("instructor_formation_create") }}" class="btn btn-sm btn-primary">Create your first formation</a>
+										</td>
+									</tr>
+								{% endif %}
 							</tbody>
 						</table>
 					</div>

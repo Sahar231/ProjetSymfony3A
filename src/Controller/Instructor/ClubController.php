@@ -5,8 +5,10 @@ namespace App\Controller\Instructor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/instructor/clubs')]
+#[IsGranted('ROLE_INSTRUCTOR')]
 class ClubController extends AbstractController
 {
     #[Route('', name: 'instructor_club_list', methods: ['GET'])]

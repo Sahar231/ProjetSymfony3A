@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin - {{ action }} {{ role|capitalize }}{% endblock %}
+
+{% block body %}
+<main>
+<nav class="navbar sidebar navbar-expand-xl navbar-dark bg-dark">
+	<div class="d-flex align-items-center">
+		<a class="navbar-brand" href="{{ path("app_home") }}">
+			<img class="navbar-brand-item" src="/assets/images/logo-light.svg" alt="">
+		</a>
+	</div>
+	
+	<div class="offcanvas offcanvas-start flex-row custom-scrollbar h-100" data-bs-backdrop="true" tabindex="-1" id="offcanvasSidebar">
+		<div class="offcanvas-body sidebar-content d-flex flex-column bg-dark">
+			<ul class="navbar-nav flex-column" id="navbar-sidebar">
+				<li class="nav-item"><a href="{{ path('admin_dashboard') }}" class="nav-link"><i class="bi bi-house fa-fw me-2"></i>Dashboard</a></li>
+				<li class="nav-item ms-2 my-2">Pages</li>
+				<li class="nav-item"> <a class="nav-link {% if role == 'instructor' %}active{% endif %}" href="{{ path('admin_instructors') }}"><i class="fas fa-user-tie fa-fw me-2"></i>Instructors</a></li>
+				<li class="nav-item"> <a class="nav-link {% if role == 'student' %}active{% endif %}" href="{{ path('admin_students') }}"><i class="fas fa-user-graduate fa-fw me-2"></i>Students</a></li>
+                <li class="nav-item"> <a class="nav-link" href="{{ path('admin_instructor_requests') }}"><i class="fas fa-user-check fa-fw me-2"></i>Requests</a></li>
+				<li class="nav-item text-danger bg-danger-soft-hover"> <a class="nav-link" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt fa-fw me-2"></i>Sign Out</a></li>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<div class="page-content">
+	<nav class="navbar top-bar navbar-light border-bottom py-0 py-xl-3">
+		<div class="container-fluid p-0">
+			<div class="d-flex align-items-center w-100">
+				<div class="navbar-expand-xl sidebar-offcanvas-menu">
+					<button class="navbar-toggler me-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
+						<i class="bi bi-text-right fa-fw h2 lh-0 mb-0"></i>
+					</button>
+				</div>
+                <h4 class="mb-0 ms-2">{{ action }} {{ role|capitalize }}</h4>
+			</div>
+		</div>
+	</nav>
+
+	<div class="page-content-wrapper border p-4">
+        <div class="card shadow">
+            <div class="card-header border-bottom">
+                <h5 class="card-header-title">{{ action }} {{ role|capitalize }} Details</h5>
+            </div>
+            <div class="card-body">
+                {{ form_start(form) }}
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name</label>
+                            {{ form_widget(form.fullName, {'attr': {'class': 'form-control', 'placeholder': 'Enter full name'}}) }}
+                            {{ form_errors(form.fullName) }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email Address</label>
+                            {{ form_widget(form.email, {'attr': {'class': 'form-control', 'placeholder': 'Enter email'}}) }}
+                            {{ form_errors(form.email) }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Role</label>
+                            {{ form_widget(form.role, {'attr': {'class': 'form-select'}}) }}
+                            {{ form_errors(form.role) }}
+                        </div>
+                        {% if form.plainPassword is defined %}
+                        <div class="col-md-6">
+                            <label class="form-label">Password</label>
+                            {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control', 'placeholder': 'Enter password'}}) }}
+                            {{ form_errors(form.plainPassword) }}
+                        </div>
+                        {% endif %}
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary">{{ action }} User</button>
+                            <a href="{{ role == 'instructor' ? path('admin_instructors') : path('admin_students') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+	</div>
+</div>
+</main>
+{% endblock %}
