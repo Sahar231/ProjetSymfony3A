@@ -239,9 +239,9 @@
 							<li class="dropdown-submenu dropend">
 								<a class="dropdown-item dropdown-toggle" href="#">Authentication</a>
 								<ul class="dropdown-menu dropdown-menu-start" data-bs-popper="none">
-									<li> <a class="dropdown-item" href="{{ path("auth_login") }}">Sign In</a></li>
-									<li> <a class="dropdown-item" href="{{ path("auth_register") }}">Sign Up</a></li>
-									<li> <a class="dropdown-item" href="{{ path("auth_forgot_password") }}">Forgot Password</a></li>
+									<li> <a class="dropdown-item" href="{{ path("app_login") }}">Sign In</a></li>
+									<li> <a class="dropdown-item" href="{{ path("app_register") }}">Sign Up</a></li>
+									<li> <a class="dropdown-item" href="{{ path("app_forgot_password_request") }}">Forgot Password</a></li>
 								</ul>
 							</li>
 
@@ -543,7 +543,7 @@ Page content START -->
 								<a class="list-group-item active" href="{{ path('instructor_payout') }}"><i class="bi bi-wallet2 fa-fw me-2"></i>Payouts</a>
 								<a class="list-group-item" href="{{ path('instructor_settings') }}"><i class="bi bi-gear fa-fw me-2"></i>Settings</a>
 								<a class="list-group-item" href="{{ path('instructor_delete_account') }}"><i class="bi bi-trash fa-fw me-2"></i>Delete Profile</a>
-								<a class="list-group-item text-danger bg-danger-soft-hover" href="{{ path("auth_login") }}"><i class="fas fa-sign-out-alt fa-fw me-2"></i>Sign Out</a>
+								<a class="list-group-item text-danger bg-danger-soft-hover" href="{{ path("app_login") }}"><i class="fas fa-sign-out-alt fa-fw me-2"></i>Sign Out</a>
 							</div>
 						</div>
 					</div>

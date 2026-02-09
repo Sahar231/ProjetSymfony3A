@@ -135,45 +135,67 @@
 							<p class="lead mb-4">Nice to see you! Please Sign up with your account.</p>
 						
 							<!-- Form START -->
-							<form>
+							{{ form_start(registrationForm) }}
 								<!-- Email -->
 								<div class="mb-4">
-									<label for="exampleInputEmail1" class="form-label">Email address *</label>
+									{{ form_label(registrationForm.email, 'Email address *', {'label_attr': {'class': 'form-label'}}) }}
 									<div class="input-group input-group-lg">
 										<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3"><i class="bi bi-envelope-fill"></i></span>
-										<input type="email" class="form-control border-0 bg-light rounded-end ps-1" placeholder="E-mail" id="exampleInputEmail1">
+										{{ form_widget(registrationForm.email, {'attr': {'class': 'form-control border-0 bg-light rounded-end ps-1', 'placeholder': 'E-mail'}}) }}
 									</div>
+									{{ form_errors(registrationForm.email) }}
 								</div>
+
+								<!-- Full Name -->
+								<div class="mb-4">
+									{{ form_label(registrationForm.fullName, 'Full Name *', {'label_attr': {'class': 'form-label'}}) }}
+									<div class="input-group input-group-lg">
+										<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3"><i class="bi bi-person-fill"></i></span>
+										{{ form_widget(registrationForm.fullName, {'attr': {'class': 'form-control border-0 bg-light rounded-end ps-1', 'placeholder': 'Full Name'}}) }}
+									</div>
+									{{ form_errors(registrationForm.fullName) }}
+								</div>
+
 								<!-- Password -->
 								<div class="mb-4">
-									<label for="inputPassword5" class="form-label">Password *</label>
+									{{ form_label(registrationForm.plainPassword, 'Password *', {'label_attr': {'class': 'form-label'}}) }}
 									<div class="input-group input-group-lg">
 										<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3"><i class="fas fa-lock"></i></span>
-										<input type="password" class="form-control border-0 bg-light rounded-end ps-1" placeholder="*********" id="inputPassword5">
+										{{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control border-0 bg-light rounded-end ps-1', 'placeholder': '*********'}}) }}
 									</div>
+									{{ form_errors(registrationForm.plainPassword) }}
 								</div>
-								<!-- Confirm Password -->
+
+								<!-- Role Selection -->
 								<div class="mb-4">
-									<label for="inputPassword6" class="form-label">Confirm Password *</label>
-									<div class="input-group input-group-lg">
-										<span class="input-group-text bg-light rounded-start border-0 text-secondary px-3"><i class="fas fa-lock"></i></span>
-										<input type="password" class="form-control border-0 bg-light rounded-end ps-1" placeholder="*********" id="inputPassword6">
+									<label class="form-label">I am a *</label>
+									<div class="d-flex gap-3">
+										{% for child in registrationForm.role %}
+											<div class="form-check">
+												{{ form_widget(child, {'attr': {'class': 'form-check-input'}}) }}
+												{{ form_label(child, null, {'label_attr': {'class': 'form-check-label'}}) }}
+											</div>
+										{% endfor %}
 									</div>
+									{{ form_errors(registrationForm.role) }}
 								</div>
+
 								<!-- Check box -->
 								<div class="mb-4">
 									<div class="form-check">
-										<input type="checkbox" class="form-check-input" id="checkbox-1">
-										<label class="form-check-label" for="checkbox-1">By signing up, you agree to the<a href="#"> terms of service</a></label>
+										{{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+										<label class="form-check-label" for="{{ registrationForm.agreeTerms.vars.id }}">By signing up, you agree to the<a href="#"> terms of service</a></label>
 									</div>
+									{{ form_errors(registrationForm.agreeTerms) }}
 								</div>
+
 								<!-- Button -->
 								<div class="align-items-center mt-0">
 									<div class="d-grid">
-										<button class="btn btn-primary mb-0" type="button">Sign Up</button>
+										<button class="btn btn-primary mb-0" type="submit">Sign Up</button>
 									</div>
 								</div>
-							</form>
+							{{ form_end(registrationForm) }}
 							<!-- Form END -->
 
 							<!-- Social buttons -->
@@ -185,7 +207,11 @@
 								</div>
 								<!-- Social btn -->
 								<div class="col-xxl-6 d-grid">
-									<a href="#" class="btn bg-google mb-2 mb-xxl-0"><i class="fab fa-fw fa-google text-white me-2"></i>Signup with Google</a>
+									<a href="{{ path('connect_google', {role: 'student'}) }}" class="btn btn-primary-soft mb-2 mb-xxl-0"><i class="fab fa-fw fa-google me-2"></i>Signup Student with Google</a>
+								</div>
+								<!-- Social btn -->
+								<div class="col-xxl-6 d-grid">
+									<a href="{{ path('connect_google', {role: 'instructor'}) }}" class="btn btn-danger-soft mb-0"><i class="fab fa-fw fa-google me-2"></i>Signup Instructor with Google</a>
 								</div>
 								<!-- Social btn -->
 								<div class="col-xxl-6 d-grid">
@@ -195,7 +221,7 @@
 
 							<!-- Sign up link -->
 							<div class="mt-4 text-center">
-								<span>Already have an account?<a href="{{ path("auth_login") }}"> Sign in here</a></span>
+								<span>Already have an account?<a href="{{ path("app_login") }}"> Sign in here</a></span>
 							</div>
 						</div>
 					</div>
