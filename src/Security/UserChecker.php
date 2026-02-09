@@ -15,6 +15,10 @@ class UserChecker implements UserCheckerInterface
             return;
         }
 
+        if ($user->isRejected()) {
+            throw new CustomUserMessageAuthenticationException('Votre demande a été rejetée par l\'administrateur.');
+        }
+
         if ($user->isBlocked()) {
             throw new CustomUserMessageAuthenticationException('Your account is blocked. Please contact the administrator.');
         }

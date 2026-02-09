@@ -135,7 +135,7 @@
 							<p class="lead mb-4">Nice to see you! Please Sign up with your account.</p>
 						
 							<!-- Form START -->
-							{{ form_start(registrationForm) }}
+							{{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
 								<!-- Email -->
 								<div class="mb-4">
 									{{ form_label(registrationForm.email, 'Email address *', {'label_attr': {'class': 'form-label'}}) }}

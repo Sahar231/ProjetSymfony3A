@@ -49,6 +49,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $isBlocked = false;
 
     #[ORM\Column]
+    private ?bool $isRejected = false;
+
+    #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
@@ -189,6 +192,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsBlocked(bool $isBlocked): static
     {
         $this->isBlocked = $isBlocked;
+
+        return $this;
+    }
+
+    public function isRejected(): ?bool
+    {
+        return $this->isRejected;
+    }
+
+    public function setIsRejected(bool $isRejected): static
+    {
+        $this->isRejected = $isRejected;
 
         return $this;
     }

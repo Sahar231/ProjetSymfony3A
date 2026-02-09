@@ -45,9 +45,9 @@ class AdminController extends AbstractController
         
         $stats = [
             'total_students' => count(array_filter($allUsers, fn($u) => in_array('ROLE_STUDENT', $u->getRoles()))),
-            'active_instructors' => count(array_filter($allUsers, fn($u) => in_array('ROLE_INSTRUCTOR', $u->getRoles()) && $u->isApproved())),
-            'pending_instructors' => count(array_filter($allUsers, fn($u) => in_array('ROLE_INSTRUCTOR', $u->getRoles()) && !$u->isApproved())),
-            'pending_students' => count(array_filter($allUsers, fn($u) => in_array('ROLE_STUDENT', $u->getRoles()) && !$u->isApproved())),
+            'active_instructors' => count(array_filter($allUsers, fn($u) => in_array('ROLE_INSTRUCTOR', $u->getRoles()) && $u->isApproved() && !$u->isRejected())),
+            'pending_instructors' => count(array_filter($allUsers, fn($u) => in_array('ROLE_INSTRUCTOR', $u->getRoles()) && !$u->isApproved() && !$u->isRejected())),
+            'pending_students' => count(array_filter($allUsers, fn($u) => in_array('ROLE_STUDENT', $u->getRoles()) && !$u->isApproved() && !$u->isRejected())),
             'blocked_users' => count(array_filter($allUsers, fn($u) => $u->isBlocked())),
             'pending_courses' => count($courseRepo->findBy(['isApproved' => false])),
             'pending_clubs' => count($clubRepo->findBy(['isApproved' => false])),
@@ -180,7 +180,7 @@ class AdminController extends AbstractController
     #[Route('/instructor-requests', name: 'instructor_requests')]
     public function instructorRequests(UserRepository $userRepository): Response
     {
-        $requests = array_filter($userRepository->findAll(), fn($u) => in_array('ROLE_INSTRUCTOR', $u->getRoles()) && !$u->isApproved());
+        $requests = array_filter($userRepository->findAll(), fn($u) => in_array('ROLE_INSTRUCTOR', $u->getRoles()) && !$u->isApproved() && !$u->isRejected());
         return $this->render('admin/admin-instructor-request.html.twig', [
             'requests' => $requests,
             'type' => 'Instructor'
@@ -190,7 +190,7 @@ class AdminController extends AbstractController
     #[Route('/student-requests', name: 'student_requests')]
     public function studentRequests(UserRepository $userRepository): Response
     {
-        $requests = array_filter($userRepository->findAll(), fn($u) => in_array('ROLE_STUDENT', $u->getRoles()) && !$u->isApproved());
+        $requests = array_filter($userRepository->findAll(), fn($u) => in_array('ROLE_STUDENT', $u->getRoles()) && !$u->isApproved() && !$u->isRejected());
         return $this->render('admin/admin-instructor-request.html.twig', [
             'requests' => $requests,
             'type' => 'Student'
@@ -235,10 +235,12 @@ class AdminController extends AbstractController
     #[Route('/user/{id}/reject', name: 'user_reject')]
     public function reject(User $user, EntityManagerInterface $em): Response
     {
-        $role = in_array('ROLE_STUDENT', $user->getRoles()) ? 'student' : 'instructor';
-        $em->remove($user);
+        $user->setIsRejected(true);
+        $user->setIsApproved(false); // Ensure it's not approved
         $em->flush();
-        $this->addFlash('success', 'Request rejected and user removed.');
+        $this->addFlash('success', 'User request rejected.');
+        
+        $role = in_array('ROLE_STUDENT', $user->getRoles()) ? 'student' : 'instructor';
         return $this->redirectToRoute('admin_' . $role . '_requests');
     }
 

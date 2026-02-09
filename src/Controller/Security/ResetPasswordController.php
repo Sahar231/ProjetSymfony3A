@@ -137,6 +137,11 @@ class ResetPasswordController extends AbstractController
 
         // Do not reveal whether a user account was found or not.
         if (!$user) {
+            // DEV: Warn the user if they are testing with a non-existent email
+            if ($_SERVER['APP_ENV'] === 'dev' || str_contains($_ENV['MAILER_DSN'] ?? '', 'null://')) {
+                 $this->addFlash('danger', 'DEV MSG: User with this email was not found in the database. No reset link generated.');
+            }
+        
             return $this->redirectToRoute('app_check_email');
         }
 
@@ -168,10 +173,9 @@ class ResetPasswordController extends AbstractController
 
         $mailer->send($email);
 
-        $mailer->send($email);
-
         // DEV: Display the link directly in the flash message
         $resetUrl = $this->generateUrl('app_reset_password', ['token' => $resetToken->getToken()], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+        
         $this->addFlash('success', 'Email sent! (DEV LINK: <a href="' . $resetUrl . '">Click here to reset</a>)');
 
         // Store the token object in session for retrieval in check-email route.
