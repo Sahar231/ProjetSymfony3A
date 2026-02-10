@@ -1,90 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport")  content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="author")  content="Education Platform">
-        <meta name="description")  content="Education Platform - LMS, Courses, and Learning">
-        <title>{% block title %}Education Platform{% endblock %}</title>
-        
-        <!-- Favicon -->
-        <link rel="icon")  href="{{ asset('images/favicon.ico') }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Education Platform">
+    <meta name="description" content="Education Platform - LMS, Courses, and Learning">
+    <title>{% block title %}Education Platform{% endblock %}</title>
 
-        <!-- Google Font -->
-        <link rel="preconnect")  href="https://fonts.googleapis.com/">
-        <link rel="preconnect")  href="https://fonts.gstatic.com/")  crossorigin>
-        <link rel="stylesheet")  href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap">
+    <link rel="icon" href="{{ asset('images/favicon.ico') }}">
 
-        <!-- Plugins CSS -->
-        <link rel="stylesheet")  type="text/css")  href="{{ asset('vendor/font-awesome/css/all.min.css') }}">
-        <link rel="stylesheet")  type="text/css")  href="{{ asset('vendor/bootstrap-icons/bootstrap-icons.css') }}">
-        <link rel="stylesheet")  type="text/css")  href="{{ asset('vendor/tiny-slider/tiny-slider.css') }}">
-        <link rel="stylesheet")  type="text/css")  href="{{ asset('vendor/glightbox/css/glightbox.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&amp;family=Roboto:wght@400;500;700&amp;display=swap">
 
-        <!-- Theme CSS -->
-        <link rel="stylesheet")  type="text/css")  href="{{ asset('css/style.css') }}">
-        
-        <!-- Dark mode script -->
-        <script>
-            const storedTheme = localStorage.getItem('theme')             const getPreferredTheme = () => {
-                if (storedTheme) return storedTheme
-                return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light') : 'light')             }
-            const setTheme = function (theme) {
-                if (theme === 'auto') && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.documentElement.setAttribute('data-bs-theme', 'dark')                 } else {
-                    document.documentElement.setAttribute('data-bs-theme', theme)
-                }
+    <link rel="stylesheet" href="{{ asset('vendor/font-awesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/apexcharts/css/apexcharts.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+    {% block stylesheets %}{% endblock %}
+
+    <script>
+        const storedTheme = localStorage.getItem('theme')
+        const getPreferredTheme = () => {
+            if (storedTheme) return storedTheme
+            return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'light'
+        }
+        const setTheme = function (theme) {
+            if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark')
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', theme)
             }
-            setTheme(getPreferredTheme())
-        </script>
-        
-        {% block stylesheets %}{% endblock %}
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-        
-        <!-- Bootstrap Bundle JS -->
-        <script src="{{ asset('vendor/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
-        
-        <!-- Vendor Scripts -->
-        <script src="{{ asset('vendor/tiny-slider/tiny-slider.js') }}"></script>
-        <script src="{{ asset('vendor/glightbox/js/glightbox.js') }}"></script>
-        <script src="{{ asset('vendor/purecounterjs/dist/purecounter_vanilla.js') }}"></script>
-        
-        <!-- App Scripts -->
-        <script src="{{ asset('js/functions.js') }}"></script>
-        
-        <!-- Dark mode toggle handler -->
-        <script>
-            window.addEventListener('DOMContentLoaded', () => {
-                var el = document.querySelector('.theme-icon-active');
-                if(el != 'undefined') && el != null) {
-                    const showActiveTheme = theme => {
-                        const activeThemeIcon = document.querySelector('.theme-icon-active use')                         const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
-                        const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')                         document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
-                            element.classList.remove('active')                         })
-                        btnToActive.classList.add('active')                         activeThemeIcon.setAttribute('href', svgOfActiveBtn)
-                    }
-                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                        if (storedTheme !== 'light') || storedTheme !== 'dark') {
-                            setTheme(getPreferredTheme())
-                        }
-                    })
-                    showActiveTheme(getPreferredTheme())
-                    document.querySelectorAll('[data-bs-theme-value]')                         .forEach(toggle => {
-                            toggle.addEventListener('click', () => {
-                                const theme = toggle.getAttribute('data-bs-theme-value')                                 localStorage.setItem('theme', theme)
-                                setTheme(theme)
-                                showActiveTheme(theme)
-                            })
-                        })
-                }
+        }
+        setTheme(getPreferredTheme())
+    </script>
+
+    {% block javascripts %}{% endblock %}
+</head>
+<body>
+
+<!-- Header (shared) -->
+<header class="navbar-light navbar-sticky">
+    <nav class="navbar navbar-expand-xl">
+        <div class="container">
+            <a class="navbar-brand" href="{{ path('app_home') }}">
+                <img class="light-mode-item navbar-brand-item" src="{{ asset('images/logo.svg') }}" alt="logo">
+                <img class="dark-mode-item navbar-brand-item" src="{{ asset('images/logo-light.svg') }}" alt="logo">
+            </a>
+            <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-animation"><span></span><span></span><span></span></span>
+            </button>
+            <div class="navbar-collapse w-100 collapse" id="navbarCollapse">
+                {% block navbar %}{% endblock %}
+            </div>
+        </div>
+    </nav>
+</header>
+
+{% block body %}{% endblock %}
+
+<!-- Footer (shared) -->
+<footer class="bg-dark p-3 mt-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                <a href="{{ path('app_home') }}"><img class="h-20px" src="{{ asset('images/logo-light.svg') }}" alt="logo"></a>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0 text-center text-white text-primary-hover">
+                Copyrights ©{{ "now"|date('Y') }}. Built by Webestica.
+            </div>
+            <div class="col-md-4 text-center text-md-end">
+                <ul class="list-inline mb-0">
+                    <li class="list-inline-item ms-2"><a href="#"><i class="fab fa-facebook text-white"></i></a></li>
+                    <li class="list-inline-item ms-2"><a href="#"><i class="fab fa-instagram text-white"></i></a></li>
+                    <li class="list-inline-item ms-2"><a href="#"><i class="fab fa-linkedin-in text-white"></i></a></li>
+                    <li class="list-inline-item ms-2"><a href="#"><i class="fab fa-twitter text-white"></i></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="{{ asset('vendor/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('vendor/purecounterjs/dist/purecounter_vanilla.js') }}"></script>
+<script src="{{ asset('vendor/apexcharts/js/apexcharts.min.js') }}"></script>
+<script src="{{ asset('vendor/overlay-scrollbar/js/overlayscrollbars.min.js') }}"></script>
+<script src="{{ asset('js/functions.js') }}"></script>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        var el = document.querySelector('.theme-icon-active');
+        if (el !== undefined && el !== null) {
+            const showActiveTheme = theme => {
+                const activeThemeIcon = document.querySelector('.theme-icon-active use')
+                const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+                if (!btnToActive) return
+                const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')
+                document.querySelectorAll('[data-bs-theme-value]').forEach(element => element.classList.remove('active'))
+                btnToActive.classList.add('active')
+                if (activeThemeIcon) activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => setTheme(getPreferredTheme()))
+            showActiveTheme(getPreferredTheme())
+            document.querySelectorAll('[data-bs-theme-value]').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const theme = toggle.getAttribute('data-bs-theme-value')
+                    localStorage.setItem('theme', theme)
+                    setTheme(theme)
+                    showActiveTheme(theme)
+                })
             })
-        </script>
-    </body>
+        }
+    })
+</script>
+
+</body>
 </html>
 
 

@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ cours.title }} - Étudiant{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ cours.title }}</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('student_cours_index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Détails du Cours</h5>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Titre:</strong></div>
+                        <div class="col-md-9">{{ cours.title }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Catégorie:</strong></div>
+                        <div class="col-md-9">{{ cours.category ?? 'N/A' }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Description:</strong></div>
+                        <div class="col-md-9">{{ cours.description ?? 'N/A' }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Date de création:</strong></div>
+                        <div class="col-md-9">{{ cours.createdAt ? cours.createdAt|date('d/m/Y H:i') : 'N/A' }}</div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        <a href="{{ path('student_chapitre_index', {coursId: cours.id}) }}" class="btn btn-primary">
+                            <i class="bi bi-book"></i> Consulter les Chapitres
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

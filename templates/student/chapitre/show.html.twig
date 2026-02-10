@@ -1,0 +1,179 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ chapitre.title }} - Étudiant{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ chapitre.title }}</h1>
+            <p class="text-muted">Cours: {{ chapitre.cours.title }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('student_chapitre_index', {coursId: chapitre.cours.id}) }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Contenu du Chapitre</h5>
+                        <button type="button" class="btn btn-sm btn-primary" id="editBtn" onclick="toggleEdit()">
+                            <i class="bi bi-pencil"></i> Éditer
+                        </button>
+                    </div>
+                    <hr>
+
+                    <div class="chapter-content" id="chapterContent" contenteditable="false">
+                        {{ chapitre.contentAsHtml|raw }}
+                    </div>
+
+                    <div id="editActions" style="display: none; margin-top: 1rem;">
+                        <button type="button" class="btn btn-success btn-sm" onclick="saveContent()">
+                            <i class="bi bi-check-circle"></i> Enregistrer
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit()">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </button>
+                    </div>
+
+                    <hr>
+                    <p class="text-muted small">
+                        Créé le: {{ chapitre.createdAt ? chapitre.createdAt|date('d/m/Y H:i') : 'N/A' }} | 
+                        Mis à jour le: {{ chapitre.updatedAt ? chapitre.updatedAt|date('d/m/Y H:i') : 'N/A' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.chapter-content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.chapter-content.editing {
+    border: 2px solid #0d6efd;
+    padding: 1rem;
+    border-radius: 5px;
+    background-color: #f8f9ff;
+    outline: none;
+}
+
+.chapter-content p {
+    margin-bottom: 1rem;
+}
+
+.chapter-content h1, .chapter-content h2, .chapter-content h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.chapter-content ul, .chapter-content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.chapter-content li {
+    margin-bottom: 0.5rem;
+}
+
+.chapter-content code {
+    background-color: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+}
+
+.chapter-content pre {
+    background-color: #f4f4f4;
+    padding: 1rem;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.chapter-content img {
+    max-width: 100%;
+    height: auto;
+    margin: 1rem 0;
+    border-radius: 5px;
+}
+</style>
+
+<script>
+let originalContent = '';
+let chapitreId = {{ chapitre.id }};
+
+function toggleEdit() {
+    const contentDiv = document.getElementById('chapterContent');
+    const editBtn = document.getElementById('editBtn');
+    const editActions = document.getElementById('editActions');
+    
+    if (contentDiv.contentEditable === 'false') {
+        // Start editing
+        originalContent = contentDiv.innerHTML;
+        contentDiv.contentEditable = 'true';
+        contentDiv.classList.add('editing');
+        contentDiv.focus();
+        editBtn.style.display = 'none';
+        editActions.style.display = 'block';
+    }
+}
+
+function saveContent() {
+    const contentDiv = document.getElementById('chapterContent');
+    const newContent = contentDiv.innerHTML;
+    
+    // Send to server via fetch
+    fetch(`{{ path('student_chapitre_update', {id: chapitre.id}) }}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ content: newContent })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Contenu mis à jour avec succès!');
+            endEdit();
+        } else {
+            alert('Erreur: ' + (data.message || 'Impossible de sauvegarder'));
+            contentDiv.innerHTML = originalContent;
+            endEdit();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Erreur de connexion');
+        contentDiv.innerHTML = originalContent;
+        endEdit();
+    });
+}
+
+function cancelEdit() {
+    const contentDiv = document.getElementById('chapterContent');
+    contentDiv.innerHTML = originalContent;
+    endEdit();
+}
+
+function endEdit() {
+    const contentDiv = document.getElementById('chapterContent');
+    const editBtn = document.getElementById('editBtn');
+    const editActions = document.getElementById('editActions');
+    
+    contentDiv.contentEditable = 'false';
+    contentDiv.classList.remove('editing');
+    editBtn.style.display = 'inline-block';
+    editActions.style.display = 'none';
+}
+</script>

@@ -1,0 +1,186 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chapitres - {{ cours.title }} - Admin{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1>Chapitres de: {{ cours.title }}</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{{ path('admin_chapitre_create', {coursId: cours.id}) }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Ajouter Chapitre
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Total des Chapitres</h6>
+                    <h2>{{ chapitres|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Cours</h6>
+                    <p class="card-text">{{ cours.title }}</p>
+                    <small>Statut: 
+                        <span class="badge bg-{{ cours.status == 'APPROVED' ? 'success' : (cours.status == 'REFUSED' ? 'danger' : 'warning') }}">
+                            {{ cours.status }}
+                        </span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a href="{{ path('admin_cours_index') }}" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Retour aux Cours
+        </a>
+    </div>
+
+    {% if app.flashes %}
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type == 'success' ? 'success' : (type == 'warning' ? 'warning' : 'info') }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+
+    {% if chapitres|length == 0 %}
+        <div class="alert alert-info">Aucun chapitre disponible.</div>
+    {% else %}
+        <!-- Search and Filter -->
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-body">
+                <form method="GET" class="row g-3" id="adminChaptersSearchForm">
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="adminChaptersSearch" placeholder="Rechercher par titre...">
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="adminChaptersSort">
+                            <option value="title">Trier par: Titre (A-Z)</option>
+                            <option value="title-desc">Titre (Z-A)</option>
+                            <option value="date">Date (récent)</option>
+                            <option value="date-old">Date (ancien)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="reset" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover" id="adminChaptresTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Titre</th>
+                        <th>Date de création</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for chapitre in chapitres %}
+                        <tr>
+                            <td>{{ chapitre.title }}</td>
+                            <td>{{ chapitre.createdAt ? chapitre.createdAt|date('d/m/Y H:i') : 'N/A' }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ path('admin_chapitre_show', {id: chapitre.id}) }}" class="btn btn-info" title="Voir">
+                                        <i class="bi bi-eye"></i> Voir
+                                    </a>
+                                    <a href="{{ path('admin_chapitre_edit', {id: chapitre.id}) }}" class="btn btn-warning" title="Modifier">
+                                        <i class="bi bi-pencil"></i> Modifier
+                                    </a>
+                                    <form action="{{ path('admin_chapitre_delete', {id: chapitre.id}) }}" method="POST" style="display:inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ chapitre.id) }}">
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Supprimer" onclick="return confirm('Êtes-vous sûr ?')">
+                                            <i class="bi bi-trash"></i> Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const adminChaptersSearch = document.getElementById('adminChaptersSearch');
+    const adminChaptersSort = document.getElementById('adminChaptersSort');
+    const adminChaptresRows = document.querySelectorAll('#adminChaptresTable tbody tr');
+
+    // Filter and Sort function
+    function filterAndSortChapters(searchTerm, sortType) {
+        const searchValue = searchTerm.toLowerCase();
+        
+        const visibleRows = Array.from(adminChaptresRows).filter(row => {
+            const title = row.cells[0]?.textContent.toLowerCase() || '';
+            return title.includes(searchValue);
+        });
+
+        // Sort rows
+        visibleRows.sort((a, b) => {
+            let aValue, bValue;
+            
+            if (sortType === 'title' || sortType === 'title-desc') {
+                aValue = a.cells[0]?.textContent.toLowerCase() || '';
+                bValue = b.cells[0]?.textContent.toLowerCase() || '';
+            } else if (sortType === 'date' || sortType === 'date-old') {
+                const aDate = new Date(a.cells[1]?.textContent || 0);
+                const bDate = new Date(b.cells[1]?.textContent || 0);
+                aValue = aDate;
+                bValue = bDate;
+            }
+
+            if (sortType.includes('desc') || sortType === 'date-old') {
+                return bValue > aValue ? 1 : -1;
+            } else {
+                return aValue > bValue ? 1 : -1;
+            }
+        });
+
+        // Show/hide rows
+        adminChaptresRows.forEach(row => {
+            row.style.display = 'none';
+        });
+        visibleRows.forEach(row => {
+            row.style.display = '';
+        });
+    }
+
+    // Event listeners
+    adminChaptersSearch.addEventListener('input', () => {
+        filterAndSortChapters(adminChaptersSearch.value, adminChaptersSort.value);
+    });
+    adminChaptersSort.addEventListener('change', () => {
+        filterAndSortChapters(adminChaptersSearch.value, adminChaptersSort.value);
+    });
+
+    // Reset form
+    document.getElementById('adminChaptersSearchForm').addEventListener('reset', () => {
+        setTimeout(() => {
+            filterAndSortChapters('', 'title');
+        }, 0);
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ isEdit ? 'Modifier' : 'Créer' }} un Chapitre - Instructeur{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest/dist/editor.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ isEdit ? 'Modifier le Chapitre' : 'Créer un Nouveau Chapitre' }}</h1>
+            <p class="text-muted">Cours: {{ cours.title }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('instructor_chapitre_index', {coursId: cours.id}) }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            {{ form_start(form, {'attr': {'id': 'chapterForm', 'class': 'needs-validation'}}) }}
+                <div class="mb-3">
+                    {{ form_label(form.title, 'Titre du Chapitre') }}
+                    {{ form_widget(form.title) }}
+                    {{ form_errors(form.title) }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="editorjs" class="form-label">Contenu du Chapitre</label>
+                    <div id="editorjs" style="border: 1px solid #ddd; padding: 10px; min-height: 400px; border-radius: 5px;"></div>
+                </div>
+
+                <!-- Editor.js content field (hidden) -->
+                {{ form_widget(form.content) }}
+
+                {% if form.vars.data.id %}
+                    <div class="mb-3">
+                        {{ form_label(form.cours, 'Cours') }}
+                        {{ form_widget(form.cours) }}
+                        {{ form_errors(form.cours) }}
+                    </div>
+                {% endif %}
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> {{ isEdit ? 'Mettre à jour' : 'Créer' }}
+                    </button>
+                    <a href="{{ path('instructor_chapitre_index', {coursId: cours.id}) }}" class="btn btn-light">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/paragraph@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/image@latest"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const contentField = document.getElementById('instructor_chapitre_content');
+    let initialContent = { blocks: [] };
+    
+    try {
+        const contentValue = contentField.value;
+        if (contentValue && contentValue !== '{}') {
+            initialContent = JSON.parse(contentValue);
+        }
+    } catch (e) {
+        console.error('Error parsing content:', e);
+        initialContent = { blocks: [] };
+    }
+
+    const editor = new EditorJS({
+        holder: 'editorjs',
+        tools: {
+            header: Header,
+            paragraph: Paragraph,
+            list: List,
+            code: Code,
+            image: SimpleImage
+        },
+        data: initialContent,
+        onReady: () => {
+            console.log('Editor.js ready');
+        }
+    });
+
+    document.getElementById('chapterForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        try {
+            const savedData = await editor.save();
+            contentField.value = JSON.stringify(savedData);
+            this.submit();
+        } catch (error) {
+            console.error('Saving failed: ', error);
+            alert('Erreur lors de la sauvegarde du contenu');
+        }
+    });
+});
+
+class SimpleImage {
+    static get toolbox() {
+        return {
+            title: 'Image',
+            icon: '<svg class="icon icon--image" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>'
+        };
+    }
+
+    constructor({data}) {
+        this.data = data;
+    }
+
+    render() {
+        const container = document.createElement('div');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Coller l\'URL de l\'image';
+        input.value = this.data.url || '';
+        input.style.width = '100%';
+        input.style.padding = '10px';
+        
+        input.addEventListener('change', () => {
+            this.data.url = input.value;
+        });
+
+        container.appendChild(input);
+        return container;
+    }
+
+    save() {
+        return this.data;
+    }
+}
+</script>
+{% endblock %}

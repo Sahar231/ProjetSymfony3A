@@ -1,0 +1,162 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chapitres - {{ cours.title }} - Étudiant{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1>Chapitres de: {{ cours.title }}</h1>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Total des Chapitres</h6>
+                    <h2>{{ chapitres|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Cours</h6>
+                    <p class="card-text">{{ cours.title }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Instructeur</h6>
+                    <p class="card-text">{{ cours.createdBy }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <a href="{{ path('student_cours_index') }}" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Retour à l'accueil
+        </a>
+    </div>
+
+    {% if chapitres|length == 0 %}
+        <div class="alert alert-info">Aucun chapitre disponible pour ce cours.</div>
+    {% else %}
+        <!-- Search and Filter -->
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-body">
+                <form method="GET" class="row g-3" id="studentChaptersSearchForm">
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="studentChaptersSearch" placeholder="Rechercher par titre...">
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="studentChaptersSort">
+                            <option value="title">Trier par: Titre (A-Z)</option>
+                            <option value="title-desc">Titre (Z-A)</option>
+                            <option value="date">Date (récent)</option>
+                            <option value="date-old">Date (ancien)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="reset" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover" id="studentChaptresTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Titre</th>
+                        <th>Date de création</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for chapitre in chapitres %}
+                        <tr>
+                            <td>{{ chapitre.title }}</td>
+                            <td>{{ chapitre.createdAt ? chapitre.createdAt|date('d/m/Y H:i') : 'N/A' }}</td>
+                            <td>
+                                <a href="{{ path('student_chapitre_show', {id: chapitre.id}) }}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-book-open"></i> Lire
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const studentChaptersSearch = document.getElementById('studentChaptersSearch');
+    const studentChaptersSort = document.getElementById('studentChaptersSort');
+    const studentChaptresRows = document.querySelectorAll('#studentChaptresTable tbody tr');
+
+    // Filter and Sort function
+    function filterAndSortChapters(searchTerm, sortType) {
+        const searchValue = searchTerm.toLowerCase();
+        
+        const visibleRows = Array.from(studentChaptresRows).filter(row => {
+            const title = row.cells[0]?.textContent.toLowerCase() || '';
+            return title.includes(searchValue);
+        });
+
+        // Sort rows
+        visibleRows.sort((a, b) => {
+            let aValue, bValue;
+            
+            if (sortType === 'title' || sortType === 'title-desc') {
+                aValue = a.cells[0]?.textContent.toLowerCase() || '';
+                bValue = b.cells[0]?.textContent.toLowerCase() || '';
+            } else if (sortType === 'date' || sortType === 'date-old') {
+                const aDate = new Date(a.cells[1]?.textContent || 0);
+                const bDate = new Date(b.cells[1]?.textContent || 0);
+                aValue = aDate;
+                bValue = bDate;
+            }
+
+            if (sortType.includes('desc') || sortType === 'date-old') {
+                return bValue > aValue ? 1 : -1;
+            } else {
+                return aValue > bValue ? 1 : -1;
+            }
+        });
+
+        // Show/hide rows
+        studentChaptresRows.forEach(row => {
+            row.style.display = 'none';
+        });
+        visibleRows.forEach(row => {
+            row.style.display = '';
+        });
+    }
+
+    // Event listeners
+    studentChaptersSearch.addEventListener('input', () => {
+        filterAndSortChapters(studentChaptersSearch.value, studentChaptersSort.value);
+    });
+    studentChaptersSort.addEventListener('change', () => {
+        filterAndSortChapters(studentChaptersSearch.value, studentChaptersSort.value);
+    });
+
+    // Reset form
+    document.getElementById('studentChaptersSearchForm').addEventListener('reset', () => {
+        setTimeout(() => {
+            filterAndSortChapters('', 'title');
+        }, 0);
+    });
+});
+</script>

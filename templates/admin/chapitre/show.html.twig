@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ chapitre.title }} - Admin{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ chapitre.title }}</h1>
+            <p class="text-muted">Cours: {{ chapitre.cours.title }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('admin_chapitre_index', {coursId: chapitre.cours.id}) }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Contenu du Chapitre</h5>
+                    <hr>
+
+                    <div class="chapter-content">
+                        {{ chapitre.contentAsHtml|raw }}
+                    </div>
+
+                    <hr>
+
+                    <div class="row mb-3 mt-4">
+                        <div class="col-md-3"><strong>Date de création:</strong></div>
+                        <div class="col-md-9">{{ chapitre.createdAt ? chapitre.createdAt|date('d/m/Y H:i') : 'N/A' }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Dernière modification:</strong></div>
+                        <div class="col-md-9">{{ chapitre.updatedAt ? chapitre.updatedAt|date('d/m/Y H:i') : 'N/A' }}</div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        <a href="{{ path('admin_chapitre_edit', {id: chapitre.id}) }}" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Modifier
+                        </a>
+                        <form action="{{ path('admin_chapitre_delete', {id: chapitre.id}) }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ chapitre.id) }}">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr ?')">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.chapter-content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.chapter-content p {
+    margin-bottom: 1rem;
+}
+
+.chapter-content h1, .chapter-content h2, .chapter-content h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.chapter-content ul, .chapter-content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.chapter-content code {
+    background-color: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+}
+
+.chapter-content pre {
+    background-color: #f4f4f4;
+    padding: 1rem;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.chapter-content img {
+    max-width: 100%;
+    height: auto;
+    margin: 1rem 0;
+}
+</style>
+{% endblock %}

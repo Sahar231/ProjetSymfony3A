@@ -22594,4 +22594,116 @@ html[dir=rtl] .choices__input {
 }
 
 /*User CSS*/
+
+/* ====================================
+   Custom Button Styles
+   ==================================== */
+
+/* Button Focus, Active & Focus-Visible States */
+.btn:focus,
+.btn:active,
+.btn:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.6);
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+}
+
+/* Primary Button Hover & Focus States */
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #0556b0;
+    border-color: #0556b0;
+    box-shadow: 0 0 15px rgba(13, 110, 253, 0.8);
+    transform: translateY(-2px);
+}
+
+/* Secondary Button Hover & Focus States */
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background-color: #7d8185;
+    border-color: #7d8185;
+    box-shadow: 0 0 12px rgba(154, 158, 164, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Success Button Hover & Focus States */
+.btn-success:hover,
+.btn-success:focus {
+    background-color: #0a9a6a;
+    border-color: #0a9a6a;
+    box-shadow: 0 0 12px rgba(12, 188, 135, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Warning Button Hover & Focus States */
+.btn-warning:hover,
+.btn-warning:focus {
+    background-color: #d4ac25;
+    border-color: #d4ac25;
+    box-shadow: 0 0 12px rgba(247, 195, 46, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Danger Button Hover & Focus States */
+.btn-danger:hover,
+.btn-danger:focus {
+    background-color: #b01e2f;
+    border-color: #b01e2f;
+    box-shadow: 0 0 12px rgba(214, 41, 62, 0.8);
+    transform: translateY(-2px);
+}
+
+/* Info Button Hover & Focus States */
+.btn-info:hover,
+.btn-info:focus {
+    background-color: #128295;
+    border-color: #128295;
+    box-shadow: 0 0 12px rgba(23, 162, 184, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Light Button Hover & Focus States */
+.btn-light:hover,
+.btn-light:focus {
+    background-color: #e0e3e6;
+    border-color: #e0e3e6;
+    color: #24292d;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Small Button Sizes */
+.btn-sm {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.875rem;
+}
+
+/* Button Group Spacing */
+.btn-group {
+    gap: 0.25rem;
+}
+
+/* Disabled Button States */
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Button Text Icon Spacing */
+.btn i {
+    margin-right: 0.3rem;
+}
+
+.btn i:last-child {
+    margin-right: 0;
+}
+
+/* Smooth Transitions for All Buttons */
+.btn {
+    transition: all 0.2s ease-in-out;
+}
+
 /*# sourceMappingURL=style.css.map */

@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Repository\CoursRepository;
+use App\Repository\ChapitreRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -10,15 +12,36 @@ use Symfony\Component\Routing\Attribute\Route;
 class AdminController extends AbstractController
 {
     #[Route('/dashboard', name: 'dashboard')]
-    public function dashboard(): Response
+    public function dashboard(CoursRepository $coursRepo, ChapitreRepository $chapRepo): Response
     {
-        return $this->render('admin/admin-dashboard.html.twig');
+        // Get all courses
+        $allCourses = $coursRepo->findAll();
+        
+        // Calculate statistics
+        $totalCourses = count($allCourses);
+        $pendingCourses = count(array_filter($allCourses, fn($c) => $c->getStatus() === 'PENDING'));
+        $approvedCourses = count(array_filter($allCourses, fn($c) => $c->getStatus() === 'APPROVED'));
+        
+        // Get all chapters
+        $allChapters = $chapRepo->findAll();
+        $totalChapters = count($allChapters);
+
+        return $this->render('admin/admin-dashboard.html.twig', [
+            'total_courses' => $totalCourses,
+            'pending_courses' => $pendingCourses,
+            'approved_courses' => $approvedCourses,
+            'total_chapters' => $totalChapters,
+        ]);
     }
 
     #[Route('/courses', name: 'courses')]
-    public function courses(): Response
+    public function courses(CoursRepository $coursRepo): Response
     {
-        return $this->render('admin/admin-course-list.html.twig');
+        $allCourses = $coursRepo->findAll();
+        
+        return $this->render('admin/admin-course-list.html.twig', [
+            'all_cours' => $allCourses,
+        ]);
     }
 
     #[Route('/course-category', name: 'course_category')]

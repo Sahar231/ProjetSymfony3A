@@ -21,7 +21,7 @@
             <div class="card bg-primary text-white">
                 <div class="card-body">
                     <h6 class="card-title text-uppercase">Total Cours</h6>
-                    <h2>{{ all_cours|length }}</h2>
+                    <h2 id="stat-total">{{ all_cours|length }}</h2>
                 </div>
             </div>
         </div>
@@ -29,7 +29,7 @@
             <div class="card bg-warning text-dark">
                 <div class="card-body">
                     <h6 class="card-title text-uppercase">En Attente</h6>
-                    <h2>{{ all_cours|filter(course => course.status == 'PENDING')|length }}</h2>
+                    <h2 id="stat-pending">{{ all_cours|filter(course => course.status == 'PENDING')|length }}</h2>
                 </div>
             </div>
         </div>
@@ -37,7 +37,7 @@
             <div class="card bg-success text-white">
                 <div class="card-body">
                     <h6 class="card-title text-uppercase">Approuvés</h6>
-                    <h2>{{ all_cours|filter(course => course.status == 'APPROVED')|length }}</h2>
+                    <h2 id="stat-approved">{{ all_cours|filter(course => course.status == 'APPROVED')|length }}</h2>
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@
             <div class="card bg-danger text-white">
                 <div class="card-body">
                     <h6 class="card-title text-uppercase">Refusés</h6>
-                    <h2>{{ all_cours|filter(course => course.status == 'REFUSED')|length }}</h2>
+                    <h2 id="stat-refused">{{ all_cours|filter(course => course.status == 'REFUSED')|length }}</h2>
                 </div>
             </div>
         </div>

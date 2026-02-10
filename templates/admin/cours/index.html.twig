@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Admin - Courses List{% endblock %}
+{% block title %}Admin - Tous les Cours{% endblock %}
 
 {% block body %}
 <div class="container mt-5">
@@ -68,12 +68,13 @@
         <!-- Search and Filter -->
         <div class="card mb-4 border-0 shadow-sm">
             <div class="card-body">
-                <form method="GET" class="row g-3" id="courseSearchForm">
+                <form method="GET" class="row g-3" id="adminSearchForm">
                     <div class="col-md-4">
-                        <input type="text" class="form-control" id="courseSearch" placeholder="Rechercher par titre...">
+                        <input type="text" class="form-control" id="adminSearch" placeholder="Rechercher par titre..." 
+                            data-filter-target="#adminCoursesTable tbody tr">
                     </div>
                     <div class="col-md-2">
-                        <select class="form-select" id="courseStatusFilter">
+                        <select class="form-select" id="adminStatusFilter" data-filter-target="#adminCoursesTable tbody tr">
                             <option value="">Tous les statuts</option>
                             <option value="PENDING">En attente</option>
                             <option value="APPROVED">Approuvé</option>
@@ -81,12 +82,12 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <select class="form-select" id="courseInstructorFilter">
+                        <select class="form-select" id="adminInstructorFilter" data-filter-target="#adminCoursesTable tbody tr">
                             <option value="">Tous les instructeurs</option>
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <select class="form-select" id="courseSort">
+                        <select class="form-select" id="adminSort" data-sort-target="#adminCoursesTable tbody tr">
                             <option value="title">Trier par: Titre (A-Z)</option>
                             <option value="title-desc">Titre (Z-A)</option>
                             <option value="date">Date (récent)</option>
@@ -103,7 +104,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover" id="coursesTable">
+            <table class="table table-hover" id="adminCoursesTable">
                 <thead class="table-light">
                     <tr>
                         <th>Titre</th>
@@ -116,7 +117,7 @@
                 </thead>
                 <tbody>
                     {% for cours in all_cours %}
-                        <tr data-title="{{ cours.title }}" data-status="{{ cours.status }}" data-instructor="{{ cours.createdBy }}" data-date="{{ cours.createdAt|date('Y-m-d H:i:s') }}">
+                        <tr>
                             <td>{{ cours.title }}</td>
                             <td>{{ cours.category ?? 'N/A' }}</td>
                             <td>
@@ -169,23 +170,23 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const courseSearch = document.getElementById('courseSearch');
-    const courseStatusFilter = document.getElementById('courseStatusFilter');
-    const courseInstructorFilter = document.getElementById('courseInstructorFilter');
-    const courseSort = document.getElementById('courseSort');
-    const coursesRows = document.querySelectorAll('#coursesTable tbody tr');
+    const adminSearch = document.getElementById('adminSearch');
+    const adminStatusFilter = document.getElementById('adminStatusFilter');
+    const adminInstructorFilter = document.getElementById('adminInstructorFilter');
+    const adminSort = document.getElementById('adminSort');
+    const adminCoursesRows = document.querySelectorAll('#adminCoursesTable tbody tr');
 
     // Get unique instructors for dropdown
     let instructors = new Set();
-    coursesRows.forEach(row => {
-        const instructor = row.dataset.instructor;
+    adminCoursesRows.forEach(row => {
+        const instructor = row.cells[3]?.textContent.trim(); // Créé par column
         if (instructor) instructors.add(instructor);
     });
     Array.from(instructors).sort().forEach(instructor => {
         const option = document.createElement('option');
         option.value = instructor;
         option.textContent = instructor;
-        courseInstructorFilter.appendChild(option);
+        adminInstructorFilter.appendChild(option);
     });
 
     // Filter and Sort function
@@ -197,21 +198,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Create array of visible rows
         const visibleRows = Array.from(rows).filter(row => {
-            // Search filter (Title column)
-            const title = row.dataset.title.toLowerCase();
+            // Search filter (Titre column)
+            const title = row.cells[0]?.textContent.toLowerCase() || '';
             const titleMatch = title.includes(searchTerm);
 
             // Status filter
             let statusMatch = true;
             if (statusValue) {
-                const status = row.dataset.status;
-                statusMatch = status === statusValue;
+                const status = row.cells[2]?.textContent.trim() || '';
+                statusMatch = status.includes(statusValue);
             }
 
             // Instructor filter
             let instructorMatch = true;
             if (instructorValue) {
-                const instructor = row.dataset.instructor;
+                const instructor = row.cells[3]?.textContent.trim() || '';
                 instructorMatch = instructor === instructorValue;
             }
 
@@ -223,11 +224,14 @@ document.addEventListener('DOMContentLoaded', function() {
             let aValue, bValue;
             
             if (sortType === 'title' || sortType === 'title-desc') {
-                aValue = a.dataset.title.toLowerCase();
-                bValue = b.dataset.title.toLowerCase();
+                aValue = a.cells[0]?.textContent.toLowerCase() || '';
+                bValue = b.cells[0]?.textContent.toLowerCase() || '';
             } else if (sortType === 'date' || sortType === 'date-old') {
-                aValue = new Date(a.dataset.date);
-                bValue = new Date(b.dataset.date);
+                // Parse dates - Date column is index 4
+                const aDateText = a.cells[4]?.textContent || '';
+                const bDateText = b.cells[4]?.textContent || '';
+                aValue = new Date(aDateText);
+                bValue = new Date(bDateText);
             }
 
             if (sortType.includes('desc') || sortType === 'date-old') {
@@ -247,23 +251,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Event listeners
-    courseSearch.addEventListener('input', () => {
-        filterAndSort(courseSearch, courseStatusFilter, courseInstructorFilter, courseSort, coursesRows);
+    adminSearch.addEventListener('input', () => {
+        filterAndSort(adminSearch, adminStatusFilter, adminInstructorFilter, adminSort, adminCoursesRows);
     });
-    courseStatusFilter.addEventListener('change', () => {
-        filterAndSort(courseSearch, courseStatusFilter, courseInstructorFilter, courseSort, coursesRows);
+    adminStatusFilter.addEventListener('change', () => {
+        filterAndSort(adminSearch, adminStatusFilter, adminInstructorFilter, adminSort, adminCoursesRows);
     });
-    courseInstructorFilter.addEventListener('change', () => {
-        filterAndSort(courseSearch, courseStatusFilter, courseInstructorFilter, courseSort, coursesRows);
+    adminInstructorFilter.addEventListener('change', () => {
+        filterAndSort(adminSearch, adminStatusFilter, adminInstructorFilter, adminSort, adminCoursesRows);
     });
-    courseSort.addEventListener('change', () => {
-        filterAndSort(courseSearch, courseStatusFilter, courseInstructorFilter, courseSort, coursesRows);
+    adminSort.addEventListener('change', () => {
+        filterAndSort(adminSearch, adminStatusFilter, adminInstructorFilter, adminSort, adminCoursesRows);
     });
 
     // Reset form
-    document.getElementById('courseSearchForm').addEventListener('reset', () => {
+    document.getElementById('adminSearchForm').addEventListener('reset', () => {
         setTimeout(() => {
-            filterAndSort(courseSearch, courseStatusFilter, courseInstructorFilter, courseSort, coursesRows);
+            filterAndSort(adminSearch, adminStatusFilter, adminInstructorFilter, adminSort, adminCoursesRows);
         }, 0);
     });
 });
