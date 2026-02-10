@@ -15,18 +15,79 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class FormationController extends AbstractController
 {
     #[Route('', name: 'student_formations', methods: ['GET'])]
-    public function list(FormationRepository $formationRepository): Response
+    public function list(EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
+        $search = $_GET['search'] ?? '';
+        $sort = $_GET['sort'] ?? 'date_desc';
+        
+        // Get enrolled formations
+        $enrolledQb = $entityManager->createQueryBuilder();
+        $enrolledQb->select('f')
+            ->from(Formation::class, 'f')
+            ->leftJoin('f.creator', 'c')
+            ->addSelect('c')
+            ->innerJoin('f.users', 'u')
+            ->where('u.id = :userId')
+            ->andWhere('f.isArchived = :archived')
+            ->setParameter('userId', $user->getId())
+            ->setParameter('archived', false);
 
-        // Filter enrolled formations to exclude archived ones
-        $enrolledFormations = $user->getFormations()->filter(function (Formation $formation) {
-            return !$formation->isArchived();
-        });
+        // Get available formations (not enrolled, approved, not archived)
+        $availableQb = $entityManager->createQueryBuilder();
+        $availableQb->select('f')
+            ->from(Formation::class, 'f')
+            ->leftJoin('f.creator', 'c')
+            ->addSelect('c')
+            ->where('f.isApproved = :approved')
+            ->andWhere('f.isArchived = :archived')
+            ->andWhere('f.id NOT IN (
+                SELECT f2.id FROM ' . Formation::class . ' f2
+                INNER JOIN f2.users u2
+                WHERE u2.id = :userId
+            )')
+            ->setParameter('approved', true)
+            ->setParameter('archived', false)
+            ->setParameter('userId', $user->getId());
+
+        // Apply search filter
+        if (!empty($search)) {
+            $enrolledQb->andWhere('f.title LIKE :search OR f.description LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+            
+            $availableQb->andWhere('f.title LIKE :search OR f.description LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+
+        // Apply sort
+        switch ($sort) {
+            case 'title_asc':
+                $enrolledQb->orderBy('f.title', 'ASC');
+                $availableQb->orderBy('f.title', 'ASC');
+                break;
+            case 'title_desc':
+                $enrolledQb->orderBy('f.title', 'DESC');
+                $availableQb->orderBy('f.title', 'DESC');
+                break;
+            case 'date_asc':
+                $enrolledQb->orderBy('f.createdAt', 'ASC');
+                $availableQb->orderBy('f.createdAt', 'ASC');
+                break;
+            case 'date_desc':
+            default:
+                $enrolledQb->orderBy('f.createdAt', 'DESC');
+                $availableQb->orderBy('f.createdAt', 'DESC');
+                break;
+        }
+
+        $enrolledFormations = $enrolledQb->getQuery()->getResult();
+        $availableFormations = $availableQb->getQuery()->getResult();
 
         return $this->render('student/formation/list.html.twig', [
             'enrolledFormations' => $enrolledFormations,
-            'availableFormations' => $formationRepository->findApprovedAndNotArchived(),
+            'availableFormations' => $availableFormations,
+            'search' => $search,
+            'sort' => $sort
         ]);
     }
 

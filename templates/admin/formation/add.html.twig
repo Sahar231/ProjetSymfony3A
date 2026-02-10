@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}admin-formation-add{% endblock %}
+{% block title %}instructor-formation-create{% endblock %}
 
 {% block body %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Eduport - Add Formation</title>
+	<title>Eduport - Create Formation</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<meta name="author" content="Webestica.com">
-	<meta name="description" content="Eduport - Add Formation">
+	<meta name="description" content="Eduport - Create Formation">
 	<script>
 		const storedTheme = localStorage.getItem('theme')
 		const getPreferredTheme = () => {
@@ -80,11 +80,11 @@
 				<ul class="navbar-nav navbar-nav-scroll mx-auto">
 					<li class="nav-item"><a class="nav-link" href="{{ path("app_home") }}">Home</a></li>
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="managementMenu" data-bs-toggle="dropdown">Management</a>
-						<ul class="dropdown-menu" aria-labelledby="managementMenu">
-							<li><a class="dropdown-item" href="{{ path('admin_formation_list') }}"><i class="bi bi-book me-2"></i>Formations</a></li>
-							<li><a class="dropdown-item" href="{{ path('admin_quiz_list') }}"><i class="bi bi-question-diamond me-2"></i>Quizzes</a></li>
-							<li><a class="dropdown-item" href="{{ path('admin_club_list') }}"><i class="bi bi-people me-2"></i>Clubs</a></li>
+						<a class="nav-link dropdown-toggle" href="#" id="contentMenu" data-bs-toggle="dropdown">Content</a>
+						<ul class="dropdown-menu" aria-labelledby="contentMenu">
+							<li><a class="dropdown-item" href="{{ path('instructor_formation_list') }}"><i class="bi bi-book me-2"></i>Formations</a></li>
+							<li><a class="dropdown-item" href="{{ path('instructor_quiz_list') }}"><i class="bi bi-question-diamond me-2"></i>Quizzes</a></li>
+							<li><a class="dropdown-item" href="{{ path('instructor_club_list') }}"><i class="bi bi-people me-2"></i>Clubs</a></li>
 						</ul>
 					</li>
 				</ul>
@@ -100,8 +100,8 @@
 								<img class="avatar-img rounded-circle shadow" src="/assets/images/avatar/01.jpg" alt="avatar">
 							</div>
 							<div>
-								<a class="h6" href="#">Admin</a>
-								<p class="small m-0">admin@example.com</p>
+								<a class="h6" href="#">Instructor</a>
+								<p class="small m-0">instructor@example.com</p>
 							</div>
 						</div>
 					</li>
@@ -121,12 +121,12 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-12">
-				<h1 class="text-white">Add Formation</h1>
+				<h1 class="text-white">Create Formation</h1>
 				<nav aria-label="breadcrumb">
 					<ol class="breadcrumb breadcrumb-dark breadcrumb-dots mb-0">
 						<li class="breadcrumb-item"><a href="{{ path("app_home") }}">Home</a></li>
-						<li class="breadcrumb-item"><a href="{{ path("admin_formation_list") }}">Formations</a></li>
-						<li class="breadcrumb-item active">Add</li>
+						<li class="breadcrumb-item"><a href="{{ path("instructor_formation_list") }}">My Formations</a></li>
+						<li class="breadcrumb-item active">Create</li>
 					</ol>
 				</nav>
 			</div>
@@ -146,17 +146,17 @@
 					<div class="card-body">
 						<ul class="list-unstyled">
 							<li class="mb-2">
-								<a href="{{ path('admin_formation_add') }}" class="btn btn-sm btn-outline-primary w-100 text-start">
+								<a href="{{ path('instructor_formation_create') }}" class="btn btn-sm btn-outline-primary w-100 text-start">
 									<i class="bi bi-book me-2"></i>Add Formation
 								</a>
 							</li>
 							<li class="mb-2">
-								<a href="{{ path('admin_quiz_add') }}" class="btn btn-sm btn-outline-primary w-100 text-start">
+								<a href="{{ path('instructor_quiz_create') }}" class="btn btn-sm btn-outline-primary w-100 text-start">
 									<i class="bi bi-question-diamond me-2"></i>Add Quiz
 								</a>
 							</li>
 							<li class="mb-0">
-								<a href="{{ path('admin_club_add') }}" class="btn btn-sm btn-outline-primary w-100 text-start">
+								<a href="{{ path('instructor_club_create') }}" class="btn btn-sm btn-outline-primary w-100 text-start">
 									<i class="bi bi-people me-2"></i>Add Club
 								</a>
 							</li>
@@ -170,41 +170,53 @@
 			<div class="col-lg-9">
 				<div class="card card-body shadow p-5">
 					<h2 class="mb-4">Create New Formation</h2>
-					<form method="POST">
-						<div class="mb-3">
-							<label class="form-label">Formation Title</label>
-							<input type="text" class="form-control" name="title" required>
-						</div>
-						<div class="mb-3">
-							<label class="form-label">Description</label>
-							<textarea class="form-control" name="description" rows="4"></textarea>
-						</div>
-						<div class="row">
-							<div class="col-md-6">
+					<form method="POST" enctype="multipart/form-data" id="formationForm">
+						<!-- Formation Details Section -->
+						<div class="card mb-4">
+							<div class="card-header bg-light">
+								<h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Formation Details</h5>
+							</div>
+							<div class="card-body">
 								<div class="mb-3">
-									<label class="form-label">Duration (hours)</label>
-									<input type="number" class="form-control" name="duration">
+									<label class="form-label">Formation Title <span class="text-danger">*</span></label>
+									<input type="text" class="form-control" id="formationTitle" name="title" required>
+									<small class="form-text text-muted">First letter must be uppercase</small>
+								</div>
+								<div class="mb-3">
+									<label class="form-label">Description <span class="text-danger">*</span></label>
+									<textarea class="form-control" id="formationDescription" name="description" rows="4" required></textarea>
+									<small class="form-text text-muted">Must contain at least 4 words</small>
+								</div>
+								<div class="row">
+									<div class="col-md-6">
+										<div class="mb-3">
+											<label class="form-label">Duration (weeks) <span class="text-danger">*</span></label>
+											<input type="number" class="form-control" name="duration" required>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="mb-3">
+											<label class="form-label">Level <span class="text-danger">*</span></label>
+											<select class="form-select" name="level" required>
+												<option value="">Select Level</option>
+												<option value="beginner">Beginner</option>
+												<option value="intermediate">Intermediate</option>
+												<option value="advanced">Advanced</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="mb-3">
+									<label class="form-label">Support Course File</label>
+									<input type="file" class="form-control" name="supportFile" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar" title="Upload course support materials">
+									<small class="form-text text-muted">Upload course materials like PDFs, documents, presentations, etc.</small>
 								</div>
 							</div>
-							<div class="col-md-6">
-								<div class="mb-3">
-									<label class="form-label">Level</label>
-									<select class="form-select" name="level">
-										<option value="">Select Level</option>
-										<option value="beginner">Beginner</option>
-										<option value="intermediate">Intermediate</option>
-										<option value="advanced">Advanced</option>
-									</select>
-								</div>
-							</div>
 						</div>
-						<div class="mb-3">
-							<label class="form-label">Number of Modules</label>
-							<input type="number" class="form-control" name="modules">
-						</div>
+
 						<div class="d-flex gap-2">
 							<button type="submit" class="btn btn-primary">Create Formation</button>
-							<a href="{{ path('admin_formation_list') }}" class="btn btn-outline-secondary">Cancel</a>
+							<a href="{{ path('instructor_formation_list') }}" class="btn btn-outline-secondary">Cancel</a>
 						</div>
 					</form>
 				</div>
@@ -241,8 +253,6 @@
 <script src="/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/assets/vendor/choices/js/choices.min.js"></script>
 <script src="/assets/js/functions.js"></script>
-
-</body>
 </html>
 {% endblock %}
 

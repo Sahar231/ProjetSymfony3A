@@ -43,6 +43,10 @@ class Formation
     #[ORM\Column(nullable: true)]
     private ?int $duration = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $creator = null;
+
     /**
      * @var Collection<int, Quiz>
      */
@@ -231,6 +235,18 @@ class Formation
         if ($this->users->removeElement($user)) {
             $user->removeFormation($this);
         }
+
+        return $this;
+    }
+
+    public function getCreator(): ?User
+    {
+        return $this->creator;
+    }
+
+    public function setCreator(?User $creator): static
+    {
+        $this->creator = $creator;
 
         return $this;
     }

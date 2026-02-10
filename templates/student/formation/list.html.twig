@@ -30,6 +30,32 @@
     <!-- Page Content START -->
     <section>
         <div class="container">
+            <!-- Search and Sort Controls -->
+            <div class="card border-0 shadow mb-4">
+                <div class="card-body">
+                    <form method="GET" class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <label for="searchInput" class="form-label fw-bold">Search Formations</label>
+                            <input type="text" id="searchInput" name="search" class="form-control" placeholder="Search by formation name or description..." value="{{ search }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="sortSelect" class="form-label fw-bold">Sort By</label>
+                            <select id="sortSelect" name="sort" class="form-select" onchange="this.form.submit()">
+                                <option value="date_desc" {% if sort == 'date_desc' %}selected{% endif %}>Newest First</option>
+                                <option value="date_asc" {% if sort == 'date_asc' %}selected{% endif %}>Oldest First</option>
+                                <option value="title_asc" {% if sort == 'title_asc' %}selected{% endif %}>Title (A-Z)</option>
+                                <option value="title_desc" {% if sort == 'title_desc' %}selected{% endif %}>Title (Z-A)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <div class="row g-4">
                 <!-- Enrolled Formations Section -->
                 <div class="col-12">
