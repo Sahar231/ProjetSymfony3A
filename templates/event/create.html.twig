@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un événement - Eduport{% endblock %}
+
+{% block body %}
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card shadow">
+                    <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                        <h4 class="card-header-title">Créer un événement</h4>
+                        <a href="{{ path('club_my_clubs') }}" class="btn btn-sm btn-light mb-0">Retour</a>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <div>Votre événement sera visible après validation par un administrateur.</div>
+                        </div>
+
+                        {{ form_start(form, {'attr': {'class': 'row g-3'}}) }}
+                            <div class="col-12">
+                                <label class="form-label">Titre de l'événement</label>
+                                {{ form_widget(form.name, {'attr': {'class': 'form-control', 'placeholder': 'ex: Workshop Symfony'}}) }}
+                                <div class="text-danger small">{{ form_errors(form.name) }}</div>
+                            </div>
+
+                            {# Commenting out fields not present in current Event entity/form if any, but based on my earlier check:
+                               EventType has: name, description, dateTime, location
+                            #}
+
+                            <div class="col-md-6">
+                                <label class="form-label">Date et Heure</label>
+                                {{ form_widget(form.dateTime, {'attr': {'class': 'form-control'}}) }}
+                                <div class="text-danger small">{{ form_errors(form.dateTime) }}</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Lien (Zoom/Meet) ou Lieu</label>
+                                {{ form_widget(form.location, {'attr': {'class': 'form-control', 'placeholder': 'https://zoom.us/j/...'}}) }}
+                                <div class="text-danger small">{{ form_errors(form.location) }}</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+                                {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': '4'}}) }}
+                                <div class="text-danger small">{{ form_errors(form.description) }}</div>
+                            </div>
+
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary">Soumettre pour approbation <i class="fas fa-paper-plane ms-2"></i></button>
+                            </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

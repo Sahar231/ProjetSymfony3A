@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Event{% endblock %}
+
+{% block body %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow">
+                    <div class="card-header bg-warning text-dark">
+                        <h4 class="mb-0">Edit Event: {{ event.name }}</h4>
+                    </div>
+                    <div class="card-body">
+                        {{ form_start(form) }}
+                            {{ form_widget(form) }}
+                            <div class="alert alert-info mt-2">
+                                Note: Editing an event might require re-approval by an administrator.
+                            </div>
+                            <button type="submit" class="btn btn-warning mt-3">Update Event</button>
+                            <a href="{{ path('club_detail', {'id': event.club.id}) }}" class="btn btn-secondary mt-3">Cancel</a>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

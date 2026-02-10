@@ -21,7 +21,7 @@
 	<div class="offcanvas offcanvas-start flex-row custom-scrollbar h-100" data-bs-backdrop="true" tabindex="-1" id="offcanvasSidebar">
 		<div class="offcanvas-body sidebar-content d-flex flex-column bg-dark">
 
-			<!-- Sidebar menu START -->
+						<!-- Sidebar menu START -->
 			<ul class="navbar-nav flex-column" id="navbar-sidebar">
 				
 				<!-- Menu item 1 -->
@@ -32,50 +32,26 @@
 
 				<!-- menu item 2 -->
 				<li class="nav-item">
-					<a class="nav-link" data-bs-toggle="collapse" href="#collapsepage" role="button" aria-expanded="false" aria-controls="collapsepage">
+					<a class="nav-link" data-bs-toggle="collapse" href="#" data-bs-target="#collapsepage" role="button" aria-expanded="false" aria-controls="collapsepage">
 						<i class="bi bi-basket fa-fw me-2"></i>Courses
 					</a>
 					<!-- Submenu -->
 					<ul class="nav collapse flex-column" id="collapsepage" data-bs-parent="#navbar-sidebar">
 						<li class="nav-item"> <a class="nav-link" href="{{ path('course_list') }}">All Courses</a></li>
 						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_course_category') }}">Course Category</a></li>
-						<li class="nav-item"> <a class="nav-link" href="{{ path('course_detail', {'id': 1}) }}">Course Detail</a></li>
 					</ul>
 				</li>
 
-				<!-- Menu item: Formations -->
+												<!-- Menu item: Clubs -->
 				<li class="nav-item">
-					<a class="nav-link" data-bs-toggle="collapse" href="#collapseformations" role="button" aria-expanded="false" aria-controls="collapseformations">
-						<i class="bi bi-book fa-fw me-2"></i>Formations
-					</a>
-					<!-- Submenu -->
-					<ul class="nav collapse flex-column" id="collapseformations" data-bs-parent="#navbar-sidebar">
-						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_formation_list') }}">All Formations</a></li>
-						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_formation_add') }}">Add Formation</a></li>
-					</ul>
-				</li>
-
-				<!-- Menu item: Quizzes -->
-				<li class="nav-item">
-					<a class="nav-link" data-bs-toggle="collapse" href="#collapsequizzes" role="button" aria-expanded="false" aria-controls="collapsequizzes">
-						<i class="bi bi-question-diamond fa-fw me-2"></i>Quizzes
-					</a>
-					<!-- Submenu -->
-					<ul class="nav collapse flex-column" id="collapsequizzes" data-bs-parent="#navbar-sidebar">
-						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_quiz_list') }}">Quiz List</a></li>
-						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_quiz_add') }}">Add Quiz</a></li>
-					</ul>
-				</li>
-
-				<!-- Menu item: Clubs -->
-				<li class="nav-item">
-					<a class="nav-link" data-bs-toggle="collapse" href="#collapseclubs" role="button" aria-expanded="false" aria-controls="collapseclubs">
+					<a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseclubs" role="button" aria-expanded="false" aria-controls="collapseclubs">
 						<i class="bi bi-people fa-fw me-2"></i>Clubs
 					</a>
 					<!-- Submenu -->
 					<ul class="nav collapse flex-column" id="collapseclubs" data-bs-parent="#navbar-sidebar">
-						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_club_list') }}">Club List</a></li>
-						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_club_add') }}">Add Club</a></li>
+						<li class="nav-item"> <a class="nav-link" href="{{ path('club_admin_pending') }}">Pending Approvals</a></li>
+						<li class="nav-item"> <a class="nav-link" href="{{ path('club_list') }}">Public List</a></li>
+						<li class="nav-item"> <a class="nav-link" href="{{ path('club_create') }}">Add Club</a></li>
 					</ul>
 				</li>
 
@@ -84,18 +60,13 @@
 
 				<!-- Menu item 4 -->
 				<li class="nav-item">
-					<a class="nav-link" data-bs-toggle="collapse" href="#collapseinstructors" role="button" aria-expanded="false" aria-controls="collapseinstructors">
+					<a class="nav-link" data-bs-toggle="collapse" href="#" data-bs-target="#collapseinstructors" role="button" aria-expanded="false" aria-controls="collapseinstructors">
 						<i class="fas fa-user-tie fa-fw me-2"></i>Instructors
 					</a>
 					<!-- Submenu -->
 					<ul class="nav collapse flex-column" id="collapseinstructors" data-bs-parent="#navbar-sidebar">
 						<li class="nav-item"> <a class="nav-link" href="{{ path('instructor_list') }}">Instructors</a></li>
-						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_instructor_detail', {'id': 1}) }}">Instructor Detail</a></li>
-						<li class="nav-item"> 
-							<a class="nav-link" href="{{ path('admin_instructor_requests') }}">Instructor requests
-								<span class="badge text-bg-success rounded-circle ms-2">2</span>
-							</a>
-						</li>
+						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_instructor_requests') }}">Instructor requests</a></li>
 					</ul>
 				</li>
 				
@@ -107,29 +78,6 @@
 
 				<!-- Menu item 7 -->
 				<li class="nav-item"> <a class="nav-link" href="{{ path('admin_settings') }}"><i class="fas fa-user-cog fa-fw me-2"></i>Admin Settings</a></li>
-
-				<!-- Menu item 8 -->
-				<li class="nav-item">
-					<a class="nav-link" data-bs-toggle="collapse" href="#collapseauthentication" role="button" aria-expanded="false" aria-controls="collapseauthentication">
-						<i class="bi bi-lock fa-fw me-2"></i>Authentication
-					</a>
-					<!-- Submenu -->
-					<ul class="nav collapse flex-column" id="collapseauthentication" data-bs-parent="#navbar-sidebar">
-						<li class="nav-item"> <a class="nav-link" href="{{ path("auth_register") }}">Sign Up</a></li>
-						<li class="nav-item"> <a class="nav-link" href="{{ path("auth_login") }}">Sign In</a></li>
-						<li class="nav-item"> <a class="nav-link" href="{{ path("auth_forgot_password") }}">Forgot Password</a></li>
-						<li class="nav-item"> <a class="nav-link" href="{{ path('app_error_404') }}">Error 404</a></li>
-					</ul>
-				</li>
-
-				<!-- Title -->
-				<li class="nav-item ms-2 my-2">Documentation</li>
-
-				<!-- Menu item 9 -->
-				<li class="nav-item"> <a class="nav-link" href="{{ path('app_home') }}"><i class="far fa-clipboard fa-fw me-2"></i>Documentation</a></li>
-
-				<!-- Menu item 10 -->
-				<li class="nav-item"> <a class="nav-link" href="docs/changelog.html"><i class="fas fa-sitemap fa-fw me-2"></i>Changelog</a></li>
 			</ul>
 			<!-- Sidebar menu end -->
 

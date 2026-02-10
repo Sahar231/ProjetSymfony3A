@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion Clubs (Admin) - Eduport{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Gestion Clubs (Admin)</h1>
+        <a href="{{ path('club_pdf') }}" class="btn btn-danger-soft"><i class="fas fa-file-pdf me-2"></i>Exporter PDF</a>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Club</th>
+                            <th>Créateur</th>
+                            <th>Date</th>
+                            <th>Statut</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for club in clubs %}
+                        <tr>
+                            <td><h6 class="mb-0">{{ club.name }}</h6></td>
+                            <td>{{ club.creator.firstName }} {{ club.creator.lastName }}</td>
+                            <td>{{ club.createdAt|date('d M Y') }}</td>
+                            <td>
+                                {% if club.status == 'APPROVED' %}
+                                    <span class="badge bg-success bg-opacity-10 text-success">ACTIF</span>
+                                {% elseif club.status == 'PENDING' %}
+                                    <span class="badge bg-warning bg-opacity-10 text-warning">EN ATTENTE</span>
+                                {% else %}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger">REFUSÉ</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                {% if club.status == 'PENDING' %}
+                                    <form method="post" action="{{ path('club_admin_approve', {id: club.id}) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-primary">Approuver</button>
+                                    </form>
+                                {% endif %}
+                                <a href="{{ path('club_edit', {id: club.id}) }}" class="btn btn-sm btn-info-soft">Modifier</a>
+                                <form method="post" action="{{ path('club_delete', {id: club.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer définitivement ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ club.id) }}">
+                                    <button type="submit" class="btn btn-sm btn-danger-soft">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
