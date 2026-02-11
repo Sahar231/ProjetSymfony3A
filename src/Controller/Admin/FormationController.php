@@ -3,7 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Formation;
-use App\Entity\Quiz;
+use App\Entity\Quizfor;
 use App\Entity\Question;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

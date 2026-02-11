@@ -31,8 +31,8 @@ class CertificateRepository extends ServiceEntityRepository
         return $this->findOneBy(['user' => $user, 'formation' => $formation]);
     }
 
-    public function findByUserAndQuiz($user, $quiz)
+    public function findByUserAndQuiz($user, $quizfor)
     {
-        return $this->findOneBy(['user' => $user, 'quiz' => $quiz]);
+        return $this->findOneBy(['user' => $user, 'quiz' => $quizfor]);
     }
 }

@@ -31,7 +31,7 @@ class Question
 
     #[ORM\ManyToOne(inversedBy: 'questions')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Quiz $quiz = null;
+    private ?Quizfor $quiz = null;
 
     public function getId(): ?int
     {
@@ -98,12 +98,12 @@ class Question
         return $this;
     }
 
-    public function getQuiz(): ?Quiz
+    public function getQuiz(): ?Quizfor
     {
         return $this->quiz;
     }
 
-    public function setQuiz(?Quiz $quiz): static
+    public function setQuiz(?Quizfor $quiz): static
     {
         $this->quiz = $quiz;
 

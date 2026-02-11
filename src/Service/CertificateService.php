@@ -4,7 +4,7 @@ namespace App\Service;
 
 use App\Entity\Certificate;
 use App\Entity\Formation;
-use App\Entity\Quiz;
+use App\Entity\Quizfor;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -21,7 +21,7 @@ class CertificateService
         User $user,
         Formation $formation,
         float $score,
-        ?Quiz $quiz = null
+        ?Quizfor $quiz = null
     ): Certificate {
         $certificate = new Certificate();
         $certificate->setUser($user);
@@ -63,7 +63,7 @@ class CertificateService
     public function awardCertificateIfPassed(
         User $user,
         Formation $formation,
-        Quiz $quiz,
+        Quizfor $quiz,
         float $score
     ): ?Certificate {
         // Check if score is passing

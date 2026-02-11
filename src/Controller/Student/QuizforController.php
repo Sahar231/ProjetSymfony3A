@@ -2,7 +2,7 @@
 
 namespace App\Controller\Student;
 
-use App\Entity\Quiz;
+use App\Entity\Quizfor;
 use App\Repository\CertificateRepository;
 use App\Service\CertificateService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,7 +14,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/student/quiz')]
 #[IsGranted('ROLE_STUDENT')]
-class QuizController extends AbstractController
+class QuizforController extends AbstractController
 {
     public function __construct(
         private CertificateService $certificateService,
@@ -30,7 +30,7 @@ class QuizController extends AbstractController
     }
 
     #[Route('/{id}/start', name: 'student_quiz_start', methods: ['GET'])]
-    public function start(Quiz $quiz): Response
+    public function start(Quizfor $quiz): Response
     {
         $user = $this->getUser();
         
@@ -49,7 +49,7 @@ class QuizController extends AbstractController
     }
 
     #[Route('/{id}/results', name: 'student_quiz_results', methods: ['GET'])]
-    public function viewResults(Quiz $quiz): Response
+    public function viewResults(Quizfor $quiz): Response
     {
         $user = $this->getUser();
         $formation = $quiz->getFormation();
@@ -77,7 +77,7 @@ class QuizController extends AbstractController
     }
 
     #[Route('/{id}/submit', name: 'student_quiz_submit', methods: ['POST'])]
-    public function submit(Quiz $quiz, Request $request): Response
+    public function submit(Quizfor $quiz, Request $request): Response
     {
         $user = $this->getUser();
         $formation = $quiz->getFormation();
@@ -128,7 +128,7 @@ class QuizController extends AbstractController
      * Calculate quiz score based on submitted answers
      * Awards points per correct question and calculates percentage
      */
-    private function calculateQuizScore(Quiz $quiz, Request $request): float
+    private function calculateQuizScore(Quizfor $quiz, Request $request): float
     {
         $answers = $request->request->all();
         $awardedPoints = 0;

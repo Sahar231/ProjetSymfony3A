@@ -21,9 +21,9 @@ class Certificate
     #[ORM\JoinColumn(nullable: false)]
     private ?Formation $formation = null;
 
-    #[ORM\ManyToOne(targetEntity: Quiz::class)]
+    #[ORM\ManyToOne(targetEntity: Quizfor::class)]
     #[ORM\JoinColumn(nullable: true)]
-    private ?Quiz $quiz = null;
+    private ?Quizfor $quiz = null;
 
     #[ORM\Column]
     private ?float $score = null;
@@ -65,12 +65,12 @@ class Certificate
         return $this;
     }
 
-    public function getQuiz(): ?Quiz
+    public function getQuiz(): ?Quizfor
     {
         return $this->quiz;
     }
 
-    public function setQuiz(?Quiz $quiz): static
+    public function setQuiz(?Quizfor $quiz): static
     {
         $this->quiz = $quiz;
 

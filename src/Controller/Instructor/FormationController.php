@@ -3,7 +3,7 @@
 namespace App\Controller\Instructor;
 
 use App\Entity\Formation;
-use App\Entity\Quiz;
+use App\Entity\Quizfor;
 use App\Entity\Question;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -166,7 +166,7 @@ class FormationController extends AbstractController
                     continue;
                 }
 
-                $quiz = new Quiz($formation);
+                $quiz = new Quizfor($formation);
                 $quiz->setTitle($quizData['title']);
                 $quiz->setDescription($quizData['description'] ?? '');
                 $quiz->setCategory($quizData['category'] ?? $title);

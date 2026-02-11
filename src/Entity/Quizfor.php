@@ -9,7 +9,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: QuizRepository::class)]
-class Quiz
+#[ORM\Table(name: 'quiz')]
+class Quizfor
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

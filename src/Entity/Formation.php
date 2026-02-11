@@ -51,9 +51,9 @@ class Formation
     private ?User $creator = null;
 
     /**
-     * @var Collection<int, Quiz>
+     * @var Collection<int, Quizfor>
      */
-    #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'Formation', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Quizfor::class, mappedBy: 'Formation', orphanRemoval: true)]
     private Collection $quizzes;
 
     /**
@@ -198,14 +198,14 @@ class Formation
   }
 
     /**
-     * @return Collection<int, Quiz>
+     * @return Collection<int, Quizfor>
      */
     public function getQuizzes(): Collection
     {
         return $this->quizzes;
     }
 
-    public function addQuiz(Quiz $quiz): static
+    public function addQuiz(Quizfor $quiz): static
     {
         if (!$this->quizzes->contains($quiz)) {
             $this->quizzes->add($quiz);
@@ -215,7 +215,7 @@ class Formation
         return $this;
     }
 
-    public function removeQuiz(Quiz $quiz): static
+    public function removeQuiz(Quizfor $quiz): static
     {
         if ($this->quizzes->removeElement($quiz)) {
             // set the owning side to null (unless already changed)

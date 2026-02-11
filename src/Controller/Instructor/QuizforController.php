@@ -9,7 +9,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/instructor/quiz')]
 #[IsGranted('ROLE_INSTRUCTOR')]
-class QuizController extends AbstractController
+class QuizforController extends AbstractController
 {
     #[Route('', name: 'instructor_quiz_list', methods: ['GET'])]
     public function list(): Response

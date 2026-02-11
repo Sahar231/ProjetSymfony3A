@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/admin/quiz')]
-class QuizController extends AbstractController
+class QuizforController extends AbstractController
 {
     #[Route('', name: 'admin_quiz_list', methods: ['GET'])]
     public function list(): Response
