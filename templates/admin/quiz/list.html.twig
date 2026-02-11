@@ -1,202 +1,473 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}admin-quiz-list{% endblock %}
+{% block title %}Gestion des Quiz - Admin{% endblock %}
 
 {% block body %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<title>Eduport - Admin Quiz Management</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="author" content="Webestica.com">
-	<meta name="description" content="Eduport - Admin Quiz Management">
-	<script>
-		const storedTheme = localStorage.getItem('theme')
-		const getPreferredTheme = () => {
-			if (storedTheme) return storedTheme
-			return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'light'
-		}
-		const setTheme = function (theme) {
-			if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-				document.documentElement.setAttribute('data-bs-theme', 'dark')
-			} else {
-				document.documentElement.setAttribute('data-bs-theme', theme)
-			}
-		}
-		setTheme(getPreferredTheme())
-		window.addEventListener('DOMContentLoaded', () => {
-		    var el = document.querySelector('.theme-icon-active');
-			if(el != 'undefined' && el != null) {
-				const showActiveTheme = theme => {
-				const activeThemeIcon = document.querySelector('.theme-icon-active use')
-				const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
-				const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')
-				document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
-					element.classList.remove('active')
-				})
-				btnToActive.classList.add('active')
-				activeThemeIcon.setAttribute('href', svgOfActiveBtn)
-			}
-			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-				if (storedTheme !== 'light' || storedTheme !== 'dark') {
-					setTheme(getPreferredTheme())
-				}
-			})
-			showActiveTheme(getPreferredTheme())
-			document.querySelectorAll('[data-bs-theme-value]').forEach(toggle => {
-				toggle.addEventListener('click', () => {
-					const theme = toggle.getAttribute('data-bs-theme-value')
-					localStorage.setItem('theme', theme)
-					setTheme(theme)
-					showActiveTheme(theme)
-				})
-			})
-			}
-		})
-	</script>
-	<link rel="shortcut icon" href="/assets/images/favicon.ico">
-	<link rel="preconnect" href="https://fonts.googleapis.com/">
-	<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap">
-	<link rel="stylesheet" type="text/css" href="/assets/vendor/font-awesome/css/all.min.css">
-	<link rel="stylesheet" type="text/css" href="/assets/vendor/bootstrap-icons/bootstrap-icons.css">
-	<link rel="stylesheet" type="text/css" href="/assets/vendor/choices/css/choices.min.css">
-	<link rel="stylesheet" type="text/css" href="/assets/css/style.css">
-</head>
-<body>
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
 
-<header class="navbar-light navbar-sticky">
-	<nav class="navbar navbar-expand-xl">
-		<div class="container">
-			<a class="navbar-brand" href="{{ path("app_home") }}">
-				<img class="light-mode-item navbar-brand-item" src="/assets/images/logo.svg" alt="logo">
-				<img class="dark-mode-item navbar-brand-item" src="/assets/images/logo-light.svg" alt="logo">
-			</a>
-			<button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-				<span class="navbar-toggler-animation"><span></span><span></span><span></span></span>
-			</button>
-			<div class="navbar-collapse w-100 collapse" id="navbarCollapse">
-				<ul class="navbar-nav navbar-nav-scroll mx-auto">
-					<li class="nav-item"><a class="nav-link" href="{{ path("app_home") }}">Home</a></li>
-					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="managementMenu" data-bs-toggle="dropdown">Management</a>
-						<ul class="dropdown-menu" aria-labelledby="managementMenu">
-							<li><a class="dropdown-item" href="{{ path('admin_formation_list') }}"><i class="bi bi-book me-2"></i>Formations</a></li>
-							<li><a class="dropdown-item" href="{{ path('admin_quiz_list') }}"><i class="bi bi-question-diamond me-2"></i>Quizzes</a></li>
-							<li><a class="dropdown-item" href="{{ path('admin_club_list') }}"><i class="bi bi-people me-2"></i>Clubs</a></li>
-						</ul>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</nav>
-</header>
+    .admin-header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2rem;
+        font-weight: 600;
+    }
 
-<main>
-<section class="bg-dark align-items-center d-flex" style="background:url(assets/images/pattern/04.png) no-repeat center center; background-size:cover;">
-	<div class="container">
-		<div class="row">
-			<div class="col-12">
-				<h1 class="text-white">Admin Quiz Management</h1>
-				<nav aria-label="breadcrumb">
-					<ol class="breadcrumb breadcrumb-dark breadcrumb-dots mb-0">
-						<li class="breadcrumb-item"><a href="{{ path("app_home") }}">Home</a></li>
-						<li class="breadcrumb-item active">Admin - Quiz</li>
-					</ol>
-				</nav>
-			</div>
-		</div>
-	</div>
-</section>
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
 
-<section class="py-5">
-	<div class="container">
-		<div class="row mb-4">
-			<div class="col-12">
-				<div class="d-flex justify-content-between align-items-center">
-					<h2>Quiz List</h2>
-					<a href="{{ path('admin_quiz_add') }}" class="btn btn-primary">
-						<i class="bi bi-plus-lg me-2"></i>Add Quiz
-					</a>
-				</div>
-			</div>
-		</div>
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
 
-		<div class="row">
-			<div class="col-12">
-				<div class="card card-body shadow">
-					<div class="alert alert-info">
-						<p><strong>Admin Quiz Management</strong> - List of all quizzes will be displayed here. You can edit, delete, or create new quizzes.</p>
-					</div>
+    .stat-card i {
+        font-size: 2rem;
+        opacity: 0.5;
+    }
 
-					<div class="table-responsive">
-						<table class="table table-hover mb-0">
-							<thead class="table-dark">
-								<tr>
-									<th>ID</th>
-									<th>Title</th>
-									<th>Questions</th>
-									<th>Difficulty</th>
-									<th>Duration</th>
-									<th>Actions</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>1</td>
-									<td>Sample Quiz</td>
-									<td>20</td>
-									<td>Intermediate</td>
-									<td>45 min</td>
-									<td>
-										<a href="#" class="btn btn-sm btn-primary">Edit</a>
-										<a href="#" class="btn btn-sm btn-danger">Delete</a>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
+    .stat-info h6 {
+        margin: 0;
+        color: #999;
+        font-size: 0.85rem;
+    }
 
-					<nav class="mt-4 d-flex justify-content-center">
-						<ul class="pagination pagination-primary-soft">
-							<li class="page-item"><a class="page-link" href="#">1</a></li>
-							<li class="page-item active"><a class="page-link" href="#">2</a></li>
-						</ul>
-					</nav>
-				</div>
-			</div>
-		</div>
-	</div>
-</section>
-</main>
+    .stat-info h3 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
 
-<footer class="pt-5 bg-light">
-	<div class="container">
-		<div class="row g-4">
-			<div class="col-lg-3">
-				<a class="me-0" href="{{ path("app_home") }}">
-					<img class="light-mode-item h-40px" src="/assets/images/logo.svg" alt="logo">
-					<img class="dark-mode-item h-40px" src="/assets/images/logo-light.svg" alt="logo">
-				</a>
-				<p class="my-3">Admin panel for managing quiz programs.</p>
-			</div>
-		</div>
-		<hr class="mt-4 mb-0">
-		<div class="py-3">
-			<div class="text-center">
-				<div class="text-body">Copyrights ©2023 Eduport. Build by <a href="https://www.webestica.com/" target="_blank">Webestica</a></div>
-			</div>
-		</div>
-	</div>
-</footer>
+    .search-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
 
-<div class="back-top"><i class="bi bi-arrow-up-short position-absolute top-50 start-50 translate-middle"></i></div>
+    .search-bar {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
 
-<script src="/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/functions.js"></script>
+    .search-bar input {
+        flex: 1;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+    }
 
-</body>
-</html>
+    .quiz-table {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .quiz-table table {
+        margin: 0;
+        width: 100%;
+    }
+
+    .quiz-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #333;
+        border: none;
+        padding: 1rem;
+    }
+
+    .quiz-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        vertical-align: middle;
+    }
+
+    .quiz-table tbody tr:hover {
+        background: #f9f9f9;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.5rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-approved {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-refused {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-draft {
+        background: #e2e3e5;
+        color: #383d41;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .action-buttons .btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .rejection-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .rejection-modal.show {
+        display: flex;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        max-width: 500px;
+        width: 90%;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 50px 20px;
+        color: #999;
+    }
+
+    .pagination-custom {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 2rem 1rem;
+        background: white;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .pagination-custom a,
+    .pagination-custom span {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #0d6efd;
+    }
+
+    .pagination-custom a:hover {
+        background: #f0f0f0;
+    }
+
+    .pagination-custom .active {
+        background: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+
+    .rejection-reason {
+        background: #f8d7da;
+        padding: 0.75rem;
+        border-radius: 4px;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: #721c24;
+    }
+</style>
+
+<div class="container mt-5">
+    <!-- Header -->
+    <div class="admin-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1>⚙️ Gestion des Quiz</h1>
+            <p class="mb-0">Visualisez, modifiez, approuvez ou refusez les quiz des instructeurs</p>
+        </div>
+        <a href="{{ path('admin_quiz_new') }}" class="btn btn-light btn-lg">
+            <i class="fas fa-plus me-2"></i> Créer un Quiz
+        </a>
+    </div>
+
+    {# Afficher les messages flash #}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            <strong>Erreur:</strong> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            <strong>Succès:</strong> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <!-- Statistics -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <i class="fas fa-hourglass-half text-warning"></i>
+            <div class="stat-info">
+                <h6>En Attente</h6>
+                <h3 class="text-warning">{{ pendingQuizzes|length }}</h3>
+            </div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-check-circle text-success"></i>
+            <div class="stat-info">
+                <h6>Approuvés</h6>
+                <h3 class="text-success">{{ approvedQuizzes|length }}</h3>
+            </div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-times-circle text-danger"></i>
+            <div class="stat-info">
+                <h6>Refusés</h6>
+                <h3 class="text-danger">{{ refusedQuizzes|length }}</h3>
+            </div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-circle-notch" style="color: #6c757d;"></i>
+            <div class="stat-info">
+                <h6>Brouillon</h6>
+                <h3>{{ draftQuizzes|length }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+        <form method="GET" action="{{ path('admin_quiz_list') }}" class="search-bar">
+            <input 
+                type="text" 
+                name="search" 
+                class="form-control" 
+                placeholder="🔍 Rechercher par titre ou description..."
+                value="{{ searchQuery }}"
+            >
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+            {% if searchQuery %}
+                <a href="{{ path('admin_quiz_list') }}" class="btn btn-secondary">Réinitialiser</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Quiz Table -->
+    <div class="quiz-table">
+        {% if pagination.items|length > 0 %}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th style="width: 20%">Titre</th>
+                        <th style="width: 10%">Questions</th>
+                        <th style="width: 12%">Statut</th>
+                        <th style="width: 10%">Créé</th>
+                        <th style="width: 10%">Soumis</th>
+                        <th style="width: 28%">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for quiz in pagination.items %}
+                        <tr>
+                            <td>
+                                <strong>{{ quiz.title }}</strong>
+                                {% if quiz.description %}
+                                    <br><small class="text-muted">{{ quiz.description|slice(0, 50) }}...</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ quiz.questions|length }}</span>
+                            </td>
+                            <td>
+                                {% if quiz.status == 'APPROVED' %}
+                                    <span class="status-badge status-approved">✓ Approuvé</span>
+                                {% elseif quiz.status == 'PENDING' %}
+                                    <span class="status-badge status-pending">⏱ En attente</span>
+                                {% elseif quiz.status == 'REFUSED' %}
+                                    <span class="status-badge status-refused">✗ Refusé</span>
+                                    {% if quiz.rejectionReason %}
+                                        <div class="rejection-reason mt-2">
+                                            <strong>Raison:</strong> {{ quiz.rejectionReason|slice(0, 80) }}{% if quiz.rejectionReason|length > 80 %}...{% endif %}
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="status-badge status-draft">Brouillon</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small>{{ quiz.createdAt|date('d/m/Y') }}</small>
+                            </td>
+                            <td>
+                                <small>
+                                    {% if quiz.submittedAt %}
+                                        {{ quiz.submittedAt|date('d/m/Y') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </small>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ path('admin_quiz_show', {id: quiz.id}) }}" class="btn btn-sm btn-outline-primary" title="Voir">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ path('admin_quiz_edit', {id: quiz.id}) }}" class="btn btn-sm btn-outline-warning" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if quiz.status == 'PENDING' %}
+                                        <a href="{{ path('admin_quiz_approve', {id: quiz.id}) }}" 
+                                           class="btn btn-sm btn-success" 
+                                           title="Approuver"
+                                           onclick="return confirm('Approuver ce quiz ?');">
+                                            <i class="fas fa-check"></i> Approuver
+                                        </a>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-danger" 
+                                                onclick="openRefusalModal({{ quiz.id }})"
+                                                title="Refuser">
+                                            <i class="fas fa-times"></i> Refuser
+                                        </button>
+                                    {% endif %}
+                                    <form method="POST" action="{{ path('admin_quiz_delete', {id: quiz.id}) }}" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quiz.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            {% if pagination.pageCount > 1 %}
+                <div class="pagination-custom">
+                    {% if pagination.currentPageNumber > 1 %}
+                        <a href="{{ path('admin_quiz_list', {page: 1, search: searchQuery}) }}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                        <a href="{{ path('admin_quiz_list', {page: pagination.currentPageNumber - 1, search: searchQuery}) }}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    {% endif %}
+
+                    {% for p in 1..pagination.pageCount %}
+                        {% if p == pagination.currentPageNumber %}
+                            <span class="active">{{ p }}</span>
+                        {% elseif p <= pagination.currentPageNumber + 2 and p >= pagination.currentPageNumber - 2 %}
+                            <a href="{{ path('admin_quiz_list', {page: p, search: searchQuery}) }}">{{ p }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if pagination.currentPageNumber < pagination.pageCount %}
+                        <a href="{{ path('admin_quiz_list', {page: pagination.currentPageNumber + 1, search: searchQuery}) }}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                        <a href="{{ path('admin_quiz_list', {page: pagination.pageCount, search: searchQuery}) }}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="no-data">
+                <i class="fas fa-inbox fa-3x mb-3"></i>
+                <p class="text-muted">Aucun quiz trouvé</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Refusal Modal -->
+<div id="refusalModal" class="rejection-modal">
+    <div class="modal-content">
+        <h5 class="mb-3">Refuser ce Quiz</h5>
+        <form id="refusalForm" method="POST">
+            <div class="mb-3">
+                <label for="reason" class="form-label">Raison du refus</label>
+                <textarea 
+                    id="reason" 
+                    name="reason" 
+                    class="form-control" 
+                    rows="4" 
+                    placeholder="Expliquez pourquoi ce quiz est refusé..."
+                    required
+                ></textarea>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger flex-grow-1">
+                    <i class="fas fa-times me-1"></i> Refuser
+                </button>
+                <button type="button" class="btn btn-secondary flex-grow-1" onclick="closeRefusalModal()">
+                    Annuler
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openRefusalModal(quizId) {
+        const form = document.getElementById('refusalForm');
+        form.action = "{{ path('admin_quiz_refuse', {id: 'QUIZ_ID'}) }}".replace('QUIZ_ID', quizId);
+        document.getElementById('refusalModal').classList.add('show');
+    }
+
+    function closeRefusalModal() {
+        document.getElementById('refusalModal').classList.remove('show');
+        document.getElementById('reason').value = '';
+    }
+
+    document.getElementById('refusalModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeRefusalModal();
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeRefusalModal();
+        }
+    });
+</script>
+
 {% endblock %}
 

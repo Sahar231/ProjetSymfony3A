@@ -32,7 +32,8 @@ class StudentController extends AbstractController
     #[Route('/quiz', name: 'quiz')]
     public function quiz(): Response
     {
-        return $this->render('student/student-quiz.html.twig');
+        // Redirect legacy static quiz page to the dynamic quiz list
+        return $this->redirectToRoute('student_quiz_list');
     }
 
     #[Route('/bookmarks', name: 'bookmarks')]

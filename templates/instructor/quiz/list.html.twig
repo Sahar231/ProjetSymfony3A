@@ -1,206 +1,359 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}instructor-quiz-list{% endblock %}
+{% block title %}Gestion des Évaluations - Instructeur{% endblock %}
 
 {% block body %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<title>Eduport - My Quizzes</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="author" content="Webestica.com">
-	<meta name="description" content="Eduport - My Quizzes">
-	<script>
-		const storedTheme = localStorage.getItem('theme')
-		const getPreferredTheme = () => {
-			if (storedTheme) return storedTheme
-			return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'light'
-		}
-		const setTheme = function (theme) {
-			if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-				document.documentElement.setAttribute('data-bs-theme', 'dark')
-			} else {
-				document.documentElement.setAttribute('data-bs-theme', theme)
-			}
-		}
-		setTheme(getPreferredTheme())
-		window.addEventListener('DOMContentLoaded', () => {
-		    var el = document.querySelector('.theme-icon-active');
-			if(el != 'undefined' && el != null) {
-				const showActiveTheme = theme => {
-				const activeThemeIcon = document.querySelector('.theme-icon-active use')
-				const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
-				const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')
-				document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
-					element.classList.remove('active')
-				})
-				btnToActive.classList.add('active')
-				activeThemeIcon.setAttribute('href', svgOfActiveBtn)
-			}
-			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-				if (storedTheme !== 'light' || storedTheme !== 'dark') {
-					setTheme(getPreferredTheme())
-				}
-			})
-			showActiveTheme(getPreferredTheme())
-			document.querySelectorAll('[data-bs-theme-value]').forEach(toggle => {
-				toggle.addEventListener('click', () => {
-					const theme = toggle.getAttribute('data-bs-theme-value')
-					localStorage.setItem('theme', theme)
-					setTheme(theme)
-					showActiveTheme(theme)
-				})
-			})
-			}
-		})
-	</script>
-	<link rel="shortcut icon" href="/assets/images/favicon.ico">
-	<link rel="preconnect" href="https://fonts.googleapis.com/">
-	<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap">
-	<link rel="stylesheet" type="text/css" href="/assets/vendor/font-awesome/css/all.min.css">
-	<link rel="stylesheet" type="text/css" href="/assets/vendor/bootstrap-icons/bootstrap-icons.css">
-	<link rel="stylesheet" type="text/css" href="/assets/vendor/choices/css/choices.min.css">
-	<link rel="stylesheet" type="text/css" href="/assets/css/style.css">
-</head>
-<body>
+<style>
+    .stats-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .search-box {
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+    }
+    .quiz-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    .badge-custom {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+    }
+    .pagination-custom {
+        margin-top: 30px;
+    }
+    .no-data {
+        text-align: center;
+        padding: 50px 20px;
+        color: #999;
+    }
+    .action-buttons .btn {
+        margin: 0 3px;
+    }
+</style>
 
-<header class="navbar-light navbar-sticky">
-	<nav class="navbar navbar-expand-xl">
-		<div class="container">
-			<a class="navbar-brand" href="{{ path("app_home") }}">
-				<img class="light-mode-item navbar-brand-item" src="/assets/images/logo.svg" alt="logo">
-				<img class="dark-mode-item navbar-brand-item" src="/assets/images/logo-light.svg" alt="logo">
-			</a>
-			<button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-				<span class="navbar-toggler-animation"><span></span><span></span><span></span></span>
-			</button>
-			<div class="navbar-collapse w-100 collapse" id="navbarCollapse">
-				<ul class="navbar-nav navbar-nav-scroll mx-auto">
-					<li class="nav-item"><a class="nav-link" href="{{ path("app_home") }}">Home</a></li>
-					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="contentMenu" data-bs-toggle="dropdown">Content</a>
-						<ul class="dropdown-menu" aria-labelledby="contentMenu">
-							<li><a class="dropdown-item" href="{{ path('instructor_formation_list') }}"><i class="bi bi-book me-2"></i>Formations</a></li>
-							<li><a class="dropdown-item" href="{{ path('instructor_quiz_list') }}"><i class="bi bi-question-diamond me-2"></i>Quizzes</a></li>
-							<li><a class="dropdown-item" href="{{ path('instructor_club_list') }}"><i class="bi bi-people me-2"></i>Clubs</a></li>
-						</ul>
-					</li>
-				</ul>
-			</div>
-			<div class="dropdown ms-1 ms-lg-0">
-				<a class="avatar avatar-sm p-0" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-					<img class="avatar-img rounded-circle" src="/assets/images/avatar/01.jpg" alt="avatar">
-				</a>
-				<ul class="dropdown-menu dropdown-animation dropdown-menu-end shadow pt-3" aria-labelledby="profileDropdown">
-					<li class="px-3 mb-3">
-						<div class="d-flex align-items-center">
-							<div class="avatar me-3">
-								<img class="avatar-img rounded-circle shadow" src="/assets/images/avatar/01.jpg" alt="avatar">
-							</div>
-							<div>
-								<a class="h6" href="#">Instructor</a>
-								<p class="small m-0">instructor@example.com</p>
-							</div>
-						</div>
-					</li>
-					<li><hr class="dropdown-divider"></li>
-					<li><a class="dropdown-item" href="#"><i class="bi bi-person fa-fw me-2"></i>Edit Profile</a></li>
-					<li><a class="dropdown-item" href="#"><i class="bi bi-gear fa-fw me-2"></i>Settings</a></li>
-					<li><hr class="dropdown-divider"></li>
-					<li><a class="dropdown-item bg-danger-soft-hover" href="#"><i class="bi bi-power fa-fw me-2"></i>Sign Out</a></li>
-				</ul>
-			</div>
-		</div>
-	</nav>
-</header>
+<div class="container mt-5">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-md-8">
+            <h1>📊 Gestion des Évaluations (Quizzes)</h1>
+            <p class="text-muted">Créez, modifiez et analysez vos quiz d'apprentissage</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('instructor_quiz_new') }}" class="btn btn-success btn-lg">
+                <i class="fas fa-plus me-2"></i>Créer une Évaluation
+            </a>
+        </div>
+    </div>
 
-<main>
-<section class="bg-dark align-items-center d-flex" style="background:url(assets/images/pattern/04.png) no-repeat center center; background-size:cover;">
-	<div class="container">
-		<div class="row">
-			<div class="col-12">
-				<h1 class="text-white">My Quizzes</h1>
-				<nav aria-label="breadcrumb">
-					<ol class="breadcrumb breadcrumb-dark breadcrumb-dots mb-0">
-						<li class="breadcrumb-item"><a href="{{ path("app_home") }}">Home</a></li>
-						<li class="breadcrumb-item active">My Quizzes</li>
-					</ol>
-				</nav>
-			</div>
-		</div>
-	</div>
-</section>
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stats-card border-0 shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <p class="text-muted small mb-1">Total Évaluations</p>
+                            <h3 class="mb-0">{{ stats.totalQuizzes }}</h3>
+                        </div>
+                        <i class="fas fa-clipboard-list fa-2x text-primary opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card border-0 shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <p class="text-muted small mb-1">Questions Totales</p>
+                            <h3 class="mb-0">{{ stats.totalQuestions }}</h3>
+                        </div>
+                        <i class="fas fa-question-circle fa-2x text-info opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card border-0 shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <p class="text-muted small mb-1">Tentatives Totales</p>
+                            <h3 class="mb-0">{{ stats.totalAttempts }}</h3>
+                        </div>
+                        <i class="fas fa-user-check fa-2x text-success opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card border-0 shadow">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <p class="text-muted small mb-1">Score Moyen</p>
+                            <h3 class="mb-0">{{ stats.averageScore }}%</h3>
+                        </div>
+                        <i class="fas fa-chart-pie fa-2x text-warning opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<section class="py-5">
-	<div class="container">
-		<div class="row">
-			<div class="col-12">
-				<div class="d-flex justify-content-between align-items-center mb-4">
-					<h2 class="mb-0">Quizzes I Created</h2>
-					<a href="{{ path("instructor_quiz_create") }}" class="btn btn-primary"><i class="bi bi-plus-circle me-2"></i>Create Quiz</a>
-				</div>
-				<div class="card">
-					<div class="table-responsive">
-						<table class="table table-hover mb-0">
-							<thead class="table-light">
-								<tr>
-									<th>ID</th>
-									<th>Title</th>
-									<th>Questions</th>
-									<th>Duration</th>
-									<th>Actions</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td>1</td>
-									<td>JavaScript Basics Quiz</td>
-									<td>20</td>
-									<td>30 min</td>
-									<td>
-										<a href="#" class="btn btn-sm btn-info">Edit</a>
-										<a href="#" class="btn btn-sm btn-danger">Delete</a>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</section>
-</main>
+    <!-- Search Bar -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form method="GET" action="{{ path('instructor_quiz_list') }}" class="d-flex gap-2">
+                <div class="flex-grow-1">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        class="form-control search-box" 
+                        placeholder="🔍 Rechercher une évaluation..."
+                        value="{{ searchQuery }}"
+                    >
+                </div>
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+                {% if searchQuery %}
+                    <a href="{{ path('instructor_quiz_list') }}" class="btn btn-secondary">Réinitialiser</a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
 
-<footer class="pt-5 bg-light">
-	<div class="container">
-		<div class="row g-4">
-			<div class="col-lg-3">
-				<a class="me-0" href="{{ path("app_home") }}">
-					<img class="light-mode-item h-40px" src="/assets/images/logo.svg" alt="logo">
-					<img class="dark-mode-item h-40px" src="/assets/images/logo-light.svg" alt="logo">
-				</a>
-				<p class="my-3">Continue your learning journey with us.</p>
-			</div>
-		</div>
-		<hr class="mt-4 mb-0">
-		<div class="py-3">
-			<div class="text-center">
-				<div class="text-body">Copyrights ©2023 Eduport. Build by <a href="https://www.webestica.com/" target="_blank">Webestica</a></div>
-			</div>
-		</div>
-	</div>
-</footer>
+    <!-- Quiz List -->
+    <div class="card border-0 shadow">
+        <div class="card-header bg-light border-bottom">
+            <h5 class="mb-0">
+                {% if searchQuery %}
+                    Résultats de recherche pour "{{ searchQuery }}"
+                {% else %}
+                    Toutes les Évaluations
+                {% endif %}
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            {% if pagination.items|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 quiz-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 20%">Titre</th>
+                                <th style="width: 10%">Questions</th>
+                                <th style="width: 12%">Statut</th>
+                                <th style="width: 10%">Créé</th>
+                                <th style="width: 28%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for quiz in pagination.items %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ quiz.title }}</strong>
+                                        {% if quiz.description %}
+                                            <br><small class="text-muted">{{ quiz.description|slice(0, 60) }}...</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-custom bg-info">
+                                            {{ quiz.questions|length }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if quiz.status == 'APPROVED' %}
+                                            <span class="badge badge-custom bg-success">
+                                                <i class="fas fa-check-circle me-1"></i> Approuvé
+                                            </span>
+                                        {% elseif quiz.status == 'PENDING' %}
+                                            <span class="badge badge-custom bg-warning text-dark">
+                                                <i class="fas fa-clock me-1"></i> En attente
+                                            </span>
+                                        {% elseif quiz.status == 'REFUSED' %}
+                                            <span class="badge badge-custom bg-danger">
+                                                <i class="fas fa-times-circle me-1"></i> Refusé
+                                            </span>
+                                            {% if quiz.rejectionReason %}
+                                                <div class="mt-2">
+                                                    <small class="text-danger d-block">
+                                                        <strong>Raison:</strong> {{ quiz.rejectionReason }}
+                                                    </small>
+                                                </div>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge badge-custom bg-secondary">
+                                                <i class="fas fa-circle-notch me-1"></i> Sans Statut
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ quiz.createdAt|date('d/m/Y') }}</small>
+                                    </td>
+                                    <td class="action-buttons">
+                                        <a 
+                                            href="{{ path('instructor_quiz_show', {id: quiz.id}) }}" 
+                                            class="btn btn-sm btn-outline-primary" 
+                                            title="Voir les détails"
+                                        >
+                                            <i class="fas fa-eye"></i> Voir
+                                        </a>
+                                        <a 
+                                            href="{{ path('instructor_quiz_edit', {id: quiz.id}) }}" 
+                                            class="btn btn-sm btn-outline-warning" 
+                                            title="Modifier"
+                                        >
+                                            <i class="fas fa-edit"></i> Modifier
+                                        </a>
+                                        <form 
+                                            method="POST" 
+                                            action="{{ path('instructor_quiz_delete', {id: quiz.id}) }}" 
+                                            style="display: inline;"
+                                            onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette évaluation ?');"
+                                        >
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quiz.id) }}">
+                                            <button 
+                                                type="submit" 
+                                                class="btn btn-sm btn-outline-danger" 
+                                                title="Supprimer"
+                                            >
+                                                <i class="fas fa-trash"></i> Supprimer
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
 
-<div class="back-top"><i class="bi bi-arrow-up-short position-absolute top-50 start-50 translate-middle"></i></div>
+                <!-- Pagination -->
+                {% if pagination.pageCount > 1 %}
+                    <nav class="pagination-custom" aria-label="Pagination">
+                        <ul class="pagination justify-content-center">
+                            <!-- Première page -->
+                            {% if pagination.currentPageNumber > 1 %}
+                                <li class="page-item">
+                                    <a 
+                                        class="page-link" 
+                                        href="{{ path('instructor_quiz_list', {page: 1, search: searchQuery}) }}"
+                                    >
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-angle-double-left"></i></span>
+                                </li>
+                            {% endif %}
 
-<script src="/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/assets/vendor/choices/js/choices.min.js"></script>
-<script src="/assets/js/functions.js"></script>
+                            <!-- Page précédente -->
+                            {% if pagination.currentPageNumber > 1 %}
+                                <li class="page-item">
+                                    <a 
+                                        class="page-link" 
+                                        href="{{ path('instructor_quiz_list', {page: pagination.currentPageNumber - 1, search: searchQuery}) }}"
+                                    >
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-angle-left"></i></span>
+                                </li>
+                            {% endif %}
 
-</body>
-</html>
+                            <!-- Pages numérotées -->
+                            {% set pagesInRange = range(1, pagination.pageCount) %}
+                            {% for page in pagesInRange %}
+                                {% if page >= pagination.currentPageNumber - 2 and page <= pagination.currentPageNumber + 2 %}
+                                    {% if page == pagination.currentPageNumber %}
+                                        <li class="page-item active">
+                                            <span class="page-link">
+                                                {{ page }}
+                                                <span class="visually-hidden">(current)</span>
+                                            </span>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a 
+                                                class="page-link" 
+                                                href="{{ path('instructor_quiz_list', {page: page, search: searchQuery}) }}"
+                                            >
+                                                {{ page }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+
+                            <!-- Page suivante -->
+                            {% if pagination.currentPageNumber < pagination.pageCount %}
+                                <li class="page-item">
+                                    <a 
+                                        class="page-link" 
+                                        href="{{ path('instructor_quiz_list', {page: pagination.currentPageNumber + 1, search: searchQuery}) }}"
+                                    >
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-angle-right"></i></span>
+                                </li>
+                            {% endif %}
+
+                            <!-- Dernière page -->
+                            {% if pagination.currentPageNumber < pagination.pageCount %}
+                                <li class="page-item">
+                                    <a 
+                                        class="page-link" 
+                                        href="{{ path('instructor_quiz_list', {page: pagination.pageCount, search: searchQuery}) }}"
+                                    >
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-angle-double-right"></i></span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    <div class="text-center text-muted mb-3">
+                        <small>Page {{ pagination.currentPageNumber }} sur {{ pagination.pageCount }} 
+                        ({{ totalCount }} évaluations au total)</small>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="no-data">
+                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                    {% if searchQuery %}
+                        <p>Aucune évaluation ne correspond à votre recherche.</p>
+                        <a href="{{ path('instructor_quiz_list') }}" class="btn btn-sm btn-outline-primary">
+                            Voir toutes les évaluations
+                        </a>
+                    {% else %}
+                        <p>Vous n'avez pas encore créé d'évaluation.</p>
+                        <a href="{{ path('instructor_quiz_new') }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-plus me-2"></i>Créer votre première évaluation
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 1200px;
+    }
+</style>
+
 {% endblock %}
 
