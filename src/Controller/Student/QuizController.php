@@ -84,25 +84,10 @@ class QuizController extends AbstractController
     {
         $answers = $request->request->all();
         $awardedPoints = 0;
+        $maxPoints = (float) $quiz->getTotalScore();
         $questions = $quiz->getQuestions();
 
-        if (count($questions) === 0) {
-            return 0;
-        }
-
-        // Calculate max points from questions (in case total_score wasn't set)
-        $maxPoints = 0;
-        foreach ($questions as $question) {
-            $maxPoints += (float) $question->getScore();
-        }
-
-        // If still no points, fall back to quiz total_score
-        if ($maxPoints <= 0) {
-            $maxPoints = (float) $quiz->getTotalScore();
-        }
-
-        // If still zero, can't calculate
-        if ($maxPoints <= 0) {
+        if ($maxPoints <= 0 || count($questions) === 0) {
             return 0;
         }
 
