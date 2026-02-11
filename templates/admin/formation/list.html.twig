@@ -189,7 +189,9 @@
 											<td>{{ formation.title }}</td>
 											<td>{% if formation.creator is not null %}{{ formation.creator.fullName }}{% else %}System Admin{% endif %}</td>
 											<td>
-												{% if formation.isArchived %}
+												{% if formation.isArchived and not formation.isApproved %}
+													<span class="badge bg-danger">Disapproved</span>
+												{% elseif formation.isArchived %}
 													<span class="badge bg-secondary">Archived</span>
 												{% elseif formation.isApproved %}
 													<span class="badge bg-success">Approved</span>

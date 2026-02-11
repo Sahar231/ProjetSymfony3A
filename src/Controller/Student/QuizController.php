@@ -3,6 +3,7 @@
 namespace App\Controller\Student;
 
 use App\Entity\Quiz;
+use App\Repository\CertificateRepository;
 use App\Service\CertificateService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,6 +19,7 @@ class QuizController extends AbstractController
     public function __construct(
         private CertificateService $certificateService,
         private EntityManagerInterface $entityManager,
+        private CertificateRepository $certificateRepository,
     ) {
     }
 
@@ -30,8 +32,47 @@ class QuizController extends AbstractController
     #[Route('/{id}/start', name: 'student_quiz_start', methods: ['GET'])]
     public function start(Quiz $quiz): Response
     {
+        $user = $this->getUser();
+        
+        // Check if user has already passed this quiz (has a certificate)
+        $certificate = $this->certificateRepository->findByUserAndQuiz($user, $quiz);
+        
+        if ($certificate) {
+            // User has passed this quiz before - redirect to view-only results
+            $this->addFlash('info', 'You have already passed this quiz. You can view your results below.');
+            return $this->redirectToRoute('student_quiz_results', ['id' => $quiz->getId()]);
+        }
+
         return $this->render('student/quiz/start.html.twig', [
             'quiz' => $quiz,
+        ]);
+    }
+
+    #[Route('/{id}/results', name: 'student_quiz_results', methods: ['GET'])]
+    public function viewResults(Quiz $quiz): Response
+    {
+        $user = $this->getUser();
+        $formation = $quiz->getFormation();
+
+        // Verify user is enrolled in the formation
+        if (!$user->getFormations()->contains($formation)) {
+            $this->addFlash('error', 'You must be enrolled in the formation to view this quiz.');
+            return $this->redirectToRoute('student_formations');
+        }
+
+        // Get the certificate for this user and quiz (should exist if they passed)
+        $certificate = $this->certificateRepository->findByUserAndQuiz($user, $quiz);
+
+        if (!$certificate) {
+            $this->addFlash('error', 'No passed quiz record found. Please take the quiz first.');
+            return $this->redirectToRoute('student_formation_view', ['id' => $formation->getId()]);
+        }
+
+        // Render view-only results page
+        return $this->render('student/quiz/passed-results.html.twig', [
+            'quiz' => $quiz,
+            'certificate' => $certificate,
+            'formation' => $formation,
         ]);
     }
 
@@ -45,6 +86,13 @@ class QuizController extends AbstractController
         if (!$user->getFormations()->contains($formation)) {
             $this->addFlash('error', 'You must be enrolled in the formation to take this quiz.');
             return $this->redirectToRoute('student_formations');
+        }
+
+        // Check if user has already passed this quiz
+        $existingCertificate = $this->certificateRepository->findByUserAndQuiz($user, $quiz);
+        if ($existingCertificate) {
+            $this->addFlash('warning', 'You have already passed this quiz and cannot retake it.');
+            return $this->redirectToRoute('student_quiz_results', ['id' => $quiz->getId()]);
         }
 
         // Calculate score from submitted answers

@@ -185,7 +185,9 @@
 											<td>{{ formation.id }}</td>
 											<td>{{ formation.title }}</td>
 											<td>
-												{% if formation.isArchived %}
+												{% if formation.isArchived and not formation.isApproved %}
+													<span class="badge bg-danger">Disapproved</span>
+												{% elseif formation.isArchived %}
 													<span class="badge bg-secondary">Archived</span>
 												{% elseif formation.isApproved %}
 													<span class="badge bg-success">Approved</span>
@@ -215,7 +217,10 @@
 													<span class="btn btn-sm btn-info disabled" title="Formation must be approved first">Edit</span>
 													<span class="btn btn-sm btn-primary disabled" title="Formation must be approved first">View</span>
 												{% endif %}
-												{% if not formation.isArchived %}
+												{% if formation.isArchived and not formation.isApproved %}
+													<!-- Disapproved formation - cannot be unarchived -->
+													<span class="btn btn-sm btn-danger disabled" title="This formation has been disapproved">Disapproved</span>
+												{% elseif not formation.isArchived %}
 													<form method="POST" action="{{ path('instructor_formation_archive', {id: formation.id}) }}" style="display:inline;">
 														<button type="submit" class="btn btn-sm btn-warning" title="Archive this formation">
 															<i class="bi bi-archive me-1"></i>Archive

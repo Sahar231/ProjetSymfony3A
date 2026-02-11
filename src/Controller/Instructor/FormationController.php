@@ -211,7 +211,7 @@ class FormationController extends AbstractController
 
             $entityManager->flush();
 
-            $this->addFlash('success', 'Formation created successfully with ' . count($quizzes) . ' quiz(zes)! It will be reviewed by admin for approval.');
+            $this->addFlash('success', "Formation \"$title\" created successfully with " . count($quizzes) . ' quiz(zes)! It will be reviewed by admin for approval.');
             return $this->redirectToRoute('instructor_formation_list');
         }
 
@@ -375,7 +375,7 @@ class FormationController extends AbstractController
 
             $entityManager->flush();
 
-            $this->addFlash('success', 'Formation updated successfully!');
+            $this->addFlash('success', "Formation \"" . $formation->getTitle() . "\" updated successfully!");
             return $this->redirectToRoute('instructor_formation_list');
         }
 
@@ -409,7 +409,7 @@ class FormationController extends AbstractController
         $formation->setArchived(true);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Formation archived successfully!');
+        $this->addFlash('success', "Formation \"" . $formation->getTitle() . "\" archived successfully!");
         return $this->redirectToRoute('instructor_formation_list');
     }
 
@@ -438,6 +438,31 @@ class FormationController extends AbstractController
         $formation->setArchived(false);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Formation unarchived successfully!');
+        $this->addFlash('success', "Formation \"" . $formation->getTitle() . "\" unarchived successfully!");
         return $this->redirectToRoute('instructor_formation_list');
-    }}
+    }
+
+    #[Route('/{id}/delete', name: 'instructor_formation_delete', methods: ['POST'])]
+    public function delete(int $id, EntityManagerInterface $entityManager): Response
+    {
+        $formation = $entityManager->getRepository(Formation::class)->find($id);
+
+        if (!$formation) {
+            $this->addFlash('error', 'Formation not found');
+            return $this->redirectToRoute('instructor_formation_list');
+        }
+
+        // Check if the current user is the creator
+        if ($formation->getCreator()?->getId() !== $this->getUser()?->getId()) {
+            $this->addFlash('error', 'You can only delete your own formations');
+            return $this->redirectToRoute('instructor_formation_list');
+        }
+
+        $formationTitle = $formation->getTitle();
+        $entityManager->remove($formation);
+        $entityManager->flush();
+
+        $this->addFlash('success', "Formation \"$formationTitle\" deleted successfully!");
+        return $this->redirectToRoute('instructor_formation_list');
+    }
+}

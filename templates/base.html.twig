@@ -321,6 +321,64 @@
 </header>
 <!-- Header END -->
 
+<!-- Flash Messages START -->
+{% if app.flashes %}
+	<div class="container mt-3">
+		{% for type, messages in app.flashes %}
+			{% if type == 'success' %}
+				<div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+					<div class="d-flex align-items-center">
+						<i class="fas fa-check-circle me-3 text-success fs-5"></i>
+						<div>
+							{% for message in messages %}
+								<p class="mb-0"><strong>{{ message }}</strong></p>
+							{% endfor %}
+						</div>
+					</div>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+			{% elseif type == 'error' %}
+				<div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+					<div class="d-flex align-items-center">
+						<i class="fas fa-exclamation-circle me-3 text-danger fs-5"></i>
+						<div>
+							{% for message in messages %}
+								<p class="mb-0"><strong>{{ message }}</strong></p>
+							{% endfor %}
+						</div>
+					</div>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+			{% elseif type == 'warning' %}
+				<div class="alert alert-warning alert-dismissible fade show border-0 shadow-sm" role="alert">
+					<div class="d-flex align-items-center">
+						<i class="fas fa-exclamation-triangle me-3 text-warning fs-5"></i>
+						<div>
+							{% for message in messages %}
+								<p class="mb-0"><strong>{{ message }}</strong></p>
+							{% endfor %}
+						</div>
+					</div>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+			{% elseif type == 'info' %}
+				<div class="alert alert-info alert-dismissible fade show border-0 shadow-sm" role="alert">
+					<div class="d-flex align-items-center">
+						<i class="fas fa-info-circle me-3 text-info fs-5"></i>
+						<div>
+							{% for message in messages %}
+								<p class="mb-0"><strong>{{ message }}</strong></p>
+							{% endfor %}
+						</div>
+					</div>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+			{% endif %}
+		{% endfor %}
+	</div>
+{% endif %}
+<!-- Flash Messages END -->
+
 <!-- **************** MAIN CONTENT START **************** -->
 <main>
 

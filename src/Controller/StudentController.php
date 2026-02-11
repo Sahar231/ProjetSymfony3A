@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Formation;
+use App\Repository\CertificateRepository;
 use App\Repository\FormationRepository;
 use App\Repository\WalletRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -93,7 +94,7 @@ class StudentController extends AbstractController
     }
 
     #[Route('/formation/{id}', name: 'formation_view')]
-    public function viewFormation(Formation $formation): Response
+    public function viewFormation(Formation $formation, CertificateRepository $certificateRepository): Response
     {
         // Prevent viewing archived formations
         if ($formation->isArchived()) {
@@ -101,8 +102,20 @@ class StudentController extends AbstractController
             return $this->redirectToRoute('student_formations');
         }
 
+        $user = $this->getUser();
+        
+        // Get all passed quiz IDs for this user in this formation
+        $passedQuizIds = [];
+        foreach ($formation->getQuizzes() as $quiz) {
+            $certificate = $certificateRepository->findByUserAndQuiz($user, $quiz);
+            if ($certificate) {
+                $passedQuizIds[] = $quiz->getId();
+            }
+        }
+
         return $this->render('student/formation/view.html.twig', [
             'formation' => $formation,
+            'passedQuizIds' => $passedQuizIds,
         ]);
     }
 

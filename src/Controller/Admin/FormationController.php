@@ -156,7 +156,7 @@ class FormationController extends AbstractController
             // Note: Admin does NOT create quizzes with formations
             // Quizzes can only be created by instructors for their own formations
 
-            $this->addFlash('success', 'Formation created successfully and auto-approved!');
+            $this->addFlash('success', "Formation \"$title\" created successfully and auto-approved!");
             return $this->redirectToRoute('admin_formation_list');
         }
 
@@ -224,7 +224,7 @@ class FormationController extends AbstractController
 
             $entityManager->flush();
 
-            $this->addFlash('success', 'Formation updated successfully!');
+            $this->addFlash('success', "Formation \"" . $formation->getTitle() . "\" updated successfully!");
             return $this->redirectToRoute('admin_formation_list');
         }
 
@@ -246,8 +246,26 @@ class FormationController extends AbstractController
         $formation->setIsApproved(true);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Formation approved successfully!');
+        $this->addFlash('success', "Formation \"" . $formation->getTitle() . "\" approved successfully!");
         return $this->redirectToRoute('admin_formations_approval', ['status' => 'approved']);
+    }
+
+    #[Route('/{id}/disapprove', name: 'admin_formation_disapprove', methods: ['POST'])]
+    public function disapprove(int $id, EntityManagerInterface $entityManager): Response
+    {
+        $formation = $entityManager->getRepository(Formation::class)->find($id);
+
+        if (!$formation) {
+            $this->addFlash('error', 'Formation not found');
+            return $this->redirectToRoute('admin_formations_approval', ['status' => 'pending']);
+        }
+
+        // Archive the formation to indicate rejection
+        $formation->setArchived(true);
+        $entityManager->flush();
+
+        $this->addFlash('error', "Formation \"" . $formation->getTitle() . "\" has been rejected and archived!");
+        return $this->redirectToRoute('admin_formations_approval', ['status' => 'pending']);
     }
 
     #[Route('/{id}/delete', name: 'admin_formation_delete', methods: ['POST'])]
@@ -260,10 +278,11 @@ class FormationController extends AbstractController
             return $this->redirectToRoute('admin_formation_list');
         }
 
+        $formationTitle = $formation->getTitle();
         $entityManager->remove($formation);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Formation deleted successfully!');
+        $this->addFlash('success', "Formation \"$formationTitle\" deleted successfully!");
         return $this->redirectToRoute('admin_formation_list');
     }
 
@@ -280,7 +299,7 @@ class FormationController extends AbstractController
         $formation->setArchived(true);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Formation archived successfully!');
+        $this->addFlash('success', "Formation \"" . $formation->getTitle() . "\" archived successfully!");
         return $this->redirectToRoute('admin_formation_list');
     }
 
@@ -297,7 +316,7 @@ class FormationController extends AbstractController
         $formation->setArchived(false);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Formation unarchived successfully!');
+        $this->addFlash('success', "Formation \"" . $formation->getTitle() . "\" unarchived successfully!");
         return $this->redirectToRoute('admin_formation_list');
     }
 
