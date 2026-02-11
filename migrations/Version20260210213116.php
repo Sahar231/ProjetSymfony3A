@@ -20,6 +20,10 @@ final class Version20260210213116 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
+        // First, set creator_id to 2 (admin) for any creator_id = 0
+        $this->addSql('UPDATE formation SET creator_id = 2 WHERE creator_id = 0 OR creator_id IS NULL');
+        
+        // Now add the foreign key constraint
         $this->addSql('ALTER TABLE formation ADD CONSTRAINT FK_404021BF61220EA6 FOREIGN KEY (creator_id) REFERENCES user (id)');
         $this->addSql('CREATE INDEX IDX_404021BF61220EA6 ON formation (creator_id)');
     }

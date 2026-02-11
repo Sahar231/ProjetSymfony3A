@@ -68,6 +68,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $bio = null;
 
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Wallet $wallet = null;
 
     /**
      * @var Collection<int, Formation>
@@ -75,10 +77,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Formation::class, inversedBy: 'users')]
     private Collection $formations;
 
+    /**
+     * @var Collection<int, Certificate>
+     */
+    #[ORM\OneToMany(targetEntity: Certificate::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $certificates;
+
     public function __construct()
     {
         $this->enrollments = new ArrayCollection();
         $this->formations = new ArrayCollection();
+        $this->certificates = new ArrayCollection();
     }
 
     public function getGoogleId(): ?string
@@ -305,6 +314,47 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeFormation(Formation $formation): static
     {
         $this->formations->removeElement($formation);
+
+        return $this;
+    }
+
+    public function getWallet(): ?Wallet
+    {
+        return $this->wallet;
+    }
+
+    public function setWallet(?Wallet $wallet): static
+    {
+        $this->wallet = $wallet;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Certificate>
+     */
+    public function getCertificates(): Collection
+    {
+        return $this->certificates;
+    }
+
+    public function addCertificate(Certificate $certificate): static
+    {
+        if (!$this->certificates->contains($certificate)) {
+            $this->certificates->add($certificate);
+            $certificate->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCertificate(Certificate $certificate): static
+    {
+        if ($this->certificates->removeElement($certificate)) {
+            if ($certificate->getUser() === $this) {
+                $certificate->setUser(null);
+            }
+        }
 
         return $this;
     }

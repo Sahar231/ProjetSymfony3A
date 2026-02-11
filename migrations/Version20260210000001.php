@@ -20,9 +20,15 @@ final class Version20260210000001 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE formation ADD creator_id INT');
-        $this->addSql('ALTER TABLE formation ADD CONSTRAINT FK_404021BF61220EA6 FOREIGN KEY (creator_id) REFERENCES user (id)');
-        $this->addSql('CREATE INDEX IDX_404021BF61220EA6 ON formation (creator_id)');
+        // Check if column already exists before adding
+        $schemaManager = $this->connection->createSchemaManager();
+        $columns = $schemaManager->listTableColumns('formation');
+        
+        if (!isset($columns['creator_id'])) {
+            $this->addSql('ALTER TABLE formation ADD creator_id INT');
+            $this->addSql('ALTER TABLE formation ADD CONSTRAINT FK_404021BF61220EA6 FOREIGN KEY (creator_id) REFERENCES user (id)');
+            $this->addSql('CREATE INDEX IDX_404021BF61220EA6 ON formation (creator_id)');
+        }
     }
 
     public function down(Schema $schema): void

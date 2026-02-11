@@ -20,7 +20,7 @@ class Question
     #[ORM\Column(length: 255)]
     private ?string $reply = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: 2)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $score = null;
 
     #[ORM\Column(length: 255)]

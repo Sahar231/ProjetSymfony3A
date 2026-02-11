@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Formation;
 use App\Repository\FormationRepository;
+use App\Repository\WalletRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,18 +35,60 @@ class StudentController extends AbstractController
     }
 
     #[Route('/formations', name: 'formations')]
-    public function formations(FormationRepository $formationRepository): Response
+    public function formations(FormationRepository $formationRepository, Request $request): Response
     {
         $user = $this->getUser();
+        $search = $request->query->get('search', '');
+        $sort = $request->query->get('sort', 'date_desc');
 
         // Filter enrolled formations to exclude archived ones
         $enrolledFormations = $user->getFormations()->filter(function (Formation $formation) {
             return !$formation->isArchived();
         });
 
+        // Apply search filter if needed
+        if (!empty($search)) {
+            $enrolledFormations = $enrolledFormations->filter(function (Formation $formation) use ($search) {
+                $lowerSearch = strtolower($search);
+                return stripos($formation->getTitle(), $search) !== false || 
+                       stripos($formation->getDescription(), $search) !== false;
+            });
+        }
+
+        $availableFormations = $formationRepository->findApprovedAndNotArchived();
+
+        // Apply search filter to available formations
+        if (!empty($search)) {
+            $availableFormations = array_filter($availableFormations, function (Formation $formation) use ($search) {
+                return stripos($formation->getTitle(), $search) !== false || 
+                       stripos($formation->getDescription(), $search) !== false;
+            });
+        }
+
+        // Apply sort
+        $sortCallback = function ($a, $b) use ($sort) {
+            switch ($sort) {
+                case 'title_asc':
+                    return strcmp($a->getTitle(), $b->getTitle());
+                case 'title_desc':
+                    return strcmp($b->getTitle(), $a->getTitle());
+                case 'date_asc':
+                    return $a->getCreatedAt() <=> $b->getCreatedAt();
+                case 'date_desc':
+                default:
+                    return $b->getCreatedAt() <=> $a->getCreatedAt();
+            }
+        };
+
+        $enrolledArray = $enrolledFormations->toArray();
+        usort($enrolledArray, $sortCallback);
+        usort($availableFormations, $sortCallback);
+
         return $this->render('student/formation/list.html.twig', [
-            'enrolledFormations' => $enrolledFormations,
-            'availableFormations' => $formationRepository->findApprovedAndNotArchived(),
+            'enrolledFormations' => $enrolledArray,
+            'availableFormations' => $availableFormations,
+            'search' => $search,
+            'sort' => $sort,
         ]);
     }
 
@@ -64,16 +107,61 @@ class StudentController extends AbstractController
     }
 
     #[Route('/formation/{id}/enroll', name: 'formation_enroll', methods: ['POST'])]
-    public function enrollFormation(Formation $formation, EntityManagerInterface $entityManager, Request $request): Response
+    public function enrollFormation(Formation $formation, EntityManagerInterface $entityManager, WalletRepository $walletRepository): Response
     {
         $user = $this->getUser();
 
-        if (!$user->getFormations()->contains($formation)) {
+        // Check if already enrolled
+        if ($user->getFormations()->contains($formation)) {
+            $this->addFlash('warning', 'You are already enrolled in this formation');
+            return $this->redirectToRoute('student_formation_view', ['id' => $formation->getId()]);
+        }
+
+        // Check if formation has a price
+        if ($formation->getPrice() && $formation->getPrice() > 0) {
+            // Formation is paid - need to process payment from wallet
+            $wallet = $walletRepository->findByUser($user);
+
+            // Check if student has a wallet
+            if (!$wallet) {
+                $this->addFlash('error', 'You need to create a wallet before purchasing formations. Please create your wallet first to get your welcome bonus.');
+                return $this->redirectToRoute('student_wallet_create');
+            }
+
+            // Check if wallet has sufficient balance
+            if ($wallet->getBalance() < $formation->getPrice()) {
+                $insufficientAmount = $formation->getPrice() - $wallet->getBalance();
+                $this->addFlash(
+                    'error', 
+                    sprintf(
+                        'Insufficient balance! You need %.2f more credits. Current balance: %.2f credits. Formation price: %.2f credits.',
+                        $insufficientAmount,
+                        $wallet->getBalance(),
+                        $formation->getPrice()
+                    )
+                );
+                return $this->redirectToRoute('student_formation_view', ['id' => $formation->getId()]);
+            }
+
+            // Deduct from wallet and enroll
+            $wallet->deductBalance($formation->getPrice());
+            $user->addFormation($formation);
+            $entityManager->flush();
+
+            $this->addFlash(
+                'success', 
+                sprintf(
+                    'Successfully purchased and enrolled in %s! %.2f credits have been deducted from your wallet. New balance: %.2f credits.',
+                    $formation->getTitle(),
+                    $formation->getPrice(),
+                    $wallet->getBalance()
+                )
+            );
+        } else {
+            // Free formation - just enroll
             $user->addFormation($formation);
             $entityManager->flush();
             $this->addFlash('success', 'Successfully enrolled in ' . $formation->getTitle());
-        } else {
-            $this->addFlash('warning', 'You are already enrolled in this formation');
         }
 
         return $this->redirectToRoute('student_formation_view', ['id' => $formation->getId()]);

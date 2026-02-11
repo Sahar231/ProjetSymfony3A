@@ -63,36 +63,6 @@ class FormationController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'instructor_formation_show', methods: ['GET'])]
-    public function show(int $id, EntityManagerInterface $entityManager): Response
-    {
-        $qb = $entityManager->createQueryBuilder();
-        $formation = $qb
-            ->select('f')
-            ->from(Formation::class, 'f')
-            ->leftJoin('f.creator', 'c')
-            ->addSelect('c')
-            ->where('f.id = :id')
-            ->setParameter('id', $id)
-            ->getQuery()
-            ->getOneOrNullResult();
-
-        if (!$formation) {
-            $this->addFlash('error', 'Formation not found');
-            return $this->redirectToRoute('instructor_formation_list');
-        }
-
-        // Check if the current user is the creator
-        if ($formation->getCreator()?->getId() !== $this->getUser()?->getId()) {
-            $this->addFlash('error', 'You can only view your own formations');
-            return $this->redirectToRoute('instructor_formation_list');
-        }
-
-        return $this->render('instructor/formation/show.html.twig', [
-            'formation' => $formation
-        ]);
-    }
-
     #[Route('/create', name: 'instructor_formation_create', methods: ['GET', 'POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -101,6 +71,7 @@ class FormationController extends AbstractController
             $description = $request->request->get('description');
             $duration = $request->request->get('duration');
             $level = $request->request->get('level');
+            $price = $request->request->get('price');
 
             // Validation errors array
             $errors = [];
@@ -132,6 +103,13 @@ class FormationController extends AbstractController
                 $errors[] = 'Formation level is required.';
             }
 
+            // Validate price
+            if ($price === '' || $price === null) {
+                $errors[] = 'Formation price is required.';
+            } elseif (!is_numeric($price) || (float)$price < 0) {
+                $errors[] = 'Formation price must be a valid number (0 or greater).';
+            }
+
             // Validate quizzes and their score distributions
             $quizzes = $request->request->all()['quiz'] ?? [];
             $quizValidationErrors = $this->validateQuizzes($quizzes);
@@ -150,7 +128,7 @@ class FormationController extends AbstractController
             $formation->setTitle($title);
             $formation->setDescription($description);
             $formation->setContent($description);
-            $formation->setPrice(0);
+            $formation->setPrice((float)$price);
             $formation->setDuration((int)$duration);
 
             // Handle file upload
@@ -198,15 +176,17 @@ class FormationController extends AbstractController
 
                 $questions = $quizData['questions'] ?? [];
                 $totalQuestions = 0;
+                $totalScore = 0;
 
                 foreach ($questions as $questionData) {
                     if (!is_array($questionData) || empty($questionData['question'])) {
                         continue;
                     }
 
+                    $questionScore = (float)($questionData['score'] ?? 1);
                     $question = new Question();
                     $question->setQuestion($questionData['question']);
-                    $question->setScore((float)($questionData['score'] ?? 1));
+                    $question->setScore($questionScore);
                     $question->setType('qcm');
                     $question->setQuiz($quiz);
 
@@ -221,9 +201,11 @@ class FormationController extends AbstractController
 
                     $entityManager->persist($question);
                     $totalQuestions++;
+                    $totalScore += $questionScore;
                 }
 
                 $quiz->setTotalQuestions($totalQuestions);
+                $quiz->setTotalScore((string)$totalScore);
                 $entityManager->persist($quiz);
             }
 
@@ -234,6 +216,36 @@ class FormationController extends AbstractController
         }
 
         return $this->render('instructor/formation/add.html.twig');
+    }
+
+    #[Route('/{id}', name: 'instructor_formation_show', methods: ['GET'])]
+    public function show(int $id, EntityManagerInterface $entityManager): Response
+    {
+        $qb = $entityManager->createQueryBuilder();
+        $formation = $qb
+            ->select('f')
+            ->from(Formation::class, 'f')
+            ->leftJoin('f.creator', 'c')
+            ->addSelect('c')
+            ->where('f.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (!$formation) {
+            $this->addFlash('error', 'Formation not found');
+            return $this->redirectToRoute('instructor_formation_list');
+        }
+
+        // Check if the current user is the creator
+        if ($formation->getCreator()?->getId() !== $this->getUser()?->getId()) {
+            $this->addFlash('error', 'You can only view your own formations');
+            return $this->redirectToRoute('instructor_formation_list');
+        }
+
+        return $this->render('instructor/formation/show.html.twig', [
+            'formation' => $formation
+        ]);
     }
 
     /**

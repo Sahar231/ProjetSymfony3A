@@ -61,7 +61,6 @@ class FormationController extends AbstractController
     }
 
     #[Route('/create', name: 'admin_formation_create', methods: ['GET', 'POST'])]
-    #[Route('/admin/create/formations', name: 'admin_create_formations', methods: ['GET', 'POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         if ($request->isMethod('POST')) {
@@ -69,6 +68,7 @@ class FormationController extends AbstractController
             $description = $request->request->get('description');
             $duration = $request->request->get('duration');
             $level = $request->request->get('level');
+            $price = $request->request->get('price');
 
             // Validation errors array
             $errors = [];
@@ -100,6 +100,13 @@ class FormationController extends AbstractController
                 $errors[] = 'Formation level is required.';
             }
 
+            // Validate price
+            if ($price === '' || $price === null) {
+                $errors[] = 'Formation price is required.';
+            } elseif (!is_numeric($price) || (float)$price < 0) {
+                $errors[] = 'Formation price must be a valid number (0 or greater).';
+            }
+
             // If there are validation errors, display them
             if (!empty($errors)) {
                 foreach ($errors as $error) {
@@ -113,7 +120,7 @@ class FormationController extends AbstractController
             $formation->setTitle($title);
             $formation->setDescription($description);
             $formation->setContent($description);
-            $formation->setPrice(0);
+            $formation->setPrice((float)$price);
             $formation->setDuration((int)$duration);
             $formation->setIsApproved(true); // Admin formations are auto-approved
 
@@ -224,6 +231,23 @@ class FormationController extends AbstractController
         return $this->render('admin/formation/edit.html.twig', [
             'formation' => $formation
         ]);
+    }
+
+    #[Route('/{id}/approve', name: 'admin_formation_approve', methods: ['POST'])]
+    public function approve(int $id, EntityManagerInterface $entityManager): Response
+    {
+        $formation = $entityManager->getRepository(Formation::class)->find($id);
+
+        if (!$formation) {
+            $this->addFlash('error', 'Formation not found');
+            return $this->redirectToRoute('admin_formations_approval', ['status' => 'pending']);
+        }
+
+        $formation->setIsApproved(true);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Formation approved successfully!');
+        return $this->redirectToRoute('admin_formations_approval', ['status' => 'approved']);
     }
 
     #[Route('/{id}/delete', name: 'admin_formation_delete', methods: ['POST'])]

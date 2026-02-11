@@ -25,10 +25,10 @@ class Quiz
     #[ORM\Column(length: 255)]
     private ?string $Category = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: 0)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $total_score = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: 0)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
     private ?string $Pass_Score = null;
 
     #[ORM\Column]

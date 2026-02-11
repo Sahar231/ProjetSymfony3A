@@ -51,9 +51,102 @@
                                 </div>
                             {% endif %}
 
+                            {% if app.user and app.user.formations.contains(formation) %}
+                                <!-- FULL CONTENT - SHOWN ONLY TO ENROLLED STUDENTS -->
+                                
+                                <!-- Course Content -->
+                                {% if formation.content %}
+                                    <div class="mb-4 p-4 bg-light border-left rounded">
+                                        <h6 class="fw-bold mb-3"><i class="fas fa-book me-2"></i>Course Content</h6>
+                                        <div class="text-muted" style="line-height: 1.8;">
+                                            {{ formation.content|raw }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Support Materials -->
+                                {% if formation.supportFile %}
+                                    <div class="mb-4">
+                                        <h6 class="fw-bold mb-2"><i class="fas fa-file-download me-2"></i>Support Materials</h6>
+                                        <a href="{{ formation.supportFile }}" target="_blank" class="btn btn-outline-primary">
+                                            <i class="fas fa-download me-2"></i>Download Course Materials
+                                        </a>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Duration Section -->
+                                {% if formation.duration %}
+                                    <div class="mb-4 p-3 bg-light rounded">
+                                        <h6 class="fw-bold mb-2"><i class="fas fa-hourglass-half me-2"></i>Course Duration</h6>
+                                        <p class="mb-0">
+                                            <span class="badge bg-primary">{{ formation.duration }} {% if formation.duration == 1 %}week{% else %}weeks{% endif %}</span>
+                                            <small class="text-muted ms-2">Self-paced learning</small>
+                                        </p>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Quizzes Section -->
+                                {% if formation.quizzes|length > 0 %}
+                                    <div class="mb-4">
+                                        <h6 class="fw-bold mb-3"><i class="fas fa-question-circle me-2 text-primary"></i>Course Quizzes</h6>
+                                        <div class="row g-3">
+                                            {% for quiz in formation.quizzes %}
+                                                <div class="col-12">
+                                                    <div class="card border-left border-primary shadow-sm h-100">
+                                                        <div class="card-body">
+                                                            <div class="d-flex align-items-start justify-content-between mb-3">
+                                                                <div class="flex-grow-1">
+                                                                    <h6 class="card-title mb-2">{{ quiz.Title }}</h6>
+                                                                    <p class="card-text text-muted small mb-0">{{ quiz.Description }}</p>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Quiz Details -->
+                                                            <div class="row g-2 mb-3">
+                                                                <div class="col-auto">
+                                                                    <span class="badge bg-info rounded-pill">
+                                                        <i class="fas fa-bar-chart me-1"></i>{{ quiz.difficulty }}
+                                                    </span>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <span class="badge bg-warning rounded-pill">
+                                                        <i class="fas fa-clipboard-check me-1"></i>{{ quiz.totalQuestions }} Questions
+                                                    </span>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <span class="badge bg-success rounded-pill">
+                                                        <i class="fas fa-check-circle me-1"></i>Pass: {{ quiz.passScore }}%
+                                                            <!-- Start Quiz Button -->
+                                                            <a href="{{ path('student_quiz_start', { id: quiz.id }) }}" class="btn btn-primary btn-sm w-100">
+                                                                <i class="fas fa-play me-2"></i>Start Quiz
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info border-0 p-3 mb-4">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <strong>No quizzes yet</strong> - Check back later for course assessments.
+                                    </div>
+                                {% endif %}
+
+                            {% else %}
+                                <!-- LIMITED CONTENT - SHOWN TO NON-ENROLLED STUDENTS -->
+                                <div class="alert alert-info border-0 p-4">
+                                    <h6 class="fw-bold mb-2"><i class="fas fa-lock me-2 text-info"></i>Course Content Preview</h6>
+                                    <p class="mb-0">
+                                        Subscribe to this formation to access the complete course content, materials, and quizzes.
+                                    </p>
+                                </div>
+
+                            {% endif %}
+
                             <!-- Enrollment Status Section -->
                             <div class="card bg-light border-0 p-3 mt-4">
-                                <h6 class="fw-bold mb-3"><i class="fas fa-info-circle me-2 text-info"></i>Enrollment Information</h6>
+                                <h6 class="fw-bold mb-3"><i class="fas fa-info-circle me-2 text-info"></i>Formation Information</h6>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <div class="d-flex align-items-center">
@@ -93,6 +186,22 @@
                 <div class="col-lg-4">
                     <div class="card border-0 shadow-sm sticky-top" style="top: 100px;">
                         <div class="card-body">
+                            <!-- Price Section -->
+                            {% if formation.price is not null %}
+                                <div class="mb-4 p-3 bg-light rounded text-center border-2" style="border-color: #f5576c !important;">
+                                    <small class="d-block text-muted mb-2">Formation Price</small>
+                                    {% if formation.price > 0 %}
+                                        <h4 class="mb-0">
+                                            <i class="fas fa-coins text-success me-2"></i>{{ formation.price|round(2) }} credits
+                                        </h4>
+                                    {% else %}
+                                        <span class="badge bg-info p-2 py-2" style="font-size: 1rem;">
+                                            <i class="fas fa-gift me-1"></i>Free Formation
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
                             {% if app.user %}
                                 {% if app.user.formations.contains(formation) %}
                                     <div class="alert alert-success mb-3">
@@ -108,11 +217,19 @@
                                 {% else %}
                                     <div class="alert alert-info mb-3">
                                         <i class="fas fa-info-circle me-2"></i>
-                                        Click below to enroll in this formation
+                                        {% if formation.price > 0 %}
+                                            Click below to purchase and enroll in this formation
+                                        {% else %}
+                                            Click below to enroll in this formation
+                                        {% endif %}
                                     </div>
                                     <form method="POST" action="{{ path('student_formation_enroll', { id: formation.id }) }}">
-                                        <button type="submit" class="btn btn-success w-100 mb-2">
-                                            <i class="fas fa-plus me-2"></i>Enroll Now
+                                        <button type="submit" class="btn w-100 mb-2 {% if formation.price > 0 %}btn-primary{% else %}btn-success{% endif %}">
+                                            {% if formation.price > 0 %}
+                                                <i class="fas fa-shopping-cart me-2"></i>Buy Now
+                                            {% else %}
+                                                <i class="fas fa-plus me-2"></i>Enroll Now
+                                            {% endif %}
                                         </button>
                                     </form>
                                     <a href="{{ path('student_formations') }}" class="btn btn-outline-secondary w-100">Browse Other Formations</a>
