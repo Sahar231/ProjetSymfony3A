@@ -22,9 +22,11 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">Contenu du Chapitre</h5>
-                        <button type="button" class="btn btn-sm btn-primary" id="editBtn" onclick="toggleEdit()">
-                            <i class="bi bi-pencil"></i> Éditer
-                        </button>
+                        <div>
+                            <a href="{{ path('student_chapitre_pdf', {id: chapitre.id}) }}" class="btn btn-sm btn-outline-primary me-2" download>
+                                <i class="bi bi-file-earmark-pdf"></i> Télécharger PDF
+                            </a>
+                        </div>
                     </div>
                     <hr>
 
@@ -32,14 +34,7 @@
                         {{ chapitre.contentAsHtml|raw }}
                     </div>
 
-                    <div id="editActions" style="display: none; margin-top: 1rem;">
-                        <button type="button" class="btn btn-success btn-sm" onclick="saveContent()">
-                            <i class="bi bi-check-circle"></i> Enregistrer
-                        </button>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit()">
-                            <i class="bi bi-x-circle"></i> Annuler
-                        </button>
-                    </div>
+                    {# editing removed for students: read-only view #}
 
                     <hr>
                     <p class="text-muted small">
@@ -108,72 +103,6 @@
 }
 </style>
 
-<script>
-let originalContent = '';
-let chapitreId = {{ chapitre.id }};
+{# Student view is read-only; no editing JS included #}
 
-function toggleEdit() {
-    const contentDiv = document.getElementById('chapterContent');
-    const editBtn = document.getElementById('editBtn');
-    const editActions = document.getElementById('editActions');
-    
-    if (contentDiv.contentEditable === 'false') {
-        // Start editing
-        originalContent = contentDiv.innerHTML;
-        contentDiv.contentEditable = 'true';
-        contentDiv.classList.add('editing');
-        contentDiv.focus();
-        editBtn.style.display = 'none';
-        editActions.style.display = 'block';
-    }
-}
-
-function saveContent() {
-    const contentDiv = document.getElementById('chapterContent');
-    const newContent = contentDiv.innerHTML;
-    
-    // Send to server via fetch
-    fetch(`{{ path('student_chapitre_update', {id: chapitre.id}) }}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({ content: newContent })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Contenu mis à jour avec succès!');
-            endEdit();
-        } else {
-            alert('Erreur: ' + (data.message || 'Impossible de sauvegarder'));
-            contentDiv.innerHTML = originalContent;
-            endEdit();
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Erreur de connexion');
-        contentDiv.innerHTML = originalContent;
-        endEdit();
-    });
-}
-
-function cancelEdit() {
-    const contentDiv = document.getElementById('chapterContent');
-    contentDiv.innerHTML = originalContent;
-    endEdit();
-}
-
-function endEdit() {
-    const contentDiv = document.getElementById('chapterContent');
-    const editBtn = document.getElementById('editBtn');
-    const editActions = document.getElementById('editActions');
-    
-    contentDiv.contentEditable = 'false';
-    contentDiv.classList.remove('editing');
-    editBtn.style.display = 'inline-block';
-    editActions.style.display = 'none';
-}
-</script>
+{% endblock %}

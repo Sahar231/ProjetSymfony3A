@@ -89,6 +89,9 @@
                                 <a href="{{ path('student_chapitre_show', {id: chapitre.id}) }}" class="btn btn-sm btn-primary">
                                     <i class="bi bi-book-open"></i> Lire
                                 </a>
+                                <a href="{{ path('student_chapitre_pdf', {id: chapitre.id}) }}" class="btn btn-sm btn-outline-primary ms-2">
+                                    <i class="bi bi-file-earmark-pdf"></i> PDF
+                                </a>
                             </td>
                         </tr>
                     {% endfor %}
@@ -96,67 +99,75 @@
             </table>
         </div>
     {% endif %}
-</div>
-{% endblock %}
+    </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const studentChaptersSearch = document.getElementById('studentChaptersSearch');
-    const studentChaptersSort = document.getElementById('studentChaptersSort');
-    const studentChaptresRows = document.querySelectorAll('#studentChaptresTable tbody tr');
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const studentChaptersSearch = document.getElementById('studentChaptersSearch');
+        const studentChaptersSort = document.getElementById('studentChaptersSort');
+        const studentChaptresRows = document.querySelectorAll('#studentChaptresTable tbody tr');
 
-    // Filter and Sort function
-    function filterAndSortChapters(searchTerm, sortType) {
-        const searchValue = searchTerm.toLowerCase();
-        
-        const visibleRows = Array.from(studentChaptresRows).filter(row => {
-            const title = row.cells[0]?.textContent.toLowerCase() || '';
-            return title.includes(searchValue);
-        });
-
-        // Sort rows
-        visibleRows.sort((a, b) => {
-            let aValue, bValue;
+        // Filter and Sort function
+        function filterAndSortChapters(searchTerm, sortType) {
+            const searchValue = searchTerm.toLowerCase();
             
-            if (sortType === 'title' || sortType === 'title-desc') {
-                aValue = a.cells[0]?.textContent.toLowerCase() || '';
-                bValue = b.cells[0]?.textContent.toLowerCase() || '';
-            } else if (sortType === 'date' || sortType === 'date-old') {
-                const aDate = new Date(a.cells[1]?.textContent || 0);
-                const bDate = new Date(b.cells[1]?.textContent || 0);
-                aValue = aDate;
-                bValue = bDate;
-            }
+            const visibleRows = Array.from(studentChaptresRows).filter(row => {
+                const title = row.cells[0]?.textContent.toLowerCase() || '';
+                return title.includes(searchValue);
+            });
 
-            if (sortType.includes('desc') || sortType === 'date-old') {
-                return bValue > aValue ? 1 : -1;
-            } else {
-                return aValue > bValue ? 1 : -1;
-            }
-        });
+            // Sort rows
+            visibleRows.sort((a, b) => {
+                let aValue, bValue;
+                
+                if (sortType === 'title' || sortType === 'title-desc') {
+                    aValue = a.cells[0]?.textContent.toLowerCase() || '';
+                    bValue = b.cells[0]?.textContent.toLowerCase() || '';
+                } else if (sortType === 'date' || sortType === 'date-old') {
+                    const aDate = new Date(a.cells[1]?.textContent || 0);
+                    const bDate = new Date(b.cells[1]?.textContent || 0);
+                    aValue = aDate;
+                    bValue = bDate;
+                }
 
-        // Show/hide rows
-        studentChaptresRows.forEach(row => {
-            row.style.display = 'none';
-        });
-        visibleRows.forEach(row => {
-            row.style.display = '';
-        });
-    }
+                if (sortType.includes('desc') || sortType === 'date-old') {
+                    return bValue > aValue ? 1 : -1;
+                } else {
+                    return aValue > bValue ? 1 : -1;
+                }
+            });
 
-    // Event listeners
-    studentChaptersSearch.addEventListener('input', () => {
-        filterAndSortChapters(studentChaptersSearch.value, studentChaptersSort.value);
+            // Show/hide rows
+            studentChaptresRows.forEach(row => {
+                row.style.display = 'none';
+            });
+            visibleRows.forEach(row => {
+                row.style.display = '';
+            });
+        }
+
+        // Event listeners
+        if (studentChaptersSearch) {
+            studentChaptersSearch.addEventListener('input', () => {
+                filterAndSortChapters(studentChaptersSearch.value, studentChaptersSort.value);
+            });
+        }
+        if (studentChaptersSort) {
+            studentChaptersSort.addEventListener('change', () => {
+                filterAndSortChapters(studentChaptersSearch.value, studentChaptersSort.value);
+            });
+        }
+
+        // Reset form
+        const searchForm = document.getElementById('studentChaptersSearchForm');
+        if (searchForm) {
+            searchForm.addEventListener('reset', () => {
+                setTimeout(() => {
+                    filterAndSortChapters('', 'title');
+                }, 0);
+            });
+        }
     });
-    studentChaptersSort.addEventListener('change', () => {
-        filterAndSortChapters(studentChaptersSearch.value, studentChaptersSort.value);
-    });
+    </script>
 
-    // Reset form
-    document.getElementById('studentChaptersSearchForm').addEventListener('reset', () => {
-        setTimeout(() => {
-            filterAndSortChapters('', 'title');
-        }, 0);
-    });
-});
-</script>
+{% endblock %}

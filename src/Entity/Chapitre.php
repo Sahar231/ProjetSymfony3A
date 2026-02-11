@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ChapitreRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ChapitreRepository::class)]
 class Chapitre
@@ -15,10 +16,18 @@ class Chapitre
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Le titre du chapitre est obligatoire.')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'Le titre doit contenir au moins {{ limit }} caractères.',
+        maxMessage: 'Le titre ne peut dépasser {{ limit }} caractères.'
+    )]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::JSON)]
-    private ?array $content = []; // Editor.js JSON data
+    #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'Le contenu du chapitre est obligatoire.')]
+    private ?string $content = null; // plain text / HTML
 
     #[ORM\ManyToOne(inversedBy: 'chapitres')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -58,12 +67,12 @@ class Chapitre
         return $this;
     }
 
-    public function getContent(): ?array
+    public function getContent(): ?string
     {
         return $this->content;
     }
 
-    public function setContent(array $content): static
+    public function setContent(?string $content): static
     {
         $this->content = $content;
         return $this;
@@ -104,41 +113,14 @@ class Chapitre
 
     public function getContentAsHtml(): string
     {
-        if (!$this->content || !isset($this->content['blocks'])) {
+        if (!$this->content) {
             return '';
         }
 
-        $html = '';
-        foreach ($this->content['blocks'] as $block) {
-            $html .= $this->renderBlock($block);
-        }
-
-        return $html;
-    }
-
-    private function renderBlock(array $block): string
-    {
-        $type = $block['type'] ?? '';
-        $data = $block['data'] ?? [];
-
-        return match ($type) {
-            'paragraph' => '<p>' . htmlspecialchars($data['text'] ?? '') . '</p>',
-            'heading' => '<h' . (int)($data['level'] ?? 2) . '>' . htmlspecialchars($data['text'] ?? '') . '</h' . (int)($data['level'] ?? 2) . '>',
-            'list' => $this->renderList($data),
-            'image' => '<img src="' . htmlspecialchars($data['url'] ?? '') . '" alt="' . htmlspecialchars($data['caption'] ?? '') . '">',
-            'code' => '<pre><code>' . htmlspecialchars($data['code'] ?? '') . '</code></pre>',
-            default => '',
-        };
-    }
-
-    private function renderList(array $data): string
-    {
-        $tag = ($data['style'] ?? 'unordered') === 'ordered' ? 'ol' : 'ul';
-        $html = '<' . $tag . '>';
-        foreach ($data['items'] ?? [] as $item) {
-            $html .= '<li>' . htmlspecialchars($item) . '</li>';
-        }
-        $html .= '</' . $tag . '>';
-        return $html;
+        // Treat stored content as safe HTML produced from the editor or user input.
+        // Escape and convert newlines to paragraphs for plain text.
+        $escaped = htmlspecialchars($this->content);
+        $withParagraphs = nl2br($escaped);
+        return $withParagraphs;
     }
 }

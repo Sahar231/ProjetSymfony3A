@@ -51,10 +51,10 @@ class AdminChapitreController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Handle content JSON conversion
+            // Store plain text content from form
             $content = $request->request->get('content');
             if ($content) {
-                $chapitre->setContent(json_decode($content, true) ?? []);
+                $chapitre->setContent($content);
             }
 
             $this->em->persist($chapitre);
@@ -82,10 +82,10 @@ class AdminChapitreController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Handle content JSON conversion
+            // Store plain text content from form
             $content = $request->request->get('content');
             if ($content) {
-                $chapitre->setContent(json_decode($content, true) ?? []);
+                $chapitre->setContent($content);
             }
 
             $this->em->flush();

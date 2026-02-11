@@ -7,6 +7,7 @@ use App\Entity\Cours;
 use App\Form\ChapitreType;
 use App\Repository\ChapitreRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +18,8 @@ class InstructorChapitreController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private ChapitreRepository $chapitreRepository
+        private ChapitreRepository $chapitreRepository,
+        private ValidatorInterface $validator
     ) {}
 
     #[Route('/cours/{coursId}', name: 'index', methods: ['GET'])]
@@ -64,26 +66,28 @@ class InstructorChapitreController extends AbstractController
         $form = $this->createForm(ChapitreType::class, $chapitre);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Handle content JSON conversion
-            $content = $request->request->get('content');
-            if ($content) {
-                $chapitre->setContent(json_decode($content, true) ?? []);
+        $errors = null;
+
+            if ($form->isSubmitted()) {
+                $violations = $this->validator->validate($chapitre);
+                if (count($violations) > 0) {
+                    $errors = $violations;
+                } elseif ($form->isValid()) {
+                    $this->em->persist($chapitre);
+                    $this->em->flush();
+
+                    $this->addFlash('success', 'Chapitre créé avec succès');
+
+                    return $this->redirectToRoute('instructor_chapitre_index', ['coursId' => $coursId]);
+                }
             }
-
-            $this->em->persist($chapitre);
-            $this->em->flush();
-
-            $this->addFlash('success', 'Chapitre créé avec succès');
-
-            return $this->redirectToRoute('instructor_chapitre_index', ['coursId' => $coursId]);
-        }
 
         return $this->render('instructor/chapitre/form.html.twig', [
             'form' => $form,
             'chapitre' => $chapitre,
             'cours' => $cours,
             'isEdit' => false,
+            'errors' => $errors ?? null,
         ]);
     }
 
@@ -101,17 +105,19 @@ class InstructorChapitreController extends AbstractController
         $form = $this->createForm(ChapitreType::class, $chapitre);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Handle content JSON conversion
-            $content = $request->request->get('content');
-            if ($content) {
-                $chapitre->setContent(json_decode($content, true) ?? []);
+        $errors = null;
+
+        if ($form->isSubmitted()) {
+            // content is mapped in the form now; validate entity
+            $violations = $this->validator->validate($chapitre);
+            if (count($violations) > 0) {
+                $errors = $violations;
+            } elseif ($form->isValid()) {
+                $this->em->flush();
+                $this->addFlash('success', 'Chapitre mis à jour avec succès');
+
+                return $this->redirectToRoute('instructor_chapitre_index', ['coursId' => $cours->getId()]);
             }
-
-            $this->em->flush();
-            $this->addFlash('success', 'Chapitre mis à jour avec succès');
-
-            return $this->redirectToRoute('instructor_chapitre_index', ['coursId' => $cours->getId()]);
         }
 
         return $this->render('instructor/chapitre/form.html.twig', [
@@ -119,6 +125,7 @@ class InstructorChapitreController extends AbstractController
             'chapitre' => $chapitre,
             'cours' => $cours,
             'isEdit' => true,
+            'errors' => $errors ?? null,
         ]);
     }
 
@@ -127,6 +134,33 @@ class InstructorChapitreController extends AbstractController
     {
         return $this->render('instructor/chapitre/show.html.twig', [
             'chapitre' => $chapitre,
+        ]);
+    }
+
+    #[Route('/{id}/pdf', name: 'pdf', methods: ['GET'])]
+    public function pdf(Chapitre $chapitre): Response
+    {
+        $html = $this->renderView('instructor/chapitre/pdf.html.twig', [
+            'chapitre' => $chapitre,
+        ]);
+
+        if (class_exists(\Dompdf\Dompdf::class)) {
+            $dompdf = new \Dompdf\Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+
+            $pdf = $dompdf->output();
+
+            return new Response($pdf, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="chapitre-' . $chapitre->getId() . '.pdf"',
+            ]);
+        }
+
+        // Fallback: Dompdf not available — return clear 501 with instructions
+        return new Response('PDF generation unavailable. Install dompdf/dompdf and run composer install.', 501, [
+            'Content-Type' => 'text/plain',
         ]);
     }
 

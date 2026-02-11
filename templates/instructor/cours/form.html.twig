@@ -17,20 +17,74 @@
 
     <div class="row">
         <div class="col-md-8 offset-md-2">
-            <form method="POST" class="needs-validation">
+            <form method="POST">
+                {# top-level errors #}
+                {% if errors is defined and errors %}
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            {% for err in errors %}
+                                <li>{{ err.propertyPath ? err.propertyPath ~ ': ' : '' }}{{ err.message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                {# determine field-level invalid flags #}
+                {% set titleInvalid = false %}
+                {% set descriptionInvalid = false %}
+                {% set categoryInvalid = false %}
+                {% if errors is defined and errors %}
+                    {% for err in errors %}
+                        {% if err.propertyPath == 'title' %}
+                            {% set titleInvalid = true %}
+                        {% elseif err.propertyPath == 'description' %}
+                            {% set descriptionInvalid = true %}
+                        {% elseif err.propertyPath == 'category' %}
+                            {% set categoryInvalid = true %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
                 <div class="mb-3">
                     <label for="title" class="form-label">Titre du Cours</label>
-                    <input type="text" class="form-control" id="title" name="title" value="{{ cours.title ?? '' }}" required>
+                    <input type="text" class="form-control{% if titleInvalid %} is-invalid{% endif %}" id="title" name="title" value="{{ cours.title ?? '' }}">
+                    {% if titleInvalid %}
+                        <div class="invalid-feedback">
+                            {% for err in errors %}
+                                {% if err.propertyPath == 'title' %}
+                                    {{ err.message }}{% if not loop.last %}<br>{% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
 
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" rows="5">{{ cours.description ?? '' }}</textarea>
+                    <textarea class="form-control{% if descriptionInvalid %} is-invalid{% endif %}" id="description" name="description" rows="5">{{ cours.description ?? '' }}</textarea>
+                    {% if descriptionInvalid %}
+                        <div class="invalid-feedback">
+                            {% for err in errors %}
+                                {% if err.propertyPath == 'description' %}
+                                    {{ err.message }}{% if not loop.last %}<br>{% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
 
                 <div class="mb-3">
                     <label for="category" class="form-label">Catégorie</label>
-                    <input type="text" class="form-control" id="category" name="category" value="{{ cours.category ?? '' }}">
+                    <input type="text" class="form-control{% if categoryInvalid %} is-invalid{% endif %}" id="category" name="category" value="{{ cours.category ?? '' }}">
+                    {% if categoryInvalid %}
+                        <div class="invalid-feedback">
+                            {% for err in errors %}
+                                {% if err.propertyPath == 'category' %}
+                                    {{ err.message }}{% if not loop.last %}<br>{% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
 
                 {% if isEdit %}

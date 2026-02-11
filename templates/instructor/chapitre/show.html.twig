@@ -33,6 +33,9 @@
                         <a href="{{ path('instructor_chapitre_edit', {id: chapitre.id}) }}" class="btn btn-warning">
                             <i class="bi bi-pencil"></i> Modifier
                         </a>
+                        <a href="{{ path('instructor_chapitre_pdf', {id: chapitre.id}) }}" class="btn btn-outline-primary">
+                            <i class="bi bi-file-earmark-pdf"></i> Télécharger PDF
+                        </a>
                         <form action="{{ path('instructor_chapitre_delete', {id: chapitre.id}) }}" method="POST" style="display:inline;">
                             <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ chapitre.id) }}">
                             <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr ?')">

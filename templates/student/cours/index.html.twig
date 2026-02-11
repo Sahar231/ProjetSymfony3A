@@ -24,7 +24,7 @@
             <div class="card bg-info text-white">
                 <div class="card-body">
                     <h6 class="card-title text-uppercase">Instructeurs</h6>
-                    <h2>{{ courses|map(c => c.createdBy)|unique|length }}</h2>
+                    <h2>{{ uniqueInstructorsCount ?? 0 }}</h2>
                 </div>
             </div>
         </div>
@@ -32,7 +32,7 @@
             <div class="card bg-primary text-white">
                 <div class="card-body">
                     <h6 class="card-title text-uppercase">Catégories</h6>
-                    <h2>{{ courses|map(c => c.category)|unique|length }}</h2>
+                    <h2>{{ uniqueCategoriesCount ?? 0 }}</h2>
                 </div>
             </div>
         </div>
@@ -40,7 +40,7 @@
             <div class="card bg-warning text-dark">
                 <div class="card-body">
                     <h6 class="card-title text-uppercase">Chapitres</h6>
-                    <h2>{{ courses|reduce(0, (c, course) => c + course.chapitres|length) }}</h2>
+                    <h2>{{ totalChaptersCount ?? 0 }}</h2>
                 </div>
             </div>
         </div>
@@ -113,7 +113,8 @@
                             <p class="card-text text-muted small">
                                 <i class="bi bi-person"></i> Par {{ cours.createdBy }}
                             </p>
-                            <p class="card-text text-muted">{{ cours.description|truncate(80) }}</p>
+                            {% set desc = cours.description|default('') %}
+                            <p class="card-text text-muted">{{ desc|length > 80 ? desc|slice(0, 80) ~ '...' : desc }}</p>
                         </div>
                         <div class="card-footer bg-white border-top">
                             <div class="d-grid gap-2">

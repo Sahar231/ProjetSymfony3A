@@ -6,7 +6,7 @@ use App\Entity\Chapitre;
 use App\Entity\Cours;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -22,14 +22,7 @@ class ChapitreType extends AbstractType
                     'class' => 'form-control',
                     'placeholder' => 'Entrez le titre du chapitre'
                 ],
-                'required' => true,
-            ])
-            ->add('content', HiddenType::class, [
-                'label' => 'Contenu du Chapitre',
                 'required' => false,
-                'attr' => [
-                    'id' => 'content',
-                ]
             ])
             ->add('cours', EntityType::class, [
                 'class' => Cours::class,
@@ -38,7 +31,18 @@ class ChapitreType extends AbstractType
                 'attr' => [
                     'class' => 'form-select',
                 ],
-                'required' => true,
+                'required' => false,
+            ])
+            ->add('content', TextareaType::class, [
+                'label' => 'Contenu du Chapitre',
+                'required' => false,
+                'mapped' => true,
+                'attr' => [
+                    'id' => 'content',
+                    'class' => 'form-control',
+                    'rows' => 10,
+                    'placeholder' => 'Entrez le contenu du chapitre (texte libre)'
+                ]
             ])
         ;
     }

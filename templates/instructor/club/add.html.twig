@@ -174,15 +174,15 @@
 						<form method="POST" action="{{ path("instructor_club_create") }}">
 							<div class="mb-3">
 								<label class="form-label" for="clubName">Club Name *</label>
-								<input type="text" class="form-control" id="clubName" name="clubName" placeholder="Enter club name" required>
+								<input type="text" class="form-control" id="clubName" name="clubName" placeholder="Enter club name">
 							</div>
 							<div class="mb-3">
 								<label class="form-label" for="clubDesc">Description *</label>
-								<textarea class="form-control" id="clubDesc" name="clubDesc" rows="4" placeholder="Enter club description" required></textarea>
+								<textarea class="form-control" id="clubDesc" name="clubDesc" rows="4" placeholder="Enter club description"></textarea>
 							</div>
 							<div class="mb-3">
 								<label class="form-label" for="clubCategory">Category *</label>
-								<select class="form-select" id="clubCategory" name="clubCategory" required>
+								<select class="form-select" id="clubCategory" name="clubCategory">
 									<option selected disabled>Select category</option>
 									<option value="tech">Technology</option>
 									<option value="arts">Arts & Design</option>
@@ -193,7 +193,7 @@
 							</div>
 							<div class="mb-3">
 								<label class="form-label" for="clubStatus">Status *</label>
-								<select class="form-select" id="clubStatus" name="clubStatus" required>
+								<select class="form-select" id="clubStatus" name="clubStatus">
 									<option selected value="active">Active</option>
 									<option value="inactive">Inactive</option>
 								</select>

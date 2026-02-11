@@ -18,8 +18,23 @@ class StudentCoursController extends AbstractController
     {
         $approvedCourses = $this->coursRepository->findApproved();
 
+        $instructors = [];
+        $categories = [];
+        $totalChapters = 0;
+        foreach ($approvedCourses as $c) {
+            $instructors[] = $c->getCreatedBy();
+            $categories[] = $c->getCategory();
+            $totalChapters += count($c->getChapitres());
+        }
+
+        $uniqueInstructorsCount = count(array_unique(array_filter($instructors)));
+        $uniqueCategoriesCount = count(array_unique(array_filter($categories)));
+
         return $this->render('student/cours/index.html.twig', [
             'courses' => $approvedCourses,
+            'uniqueInstructorsCount' => $uniqueInstructorsCount,
+            'uniqueCategoriesCount' => $uniqueCategoriesCount,
+            'totalChaptersCount' => $totalChapters,
         ]);
     }
 

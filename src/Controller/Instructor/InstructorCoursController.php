@@ -5,6 +5,7 @@ namespace App\Controller\Instructor;
 use App\Entity\Cours;
 use App\Repository\CoursRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,10 +14,15 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/instructor/cours', name: 'instructor_cours_')]
 class InstructorCoursController extends AbstractController
 {
+    private ValidatorInterface $validator;
+
     public function __construct(
         private EntityManagerInterface $em,
-        private CoursRepository $coursRepository
-    ) {}
+        private CoursRepository $coursRepository,
+        ValidatorInterface $validator
+    ) {
+        $this->validator = $validator;
+    }
 
     // Dashboard: Own courses + approved courses from others
     #[Route('', name: 'index')]
@@ -46,6 +52,7 @@ class InstructorCoursController extends AbstractController
         $cours = new Cours();
         $instructorName = 'instructor_user1'; // Placeholder
 
+        $errors = null;
         if ($request->isMethod('POST')) {
             $cours->setTitle($request->request->get('title', ''));
             $cours->setDescription($request->request->get('description', ''));
@@ -53,17 +60,23 @@ class InstructorCoursController extends AbstractController
             $cours->setStatus('PENDING'); // Always PENDING for instructor
             $cours->setCreatedBy($instructorName);
 
-            $this->em->persist($cours);
-            $this->em->flush();
+            $errorsList = $this->validator->validate($cours);
+            if (count($errorsList) > 0) {
+                $errors = $errorsList;
+            } else {
+                $this->em->persist($cours);
+                $this->em->flush();
 
-            $this->addFlash('success', 'Cours créé avec succès. En attente d\'approbation.');
+                $this->addFlash('success', 'Cours créé avec succès. En attente d\'approbation.');
 
-            return $this->redirectToRoute('instructor_cours_index');
+                return $this->redirectToRoute('instructor_cours_index');
+            }
         }
 
         return $this->render('instructor/cours/form.html.twig', [
             'cours' => $cours,
             'isEdit' => false,
+            'errors' => $errors,
         ]);
     }
 
@@ -78,20 +91,27 @@ class InstructorCoursController extends AbstractController
             throw $this->createAccessDeniedException('You can only edit your own courses');
         }
 
+        $errors = null;
         if ($request->isMethod('POST')) {
             $cours->setTitle($request->request->get('title', ''));
             $cours->setDescription($request->request->get('description', ''));
             $cours->setCategory($request->request->get('category', ''));
 
-            $this->em->flush();
-            $this->addFlash('success', 'Cours mis à jour avec succès');
+            $errorsList = $this->validator->validate($cours);
+            if (count($errorsList) > 0) {
+                $errors = $errorsList;
+            } else {
+                $this->em->flush();
+                $this->addFlash('success', 'Cours mis à jour avec succès');
 
-            return $this->redirectToRoute('instructor_cours_index');
+                return $this->redirectToRoute('instructor_cours_index');
+            }
         }
 
         return $this->render('instructor/cours/form.html.twig', [
             'cours' => $cours,
             'isEdit' => true,
+            'errors' => $errors,
         ]);
     }
 
