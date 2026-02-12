@@ -102,7 +102,7 @@
                             <strong>{{ club.name }}</strong><br>
                             <small style="color: #666;">{{ club.description|slice(0, 50) }}{% if club.description|length > 50 %}...{% endif %}</small>
                         </td>
-                        <td>{{ club.creator.firstName }} {{ club.creator.lastName }}</td>
+                        <td>{{ club.creator.fullName }}</td>
                         <td>{{ club.members|length }}</td>
                         <td>{{ club.events|length }}</td>
                         <td>

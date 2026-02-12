@@ -59,7 +59,7 @@
                                                         <h6 class="mb-0 fw-bold">{{ quiz.title }}</h6>
                                                         <small class="text-muted">
                                                             {% if quiz.creator %}
-                                                                By: {{ quiz.creator.firstname }} {{ quiz.creator.lastname }}
+                                                                By: {{ quiz.creator.fullName }}
                                                             {% else %}
                                                                 Admin Quiz
                                                             {% endif %}

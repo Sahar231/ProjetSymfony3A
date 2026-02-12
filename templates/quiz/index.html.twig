@@ -77,7 +77,7 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ quiz.questions | length }}</td>
-                                    <td>{{ quiz.creator.firstname }} {{ quiz.creator.lastname }}</td>
+                                    <td>{{ quiz.creator.fullName }}</td>
                                     <td>{{ quiz.createdAt | date('Y-m-d H:i') }}</td>
                                     <td>
                                         <a href="{{ path('quiz_show', {id: quiz.id}) }}" class="btn btn-sm btn-info">View</a>

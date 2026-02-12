@@ -107,6 +107,48 @@ class QuizforController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/edit', name: 'admin_quiz_edit', methods: ['GET', 'POST'])]
+    public function edit(int $id, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $quiz = $entityManager->getRepository(Quiz::class)->find($id);
+
+        if (!$quiz) {
+            $this->addFlash('error', 'Quiz not found');
+            return $this->redirectToRoute('admin_quiz_list');
+        }
+
+        $form = $this->createForm(QuizType::class, $quiz);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+            $this->addFlash('success', 'Quiz updated successfully!');
+            return $this->redirectToRoute('admin_quiz_list', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('admin/quiz/edit.html.twig', [
+            'quiz' => $quiz,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}/delete', name: 'admin_quiz_delete', methods: ['POST'])]
+    public function delete(int $id, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $quiz = $entityManager->getRepository(Quiz::class)->find($id);
+
+        if (!$quiz) {
+            $this->addFlash('error', 'Quiz not found');
+            return $this->redirectToRoute('admin_quiz_list');
+        }
+
+        $entityManager->remove($quiz);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Quiz deleted successfully!');
+        return $this->redirectToRoute('admin_quiz_list');
+    }
+
     #[Route('/{id}/approve', name: 'admin_quiz_approve', methods: ['POST'])]
     public function approve(int $id, EntityManagerInterface $entityManager): Response
     {

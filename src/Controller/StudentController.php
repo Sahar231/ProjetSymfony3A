@@ -253,6 +253,27 @@ class StudentController extends AbstractController
         ]);
     }
 
+    #[Route('/quiz/{id<\d+>}/start', name: 'quiz_start')]
+    public function startQuiz(Quiz $quiz, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+
+        // Check if user has already taken this quiz
+        $existingResult = $entityManager->getRepository(Resultat::class)->findOneBy([
+            'quiz' => $quiz,
+            'student' => $user
+        ]);
+
+        if ($existingResult) {
+            $this->addFlash('warning', 'You have already completed this quiz.');
+            return $this->redirectToRoute('student_quiz_available');
+        }
+
+        return $this->render('student/quiz/add.html.twig', [
+            'quiz' => $quiz,
+        ]);
+    }
+
     #[Route('/bookmarks', name: 'bookmarks')]
     public function bookmarks(): Response
     {

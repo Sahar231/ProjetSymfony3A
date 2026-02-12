@@ -59,7 +59,10 @@ class QuizType extends AbstractType
                     new Assert\PositiveOrZero(['message' => 'Duration must be a positive number'])
                 ]
             ])
-            ->add('isApproved', HiddenType::class)
+            ->add('isApproved', HiddenType::class, [
+                'data' => false,
+                'empty_data' => false,
+            ])
             ->add('questions', CollectionType::class, [
                 'entry_type' => QuestionQuizType::class,
                 'entry_options' => ['label' => false],

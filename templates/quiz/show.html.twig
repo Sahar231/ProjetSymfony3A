@@ -46,10 +46,10 @@
                             {% endif %}
                         </div>
                         <div class="col-md-3">
-                            <strong>Created By:</strong> {{ quiz.creator.firstname }} {{ quiz.creator.lastname }}
+                            <strong>Created By:</strong> {{ quiz.creator.fullName }}
                         </div>
                         <div class="col-md-3">
-                            <strong>Created At:</strong> {{ quiz.createdAt | format_datetime }}
+                            <strong>Created At:</strong> {{ quiz.createdAt | date('Y-m-d H:i:s') }}
                         </div>
                     </div>
 

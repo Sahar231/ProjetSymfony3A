@@ -70,7 +70,11 @@
 								<label for="club" class="form-label">Club <span class="text-danger">*</span></label>
 								<select class="form-select" id="club" name="club" required>
 									<option value="">Select a club</option>
-									<option value="1">Sample Club</option>
+									{% if clubs is defined %}
+										{% for club in clubs %}
+											<option value="{{ club.id }}">{{ club.name }}</option>
+										{% endfor %}
+									{% endif %}
 								</select>
 								<small class="text-muted">Select the club this event belongs to</small>
 							</div>

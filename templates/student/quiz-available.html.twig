@@ -83,7 +83,7 @@
                                         <small class="text-muted">
                                             <i class="fas fa-user me-1"></i>By: <strong>
                                                 {% if quiz.creator %}
-                                                    {{ quiz.creator.firstname }} {{ quiz.creator.lastname }}
+                                                    {{ quiz.creator.fullName }}
                                                 {% else %}
                                                     Admin
                                                 {% endif %}
@@ -100,7 +100,7 @@
                                         </div>
                                     {% else %}
                                         <div class="d-grid gap-2">
-                                            <a href="#" class="btn btn-primary btn-sm">
+                                            <a href="{{ path('student_quiz_start', { id: quiz.id }) }}" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-play-circle me-1"></i>Start Quiz
                                             </a>
                                         </div>
