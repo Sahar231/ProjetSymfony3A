@@ -3,7 +3,14 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Formation;
+use App\Entity\Quiz;
+use App\Entity\Cours;
+use App\Entity\Club;
+use App\Entity\Event;
 use App\Repository\FormationRepository;
+use App\Repository\CoursRepository;
+use App\Repository\ClubRepository;
+use App\Repository\EventRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -58,6 +65,134 @@ class DashboardController extends AbstractController
             ->getQuery()
             ->getResult();
 
+        // Get pending quizzes (created by instructors, not auto-approved)
+        $qb = $entityManager->createQueryBuilder();
+        $pendingQuizzes = $qb
+            ->select('q')
+            ->from(Quiz::class, 'q')
+            ->leftJoin('q.creator', 'c')
+            ->addSelect('c')
+            ->where('q.isApproved = :approved')
+            ->andWhere('q.isArchived = :archived')
+            ->setParameter('approved', false)
+            ->setParameter('archived', false)
+            ->getQuery()
+            ->getResult();
+
+        // Get all approved quizzes
+        $qb = $entityManager->createQueryBuilder();
+        $approvedQuizzes = $qb
+            ->select('q')
+            ->from(Quiz::class, 'q')
+            ->leftJoin('q.creator', 'c')
+            ->addSelect('c')
+            ->where('q.isApproved = :approved')
+            ->andWhere('q.isArchived = :archived')
+            ->setParameter('approved', true)
+            ->setParameter('archived', false)
+            ->getQuery()
+            ->getResult();
+
+        // Get archived quizzes
+        $qb = $entityManager->createQueryBuilder();
+        $archivedQuizzes = $qb
+            ->select('q')
+            ->from(Quiz::class, 'q')
+            ->leftJoin('q.creator', 'c')
+            ->addSelect('c')
+            ->where('q.isArchived = :archived')
+            ->setParameter('archived', true)
+            ->getQuery()
+            ->getResult();
+
+        // Get pending courses
+        $qb = $entityManager->createQueryBuilder();
+        $pendingCourses = $qb
+            ->select('c')
+            ->from(Cours::class, 'c')
+            ->leftJoin('c.creator', 'u')
+            ->addSelect('u')
+            ->where('c.status = :status')
+            ->setParameter('status', Cours::STATUS_PENDING)
+            ->getQuery()
+            ->getResult();
+
+        // Get all approved courses
+        $qb = $entityManager->createQueryBuilder();
+        $approvedCourses = $qb
+            ->select('c')
+            ->from(Cours::class, 'c')
+            ->leftJoin('c.creator', 'u')
+            ->addSelect('u')
+            ->where('c.status = :status')
+            ->setParameter('status', Cours::STATUS_APPROVED)
+            ->getQuery()
+            ->getResult();
+
+        // Get refused courses
+        $qb = $entityManager->createQueryBuilder();
+        $refusedCourses = $qb
+            ->select('c')
+            ->from(Cours::class, 'c')
+            ->leftJoin('c.creator', 'u')
+            ->addSelect('u')
+            ->where('c.status = :status')
+            ->setParameter('status', Cours::STATUS_REFUSED)
+            ->getQuery()
+            ->getResult();
+
+        // Get pending clubs
+        $qb = $entityManager->createQueryBuilder();
+        $pendingClubs = $qb
+            ->select('club')
+            ->from(Club::class, 'club')
+            ->leftJoin('club.creator', 'clubCreator')
+            ->addSelect('clubCreator')
+            ->where('club.status = :status')
+            ->setParameter('status', Club::STATUS_PENDING)
+            ->getQuery()
+            ->getResult();
+
+        // Get approved clubs
+        $qb = $entityManager->createQueryBuilder();
+        $approvedClubs = $qb
+            ->select('club')
+            ->from(Club::class, 'club')
+            ->leftJoin('club.creator', 'clubCreator')
+            ->addSelect('clubCreator')
+            ->where('club.status = :status')
+            ->setParameter('status', Club::STATUS_APPROVED)
+            ->getQuery()
+            ->getResult();
+
+        // Get pending events
+        $qb = $entityManager->createQueryBuilder();
+        $pendingEvents = $qb
+            ->select('event')
+            ->from(Event::class, 'event')
+            ->leftJoin('event.creator', 'eventCreator')
+            ->leftJoin('event.club', 'eventClub')
+            ->addSelect('eventCreator')
+            ->addSelect('eventClub')
+            ->where('event.status = :status')
+            ->setParameter('status', Event::STATUS_PENDING)
+            ->getQuery()
+            ->getResult();
+
+        // Get approved events
+        $qb = $entityManager->createQueryBuilder();
+        $approvedEvents = $qb
+            ->select('event')
+            ->from(Event::class, 'event')
+            ->leftJoin('event.creator', 'eventCreator')
+            ->leftJoin('event.club', 'eventClub')
+            ->addSelect('eventCreator')
+            ->addSelect('eventClub')
+            ->where('event.status = :status')
+            ->setParameter('status', Event::STATUS_APPROVED)
+            ->getQuery()
+            ->getResult();
+
         return $this->render('admin/dashboard.html.twig', [
             'pendingFormations' => $pendingFormations,
             'approvedFormations' => $approvedFormations,
@@ -65,6 +200,28 @@ class DashboardController extends AbstractController
             'pendingCount' => count($pendingFormations),
             'approvedCount' => count($approvedFormations),
             'archivedCount' => count($archivedFormations),
+            'pendingQuizzes' => $pendingQuizzes,
+            'approvedQuizzes' => $approvedQuizzes,
+            'archivedQuizzes' => $archivedQuizzes,
+            'pendingQuizzesCount' => count($pendingQuizzes),
+            'approvedQuizzesCount' => count($approvedQuizzes),
+            'archivedQuizzesCount' => count($archivedQuizzes),
+            'pendingCourses' => $pendingCourses,
+            'approvedCourses' => $approvedCourses,
+            'refusedCourses' => $refusedCourses,
+            'pendingCoursesCount' => count($pendingCourses),
+            'approvedCoursesCount' => count($approvedCourses),
+            'refusedCoursesCount' => count($refusedCourses),
+            'pendingClubs' => $pendingClubs,
+            'approvedClubs' => $approvedClubs,
+            'pendingClubsCount' => count($pendingClubs),
+            'approvedClubsCount' => count($approvedClubs),
+            'totalClubsCount' => count($pendingClubs) + count($approvedClubs),
+            'pendingEvents' => $pendingEvents,
+            'approvedEvents' => $approvedEvents,
+            'pendingEventsCount' => count($pendingEvents),
+            'approvedEventsCount' => count($approvedEvents),
+            'totalEventsCount' => count($pendingEvents) + count($approvedEvents),
         ]);
     }
 
@@ -122,6 +279,64 @@ class DashboardController extends AbstractController
 
         return $this->render('admin/approvals_formations.html.twig', [
             'formations' => $formations,
+            'status' => $status,
+        ]);
+    }
+
+    #[Route('/approvals/quizzes', name: 'admin_quizzes_approval', methods: ['GET'])]
+    public function approvalsQuizzes(EntityManagerInterface $entityManager): Response
+    {
+        $status = $_GET['status'] ?? 'pending';
+        
+        $qb = $entityManager->createQueryBuilder();
+        
+        $quizzes = match($status) {
+            'pending' => $qb
+                ->select('q')
+                ->from(Quiz::class, 'q')
+                ->leftJoin('q.creator', 'c')
+                ->addSelect('c')
+                ->where('q.isApproved = :approved')
+                ->andWhere('q.isArchived = :archived')
+                ->setParameter('approved', false)
+                ->setParameter('archived', false)
+                ->getQuery()
+                ->getResult(),
+            'approved' => $qb
+                ->select('q')
+                ->from(Quiz::class, 'q')
+                ->leftJoin('q.creator', 'c')
+                ->addSelect('c')
+                ->where('q.isApproved = :approved')
+                ->andWhere('q.isArchived = :archived')
+                ->setParameter('approved', true)
+                ->setParameter('archived', false)
+                ->getQuery()
+                ->getResult(),
+            'archived' => $qb
+                ->select('q')
+                ->from(Quiz::class, 'q')
+                ->leftJoin('q.creator', 'c')
+                ->addSelect('c')
+                ->where('q.isArchived = :archived')
+                ->setParameter('archived', true)
+                ->getQuery()
+                ->getResult(),
+            default => $qb
+                ->select('q')
+                ->from(Quiz::class, 'q')
+                ->leftJoin('q.creator', 'c')
+                ->addSelect('c')
+                ->where('q.isApproved = :approved')
+                ->andWhere('q.isArchived = :archived')
+                ->setParameter('approved', false)
+                ->setParameter('archived', false)
+                ->getQuery()
+                ->getResult()
+        };
+
+        return $this->render('admin/approvals_quizzes.html.twig', [
+            'quizzes' => $quizzes,
             'status' => $status,
         ]);
     }

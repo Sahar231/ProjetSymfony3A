@@ -3,9 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Formation;
+use App\Entity\Quiz;
+use App\Entity\Resultat;
+use App\Entity\Club;
 use App\Repository\CertificateRepository;
 use App\Repository\FormationRepository;
+use App\Repository\NewQuizRepository;
+use App\Repository\ResultatRepository;
 use App\Repository\WalletRepository;
+use App\Repository\ClubRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +25,7 @@ use App\Form\FormationType;
 class StudentController extends AbstractController
 {
     #[Route('/dashboard', name: 'dashboard', methods: ['GET'])]
-    public function dashboard(FormationRepository $formationRepository): Response
+    public function dashboard(FormationRepository $formationRepository, ClubRepository $clubRepository): Response
     {
         $user = $this->getUser();
 
@@ -28,10 +34,21 @@ class StudentController extends AbstractController
             return !$formation->isArchived();
         });
 
+        // Get clubs the user is a member of (approved clubs only)
+        $myClubs = $clubRepository->createQueryBuilder('c')
+            ->join('c.members', 'm')
+            ->where('m.id = :userId')
+            ->andWhere('c.status = :status')
+            ->setParameter('userId', $user->getId())
+            ->setParameter('status', Club::STATUS_APPROVED)
+            ->getQuery()
+            ->getResult();
+
         return $this->render('student/student-dashboard.html.twig', [
             'enrolledFormations' => $enrolledFormations,
             'availableFormations' => $formationRepository->findApprovedAndNotArchived(),
             'enrollmentCount' => count($enrolledFormations),
+            'myClubs' => $myClubs,
         ]);
     }
 
@@ -208,10 +225,32 @@ class StudentController extends AbstractController
         ]);
     }
 
-    #[Route('/quiz', name: 'quiz')]
-    public function quiz(): Response
+    #[Route('/quiz', name: 'quiz_available')]
+    public function quizzes(NewQuizRepository $quizRepository): Response
     {
-        return $this->render('student/student-quiz.html.twig');
+        $user = $this->getUser();
+        
+        // Get all approved quizzes
+        $availableQuizzes = $quizRepository->findApproved();
+        
+        // Get quizzes user has already taken (via Resultat)
+        $takenQuizzes = $user->getResultats()->map(fn($result) => $result->getQuiz())->toArray();
+        
+        return $this->render('student/quiz-available.html.twig', [
+            'availableQuizzes' => $availableQuizzes,
+            'takenQuizzes' => $takenQuizzes,
+        ]);
+    }
+
+    #[Route('/quiz/my-result', name: 'quiz_results')]
+    public function myQuizResults(ResultatRepository $resultatRepository): Response
+    {
+        $user = $this->getUser();
+        $results = $resultatRepository->findBy(['student' => $user], ['createdAt' => 'DESC']);
+        
+        return $this->render('student/quiz-results.html.twig', [
+            'results' => $results,
+        ]);
     }
 
     #[Route('/bookmarks', name: 'bookmarks')]

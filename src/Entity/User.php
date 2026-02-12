@@ -83,11 +83,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Certificate::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $certificates;
 
+    /**
+     * @var Collection<int, Resultat>
+     */
+    #[ORM\OneToMany(targetEntity: Resultat::class, mappedBy: 'student')]
+    private Collection $resultats;
+
     public function __construct()
     {
         $this->enrollments = new ArrayCollection();
         $this->formations = new ArrayCollection();
         $this->certificates = new ArrayCollection();
+        $this->resultats = new ArrayCollection();
     }
 
     public function getGoogleId(): ?string
@@ -353,6 +360,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->certificates->removeElement($certificate)) {
             if ($certificate->getUser() === $this) {
                 $certificate->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getResultats(): Collection
+    {
+        return $this->resultats;
+    }
+
+    public function addResultat(Resultat $resultat): static
+    {
+        if (!$this->resultats->contains($resultat)) {
+            $this->resultats->add($resultat);
+            $resultat->setStudent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeResultat(Resultat $resultat): static
+    {
+        if ($this->resultats->removeElement($resultat)) {
+            if ($resultat->getStudent() === $this) {
+                $resultat->setStudent(null);
             }
         }
 

@@ -2,6 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Club;
+use App\Entity\Event;
+use App\Repository\ClubRepository;
+use App\Repository\EventRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -12,9 +16,28 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class InstructorController extends AbstractController
 {
     #[Route('/dashboard', name: 'dashboard')]
-    public function dashboard(): Response
+    public function dashboard(ClubRepository $clubRepository, EventRepository $eventRepository): Response
     {
-        return $this->render('instructor/instructor-dashboard.html.twig');
+        $user = $this->getUser();
+
+        // Get clubs created by this instructor
+        $instructorClubs = $clubRepository->createQueryBuilder('c')
+            ->where('c.creator = :userId')
+            ->setParameter('userId', $user->getId())
+            ->getQuery()
+            ->getResult();
+
+        // Get events created by this instructor
+        $instructorEvents = $eventRepository->createQueryBuilder('e')
+            ->where('e.creator = :userId')
+            ->setParameter('userId', $user->getId())
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('instructor/instructor-dashboard.html.twig', [
+            'instructorClubs' => $instructorClubs,
+            'instructorEvents' => $instructorEvents,
+        ]);
     }
 
     #[Route('/list', name: 'list')]

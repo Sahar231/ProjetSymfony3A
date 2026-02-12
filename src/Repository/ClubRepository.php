@@ -15,4 +15,64 @@ class ClubRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Club::class);
     }
+
+    public function findApproved()
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.status = :status')
+            ->setParameter('status', Club::STATUS_APPROVED)
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findPending()
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.status = :status')
+            ->setParameter('status', Club::STATUS_PENDING)
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByStatus($status)
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.status = :status')
+            ->setParameter('status', $status)
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countApproved(): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.status = :status')
+            ->setParameter('status', Club::STATUS_APPROVED)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countPending(): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.status = :status')
+            ->setParameter('status', Club::STATUS_PENDING)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countRejected(): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.status = :status')
+            ->setParameter('status', Club::STATUS_REJECTED)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

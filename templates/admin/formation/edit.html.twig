@@ -82,9 +82,9 @@
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="contentMenu" data-bs-toggle="dropdown">Content</a>
 						<ul class="dropdown-menu" aria-labelledby="contentMenu">
-							<li><a class="dropdown-item" href="{{ path('instructor_formation_list') }}"><i class="bi bi-book me-2"></i>Formations</a></li>
-							<li><a class="dropdown-item" href="{{ path('instructor_quiz_list') }}"><i class="bi bi-question-diamond me-2"></i>Quizzes</a></li>
-							<li><a class="dropdown-item" href="{{ path('instructor_club_list') }}"><i class="bi bi-people me-2"></i>Clubs</a></li>
+							<li><a class="dropdown-item" href="{{ path('admin_formation_list') }}"><i class="bi bi-book me-2"></i>Formations</a></li>
+							<li><a class="dropdown-item" href="{{ path('admin_quiz_list') }}"><i class="bi bi-question-diamond me-2"></i>Quizzes</a></li>
+							<li><a class="dropdown-item" href="{{ path('admin_club_list') }}"><i class="bi bi-people me-2"></i>Clubs</a></li>
 						</ul>
 					</li>
 				</ul>
@@ -125,7 +125,7 @@
 				<nav aria-label="breadcrumb">
 					<ol class="breadcrumb breadcrumb-dark breadcrumb-dots mb-0">
 						<li class="breadcrumb-item"><a href="{{ path("app_home") }}">Home</a></li>
-						<li class="breadcrumb-item"><a href="{{ path("instructor_formation_list") }}">My Formations</a></li>
+						<li class="breadcrumb-item"><a href="{{ path("admin_formation_list") }}">All Formations</a></li>
 						<li class="breadcrumb-item active">Edit</li>
 					</ol>
 				</nav>
@@ -146,12 +146,12 @@
 					<div class="card-body">
 						<ul class="list-unstyled">
 							<li class="mb-2">
-								<a href="{{ path('instructor_formation_create') }}" class="btn btn-sm btn-outline-primary w-100 text-start">
+								<a href="{{ path('admin_formation_create') }}" class="btn btn-sm btn-outline-primary w-100 text-start">
 									<i class="bi bi-book me-2"></i>Add Formation
 								</a>
 							</li>
 							<li class="mb-2">
-								<a href="{{ path('instructor_quiz_create') }}" class="btn btn-sm btn-outline-primary w-100 text-start">
+								<a href="{{ path('admin_quiz_add') }}" class="btn btn-sm btn-outline-primary w-100 text-start">
 									<i class="bi bi-question-diamond me-2"></i>Add Quiz
 								</a>
 							</li>

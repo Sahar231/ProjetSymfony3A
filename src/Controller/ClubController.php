@@ -2,30 +2,187 @@
 
 namespace App\Controller;
 
+use App\Entity\Club;
+use App\Entity\JoinRequest;
+use App\Repository\ClubRepository;
+use App\Repository\JoinRequestRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/clubs', name: 'club_')]
 class ClubController extends AbstractController
 {
-    #[Route('/', name: 'list')]
-    public function list(): Response
-    {
-        return $this->render('club/club-list.html.twig');
-    }
+    public function __construct(
+        private ClubRepository $clubRepository,
+        private JoinRequestRepository $joinRequestRepository,
+        private EntityManagerInterface $em
+    ) {}
 
-    #[Route('/detail/{id<\d+>}', name: 'detail')]
-    public function detail(int $id): Response
+    #[Route('/', name: 'list', methods: ['GET'])]
+    public function list(Request $request): Response
     {
-        return $this->render('club/club-detail.html.twig', [
-            'clubId' => $id,
+        $search = $request->query->get('search', '');
+        $sort = $request->query->get('sort', 'date_desc');
+
+        $qb = $this->clubRepository->createQueryBuilder('c')
+            ->where('c.status = :status')
+            ->setParameter('status', Club::STATUS_APPROVED)
+            ->leftJoin('c.creator', 'creator')
+            ->addSelect('creator');
+
+        // Apply search filter
+        if ($search) {
+            $qb->andWhere('c.name LIKE :search OR c.description LIKE :search OR creator.username LIKE :search')
+               ->setParameter('search', "%$search%");
+        }
+
+        // Apply sorting
+        switch ($sort) {
+            case 'date_asc':
+                $qb->orderBy('c.createdAt', 'ASC');
+                break;
+            case 'name_asc':
+                $qb->orderBy('c.name', 'ASC');
+                break;
+            case 'name_desc':
+                $qb->orderBy('c.name', 'DESC');
+                break;
+            case 'date_desc':
+            default:
+                $qb->orderBy('c.createdAt', 'DESC');
+                break;
+        }
+
+        $clubs = $qb->getQuery()->getResult();
+
+        return $this->render('club/club-list.html.twig', [
+            'clubs' => $clubs,
+            'search' => $search,
+            'sort' => $sort,
         ]);
     }
 
-    #[Route('/added', name: 'added')]
-    public function added(): Response
+    #[Route('/detail/{id}', name: 'detail', methods: ['GET'])]
+    public function detail(Club $club): Response
     {
-        return $this->render('club/club-added.html.twig');
+        // Only show approved clubs to public
+        if ($club->getStatus() !== Club::STATUS_APPROVED) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $userJoinStatus = null;
+        if ($this->getUser()) {
+            $joinRequest = $this->joinRequestRepository->findOneBy([
+                'club' => $club,
+                'user' => $this->getUser(),
+            ]);
+            $userJoinStatus = $joinRequest?->getStatus();
+        }
+
+        $events = $club->getEvents();
+        $approvedEvents = array_filter($events->toArray(), fn($e) => $e->getStatus() === 'APPROVED');
+
+        return $this->render('club/club-detail.html.twig', [
+            'club' => $club,
+            'events' => $approvedEvents,
+            'userJoinStatus' => $userJoinStatus,
+        ]);
+    }
+
+    #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_STUDENT')] // Students and Instructors can create clubs
+    public function create(Request $request): Response
+    {
+        if ($request->isMethod('POST')) {
+            $club = new Club();
+            $club->setName($request->request->get('name'));
+            $club->setDescription($request->request->get('description'));
+            $club->setCreator($this->getUser());
+            $club->setStatus(Club::STATUS_PENDING);
+
+            $this->em->persist($club);
+            $this->em->flush();
+
+            $this->addFlash('success', 'Club created successfully! Awaiting admin approval.');
+            return $this->redirectToRoute('club_list');
+        }
+
+        return $this->render('club/club-create.html.twig');
+    }
+
+    #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_STUDENT')]
+    public function edit(Request $request, Club $club): Response
+    {
+        // Check permissions: creator and club must be approved
+        if ($club->getCreator() !== $this->getUser() || !$club->isApproved()) {
+            throw $this->createAccessDeniedException('You can only edit approved clubs you created.');
+        }
+
+        if ($request->isMethod('POST')) {
+            $club->setName($request->request->get('name'));
+            $club->setDescription($request->request->get('description'));
+            $club->setUpdatedAt(new \DateTimeImmutable());
+
+            $this->em->flush();
+            $this->addFlash('success', 'Club updated successfully!');
+            return $this->redirectToRoute('club_detail', ['id' => $club->getId()]);
+        }
+
+        return $this->render('club/club-edit.html.twig', [
+            'club' => $club,
+        ]);
+    }
+
+    #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]
+    #[IsGranted('ROLE_STUDENT')]
+    public function delete(Request $request, Club $club): Response
+    {
+        // Check permissions
+        if ($club->getCreator() !== $this->getUser() || !$club->isApproved()) {
+            throw $this->createAccessDeniedException('You can only delete approved clubs you created.');
+        }
+
+        if ($this->isCsrfTokenValid('delete' . $club->getId(), $request->request->get('_token'))) {
+            $this->em->remove($club);
+            $this->em->flush();
+            $this->addFlash('success', 'Club deleted successfully!');
+        }
+
+        return $this->redirectToRoute('club_list');
+    }
+
+    #[Route('/{id}/join', name: 'join', methods: ['POST'])]
+    #[IsGranted('ROLE_STUDENT')]
+    public function join(Request $request, Club $club): Response
+    {
+        // Check if user already has a join request
+        $existingRequest = $this->joinRequestRepository->findOneBy([
+            'club' => $club,
+            'user' => $this->getUser(),
+        ]);
+
+        if ($existingRequest) {
+            $this->addFlash('warning', 'You have already requested to join this club.');
+            return $this->redirectToRoute('club_detail', ['id' => $club->getId()]);
+        }
+
+        if ($this->isCsrfTokenValid('join' . $club->getId(), $request->request->get('_token'))) {
+            $joinRequest = new JoinRequest();
+            $joinRequest->setClub($club);
+            $joinRequest->setUser($this->getUser());
+            $joinRequest->setStatus(JoinRequest::STATUS_PENDING);
+
+            $this->em->persist($joinRequest);
+            $this->em->flush();
+
+            $this->addFlash('success', 'Join request sent! Awaiting admin approval.');
+        }
+
+        return $this->redirectToRoute('club_detail', ['id' => $club->getId()]);
     }
 }

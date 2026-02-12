@@ -51,8 +51,25 @@
 					</ul>
 				</li>
 				<li class="nav-item"> <a class="nav-link" href="{{ path('admin_approvals', {type: 'clubs'}) }}"><i class="fas fa-users fa-fw me-2"></i>Club Approvals <span class="badge text-bg-success rounded-circle ms-2">{{ stats.pending_clubs }}</span></a></li>
-				<li class="nav-item"> <a class="nav-link" href="{{ path('admin_approvals', {type: 'formations'}) }}"><i class="fas fa-graduation-cap fa-fw me-2"></i>Formation Approvals <span class="badge text-bg-success rounded-circle ms-2">{{ stats.pending_formations }}</span></a></li>
-                <li class="nav-item"> <a class="nav-link" href="{{ path('admin_approvals', {type: 'evaluations'}) }}"><i class="fas fa-star fa-fw me-2"></i>Evaluation Approvals <span class="badge text-bg-success rounded-circle ms-2">{{ stats.pending_evaluations }}</span></a></li>
+				<li class="nav-item">
+					<a class="nav-link" data-bs-toggle="collapse" href="#collapseFormations" role="button" aria-expanded="true" aria-controls="collapseFormations">
+						<i class="fas fa-graduation-cap fa-fw me-2"></i>Formations
+					</a>
+					<ul class="nav collapse show flex-column" id="collapseFormations" data-bs-parent="#navbar-sidebar">
+						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_formation_create') }}">Create Formation</a></li>
+						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_approvals', {type: 'formations'}) }}">Formation Approvals</a></li>
+					</ul>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" data-bs-toggle="collapse" href="#collapseQuizzes" role="button" aria-expanded="true" aria-controls="collapseQuizzes">
+						<i class="fas fa-question-circle fa-fw me-2"></i>Quizzes
+					</a>
+					<ul class="nav collapse show flex-column" id="collapseQuizzes" data-bs-parent="#navbar-sidebar">
+						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_quiz_add') }}">Create Quiz</a></li>
+						<li class="nav-item"> <a class="nav-link" href="{{ path('admin_quiz_list') }}">All Quizzes</a></li>
+						<li class="nav-item"> <a class="nav-link" href="{{ path('quiz_pending') }}">Quizzes Approval</a></li>
+					</ul>
+				</li>
 
 				
 				<!-- Menu item 5 -->

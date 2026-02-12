@@ -90,12 +90,13 @@ Page content START -->
 							<div class="list-group list-group-dark list-group-borderless collapse-list">
 								<a class="list-group-item active" href="{{ path('student_dashboard') }}"><i class="bi bi-ui-checks-grid fa-fw me-2"></i>Dashboard</a>
 								<a class="list-group-item" href="{{ path('student_formations') }}"><i class="fas fa-graduation-cap fa-fw me-2"></i>My Formations</a>
+								<a class="list-group-item" href="{{ path('student_quiz_available') }}"><i class="bi bi-question-diamond fa-fw me-2"></i>Quiz</a>
+								<a class="list-group-item" href="{{ path('student_quiz_results') }}"><i class="fas fa-tasks fa-fw me-2"></i>My Quizzes</a>
 								<a class="list-group-item" href="{{ path('student_wallet_index') }}"><i class="bi bi-wallet2 fa-fw me-2"></i>My Wallet</a>
 								<a class="list-group-item" href="{{ path('student_certificate_index') }}"><i class="fas fa-medal fa-fw me-2"></i>My Certificates</a>
 								<a class="list-group-item" href="#"><i class="bi bi-card-checklist fa-fw me-2"></i>My Subscriptions</a>
 								<a class="list-group-item" href="#"><i class="bi bi-basket fa-fw me-2"></i>My Courses</a>
 								<a class="list-group-item" href="#"><i class="far fa-fw fa-file-alt me-2"></i>Course Resume</a>
-								<a class="list-group-item" href="#"><i class="bi bi-question-diamond fa-fw me-2"></i>Quiz</a>
 								<a class="list-group-item" href="#"><i class="bi bi-credit-card-2-front fa-fw me-2"></i>Payment Info</a>
 								<a class="list-group-item" href="#"><i class="bi bi-cart-check fa-fw me-2"></i>Wishlist</a>
 								<a class="list-group-item" href="{{ path('student_profile_edit') }}"><i class="bi bi-pencil-square fa-fw me-2"></i>Edit Profile</a>
@@ -153,6 +154,69 @@ Page content START -->
 					</div>
 				</div>
 				<!-- Counter boxes END -->
+
+				<!-- My Clubs Section START -->
+				<div class="row mb-4 g-4">
+					<!-- Clubs Header -->
+					<div class="col-12">
+						<div class="d-flex justify-content-between align-items-center mb-3">
+							<div>
+								<h3 class="mb-1"><i class="fas fa-users me-2 text-primary"></i>My Clubs</h3>
+								<p class="text-muted mb-0">Join and manage your club memberships</p>
+							</div>
+							<a href="{{ path('student_club_list') }}" class="btn btn-primary">View All Clubs</a>
+						</div>
+					</div>
+
+					<!-- My Clubs Display -->
+					{% if myClubs|length > 0 %}
+						{% for club in myClubs|slice(0, 3) %}
+							<div class="col-md-6 col-lg-4">
+								<div class="card card-hover h-100 shadow-sm border-0">
+									<div class="card-body">
+										<div class="d-flex justify-content-between align-items-start mb-2">
+											<h6 class="card-title mb-0">{{ club.name }}</h6>
+											<span class="badge bg-success rounded-pill">Member</span>
+										</div>
+										{% if club.description %}
+											<p class="card-text text-muted small mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+												{{ club.description|striptags|slice(0, 80) }}...
+											</p>
+										{% endif %}
+										<small class="text-muted d-block mb-2">
+											<i class="fas fa-users me-1"></i>{{ club.members|length }} members
+										</small>
+										<small class="text-muted d-block mb-3">
+											<i class="fas fa-calendar me-1"></i>{{ club.createdAt|date('M d, Y') }}
+										</small>
+										<a href="{{ path('student_club_show', { id: club.id }) }}" class="btn btn-sm btn-outline-primary w-100">
+											<i class="fas fa-eye me-1"></i>View Club
+										</a>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+
+						{% if myClubs|length > 3 %}
+							<div class="col-md-6 col-lg-4">
+								<div class="card h-100 border-2 border-primary shadow-sm d-flex align-items-center justify-content-center" style="min-height: 300px;">
+									<div class="card-body text-center">
+										<h5>See More Clubs</h5>
+										<p class="text-muted mb-3">You have {{ myClubs|length - 3 }} more clubs</p>
+										<a href="{{ path('student_club_list') }}" class="btn btn-primary btn-sm">View All</a>
+									</div>
+								</div>
+							</div>
+						{% endif %}
+					{% else %}
+						<div class="col-12">
+							<div class="alert alert-info border-info border-2">
+								<i class="bi bi-info-circle me-2"></i>You haven't joined any clubs yet. <a href="{{ path('student_club_list') }}">Browse available clubs</a>
+							</div>
+						</div>
+					{% endif %}
+				</div>
+				<!-- My Clubs Section END -->
 
 				<!-- Formations Section START -->
 				<div class="row mb-4 g-4">

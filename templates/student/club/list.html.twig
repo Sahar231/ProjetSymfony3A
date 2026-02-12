@@ -82,8 +82,8 @@
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="learningMenu" data-bs-toggle="dropdown">Learning</a>
 						<ul class="dropdown-menu" aria-labelledby="learningMenu">
-							<li><a class="dropdown-item" href="{{ path('student_formation_list') }}"><i class="bi bi-book me-2"></i>Formations</a></li>
-							<li><a class="dropdown-item" href="{{ path('student_quiz_list') }}"><i class="bi bi-question-diamond me-2"></i>Quizzes</a></li>
+							<li><a class="dropdown-item" href="{{ path('student_formations') }}"><i class="bi bi-book me-2"></i>Formations</a></li>
+							<li><a class="dropdown-item" href="{{ path('student_quiz_available') }}"><i class="bi bi-question-diamond me-2"></i>Quizzes</a></li>
 							<li><a class="dropdown-item" href="{{ path('student_club_list') }}"><i class="bi bi-people me-2"></i>Clubs</a></li>
 						</ul>
 					</li>
@@ -149,7 +149,7 @@
 								<p class="card-text text-muted">156 Members | Founded 2023</p>
 								<div class="d-flex justify-content-between align-items-center">
 									<span class="badge bg-success">Active Member</span>
-									<a href="{{ path('student_club_detail', {id: 1}) }}" class="btn btn-sm btn-outline-primary">View Club</a>
+									<a href="{{ path('student_club_show', {id: 1}) }}" class="btn btn-sm btn-outline-primary">View Club</a>
 								</div>
 							</div>
 						</div>
@@ -161,7 +161,7 @@
 								<p class="card-text text-muted">98 Members | Founded 2023</p>
 								<div class="d-flex justify-content-between align-items-center">
 									<span class="badge bg-success">Active Member</span>
-									<a href="{{ path('student_club_detail', {id: 2}) }}" class="btn btn-sm btn-outline-primary">View Club</a>
+									<a href="{{ path('student_club_show', {id: 2}) }}" class="btn btn-sm btn-outline-primary">View Club</a>
 								</div>
 							</div>
 						</div>

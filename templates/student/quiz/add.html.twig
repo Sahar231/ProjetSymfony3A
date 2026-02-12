@@ -82,8 +82,8 @@
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="learningMenu" data-bs-toggle="dropdown">Learning</a>
 						<ul class="dropdown-menu" aria-labelledby="learningMenu">
-							<li><a class="dropdown-item" href="{{ path('student_formation_list') }}"><i class="bi bi-book me-2"></i>Formations</a></li>
-							<li><a class="dropdown-item" href="{{ path('student_quiz_list') }}"><i class="bi bi-question-diamond me-2"></i>Quizzes</a></li>
+								<li><a class="dropdown-item" href="{{ path('student_formations') }}"><i class="bi bi-book me-2"></i>Formations</a></li>
+								<li><a class="dropdown-item" href="{{ path('student_quiz_available') }}"><i class="bi bi-question-diamond me-2"></i>Quizzes</a></li>
 							<li><a class="dropdown-item" href="{{ path('student_club_list') }}"><i class="bi bi-people me-2"></i>Clubs</a></li>
 						</ul>
 					</li>
@@ -125,7 +125,7 @@
 				<nav aria-label="breadcrumb">
 					<ol class="breadcrumb breadcrumb-dark breadcrumb-dots mb-0">
 						<li class="breadcrumb-item"><a href="{{ path("app_home") }}">Home</a></li>
-						<li class="breadcrumb-item"><a href="{{ path('student_quiz_list') }}">My Quizzes</a></li>
+							<li class="breadcrumb-item"><a href="{{ path('student_quiz_available') }}">My Quizzes</a></li>
 						<li class="breadcrumb-item active">Start</li>
 					</ol>
 				</nav>
@@ -195,7 +195,7 @@
 					</div>
 					<div class="d-flex gap-2">
 						<button type="submit" class="btn btn-primary">Start Quiz</button>
-						<a href="{{ path('student_quiz_list') }}" class="btn btn-outline-secondary">Cancel</a>
+							<a href="{{ path('student_quiz_available') }}" class="btn btn-outline-secondary">Cancel</a>
 					</div>
 				</div>
 				</div>
