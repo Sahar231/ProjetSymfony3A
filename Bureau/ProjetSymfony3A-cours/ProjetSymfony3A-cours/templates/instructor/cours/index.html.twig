@@ -1,0 +1,344 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Cours - Instructeur{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Tableau de Bord Instructeur - Mes Cours</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('instructor_cours_create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Créer un Cours
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Mes Cours</h6>
+                    <h2>{{ ownCourses|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">En Attente</h6>
+                    <h2>{{ ownCourses|filter(course => course.status == 'PENDING')|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Approuvés</h6>
+                    <h2>{{ ownCourses|filter(course => course.status == 'APPROVED')|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Autres Approuvés</h6>
+                    <h2>{{ otherApprovedCourses|length }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if app.flashes %}
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type == 'success' ? 'success' : 'info' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+
+    <!-- My Courses Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h2 class="mb-3">
+                <i class="bi bi-book"></i> Mes Cours Personnels
+            </h2>
+            
+            {% if ownCourses|length == 0 %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Vous n'avez pas encore créé de cours.
+                    <a href="{{ path('instructor_cours_create') }}">Créer un cours maintenant</a>
+                </div>
+            {% else %}
+                <!-- Search and Filter -->
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-body">
+                        <form method="GET" class="row g-3" id="searchFormOwn">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="searchOwn" placeholder="Rechercher par titre...">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="statusFilterOwn">
+                                    <option value="">Tous les statuts</option>
+                                    <option value="PENDING">En attente</option>
+                                    <option value="APPROVED">Approuvé</option>
+                                    <option value="REFUSED">Refusé</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="sortOwn">
+                                    <option value="title">Trier par: Titre (A-Z)</option>
+                                    <option value="title-desc">Titre (Z-A)</option>
+                                    <option value="date">Date (récent)</option>
+                                    <option value="date-old">Date (ancien)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="reset" class="btn btn-outline-secondary w-100">
+                                    <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover" id="ownCoursesTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Titre</th>
+                                <th>Catégorie</th>
+                                <th>Statut</th>
+                                <th>Date de création</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cours in ownCourses %}
+                                <tr data-title="{{ cours.title }}" data-status="{{ cours.status }}" data-date="{{ cours.createdAt|date('Y-m-d H:i:s') }}">
+                                    <td>{{ cours.title }}</td>
+                                    <td>{{ cours.category ?? 'N/A' }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ cours.status == 'APPROVED' ? 'success' : (cours.status == 'REFUSED' ? 'danger' : 'warning') }}">
+                                            {{ cours.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ cours.createdAt ? cours.createdAt|date('d/m/Y H:i') : 'N/A' }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ path('instructor_cours_show', {id: cours.id}) }}" class="btn btn-info" title="Voir">
+                                                <i class="bi bi-eye"></i> Voir
+                                            </a>
+                                            <a href="{{ path('instructor_cours_edit', {id: cours.id}) }}" class="btn btn-warning" title="Modifier">
+                                                <i class="bi bi-pencil"></i> Modifier
+                                            </a>
+                                            <form action="{{ path('instructor_cours_delete', {id: cours.id}) }}" method="POST" style="display:inline;">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ cours.id) }}">
+                                                <button type="submit" class="btn btn-danger btn-sm" title="Supprimer" onclick="return confirm('Êtes-vous sûr ?')">
+                                                    <i class="bi bi-trash"></i> Supprimer
+                                                </button>
+                                            </form>
+                                            <a href="{{ path('instructor_chapitre_index', {coursId: cours.id}) }}" class="btn btn-secondary btn-sm" title="Chapitres">
+                                                <i class="bi bi-book"></i> Chapitres
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Other Approved Courses Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="mb-3">
+                <i class="bi bi-star"></i> Autres Cours Approuvés
+            </h2>
+            
+            {% if otherApprovedCourses|length == 0 %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Aucun autre cours approuvé disponible actuellement.
+                </div>
+            {% else %}
+                <!-- Search and Filter for Other Courses -->
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-body">
+                        <form method="GET" class="row g-3" id="searchFormOther">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="searchOther" placeholder="Rechercher par titre...">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="instructorFilterOther">
+                                    <option value="">Tous les instructeurs</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="sortOther">
+                                    <option value="title">Trier par: Titre (A-Z)</option>
+                                    <option value="title-desc">Titre (Z-A)</option>
+                                    <option value="date">Date (récent)</option>
+                                    <option value="date-old">Date (ancien)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="reset" class="btn btn-outline-secondary w-100">
+                                    <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover" id="otherCoursesTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Titre</th>
+                                <th>Instructeur</th>
+                                <th>Catégorie</th>
+                                <th>Date de création</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cours in otherApprovedCourses %}
+                                <tr data-title="{{ cours.title }}" data-instructor="{{ cours.createdBy }}" data-date="{{ cours.createdAt|date('Y-m-d H:i:s') }}">
+                                    <td>{{ cours.title }}</td>
+                                    <td>{{ cours.createdBy }}</td>
+                                    <td>{{ cours.category ?? 'N/A' }}</td>
+                                    <td>{{ cours.createdAt ? cours.createdAt|date('d/m/Y H:i') : 'N/A' }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ path('instructor_cours_show', {id: cours.id}) }}" class="btn btn-info" title="Voir">
+                                                <i class="bi bi-eye"></i> Voir
+                                            </a>
+                                            <a href="{{ path('instructor_chapitre_index', {coursId: cours.id}) }}" class="btn btn-secondary btn-sm" title="Chapitres">
+                                                <i class="bi bi-book"></i> Chapitres
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Own Courses Filtering
+    const searchOwn = document.getElementById('searchOwn');
+    const statusFilterOwn = document.getElementById('statusFilterOwn');
+    const sortOwn = document.getElementById('sortOwn');
+    const ownCoursesRows = document.querySelectorAll('#ownCoursesTable tbody tr');
+
+    // Other Courses Filtering
+    const searchOther = document.getElementById('searchOther');
+    const instructorFilterOther = document.getElementById('instructorFilterOther');
+    const sortOther = document.getElementById('sortOther');
+    const otherCoursesRows = document.querySelectorAll('#otherCoursesTable tbody tr');
+
+    // Get unique instructors for dropdown
+    let instructors = new Set();
+    otherCoursesRows.forEach(row => {
+        const instructor = row.dataset.instructor;
+        if (instructor) instructors.add(instructor);
+    });
+    Array.from(instructors).sort().forEach(instructor => {
+        const option = document.createElement('option');
+        option.value = instructor;
+        option.textContent = instructor;
+        instructorFilterOther.appendChild(option);
+    });
+
+    // Filter and Sort function
+    function filterAndSort(searchInput, filterSelect, sortSelect, rows) {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filterValue = filterSelect.value;
+        const sortType = sortSelect.value;
+
+        // Create array of visible rows
+        let visibleRows = Array.from(rows).filter(row => {
+            // Search filter (Title)
+            const title = row.dataset.title.toLowerCase();
+            const titleMatch = title.includes(searchTerm);
+
+            // Filter (status or instructor)
+            let filterMatch = true;
+            if (filterValue) {
+                const status = row.dataset.status;
+                const instructor = row.dataset.instructor;
+                filterMatch = (status || instructor) === filterValue;
+            }
+
+            return titleMatch && filterMatch;
+        });
+
+        // Sort rows
+        visibleRows.sort((a, b) => {
+            let aValue, bValue;
+            
+            if (sortType === 'title' || sortType === 'title-desc') {
+                aValue = a.dataset.title.toLowerCase();
+                bValue = b.dataset.title.toLowerCase();
+            } else if (sortType === 'date' || sortType === 'date-old') {
+                aValue = new Date(a.dataset.date);
+                bValue = new Date(b.dataset.date);
+            }
+
+            if (sortType.includes('desc') || sortType === 'date-old') {
+                return bValue > aValue ? 1 : -1;
+            } else {
+                return aValue > bValue ? 1 : -1;
+            }
+        });
+
+        // Show/hide rows
+        rows.forEach(row => {
+            row.style.display = 'none';
+        });
+        visibleRows.forEach(row => {
+            row.style.display = '';
+        });
+    }
+
+    // Event listeners for Own Courses
+    if (ownCoursesRows.length > 0) {
+        const updateOwnCourses = () => filterAndSort(searchOwn, statusFilterOwn, sortOwn, ownCoursesRows);
+        
+        searchOwn.addEventListener('input', updateOwnCourses);
+        statusFilterOwn.addEventListener('change', updateOwnCourses);
+        sortOwn.addEventListener('change', updateOwnCourses);
+        
+        document.getElementById('searchFormOwn').addEventListener('reset', () => {
+            setTimeout(updateOwnCourses, 0);
+        });
+    }
+
+    // Event listeners for Other Courses
+    if (otherCoursesRows.length > 0) {
+        const updateOtherCourses = () => filterAndSort(searchOther, instructorFilterOther, sortOther, otherCoursesRows);
+        
+        searchOther.addEventListener('input', updateOtherCourses);
+        instructorFilterOther.addEventListener('change', updateOtherCourses);
+        sortOther.addEventListener('change', updateOtherCourses);
+        
+        document.getElementById('searchFormOther').addEventListener('reset', () => {
+            setTimeout(updateOtherCourses, 0);
+        });
+    }
+});
+</script>
+{% endblock %}

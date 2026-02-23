@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ cours.title }} - Instructeur{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ cours.title }}</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('instructor_cours_index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Détails du Cours</h5>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Titre:</strong></div>
+                        <div class="col-md-9">{{ cours.title }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Catégorie:</strong></div>
+                        <div class="col-md-9">{{ cours.category ?? 'N/A' }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Statut:</strong></div>
+                        <div class="col-md-9">
+                            <span class="badge bg-{{ cours.status == 'APPROVED' ? 'success' : (cours.status == 'REFUSED' ? 'danger' : 'warning') }}">
+                                {{ cours.status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Description:</strong></div>
+                        <div class="col-md-9">{{ cours.description ?? 'N/A' }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3"><strong>Date de création:</strong></div>
+                        <div class="col-md-9">{{ cours.createdAt ? cours.createdAt|date('d/m/Y H:i') : 'N/A' }}</div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        {% if cours.createdBy == 'instructor_user1' %}
+                            <a href="{{ path('instructor_cours_edit', {id: cours.id}) }}" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Modifier
+                            </a>
+                            <form action="{{ path('instructor_cours_delete', {id: cours.id}) }}" method="POST" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ cours.id) }}">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr ?')">
+                                    <i class="bi bi-trash"></i> Supprimer
+                                </button>
+                            </form>
+                        {% endif %}
+                        <a href="{{ path('instructor_chapitre_index', {coursId: cours.id}) }}" class="btn btn-secondary">
+                            <i class="bi bi-book"></i> Gérer les Chapitres
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

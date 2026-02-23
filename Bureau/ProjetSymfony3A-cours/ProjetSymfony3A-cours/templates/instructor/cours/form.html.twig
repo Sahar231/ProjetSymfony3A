@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ isEdit ? 'Modifier' : 'Créer' }} un Cours - Instructeur{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ isEdit ? 'Modifier le Cours' : 'Créer un Nouveau Cours' }}</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('instructor_cours_index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <form method="POST">
+                {# top-level errors #}
+                {% if errors is defined and errors %}
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            {% for err in errors %}
+                                <li>{{ err.propertyPath ? err.propertyPath ~ ': ' : '' }}{{ err.message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                {# determine field-level invalid flags #}
+                {% set titleInvalid = false %}
+                {% set descriptionInvalid = false %}
+                {% set categoryInvalid = false %}
+                {% if errors is defined and errors %}
+                    {% for err in errors %}
+                        {% if err.propertyPath == 'title' %}
+                            {% set titleInvalid = true %}
+                        {% elseif err.propertyPath == 'description' %}
+                            {% set descriptionInvalid = true %}
+                        {% elseif err.propertyPath == 'category' %}
+                            {% set categoryInvalid = true %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="title" class="form-label">Titre du Cours</label>
+                    <input type="text" class="form-control{% if titleInvalid %} is-invalid{% endif %}" id="title" name="title" value="{{ cours.title ?? '' }}">
+                    {% if titleInvalid %}
+                        <div class="invalid-feedback">
+                            {% for err in errors %}
+                                {% if err.propertyPath == 'title' %}
+                                    {{ err.message }}{% if not loop.last %}<br>{% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control{% if descriptionInvalid %} is-invalid{% endif %}" id="description" name="description" rows="5">{{ cours.description ?? '' }}</textarea>
+                    {% if descriptionInvalid %}
+                        <div class="invalid-feedback">
+                            {% for err in errors %}
+                                {% if err.propertyPath == 'description' %}
+                                    {{ err.message }}{% if not loop.last %}<br>{% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="category" class="form-label">Catégorie</label>
+                    <input type="text" class="form-control{% if categoryInvalid %} is-invalid{% endif %}" id="category" name="category" value="{{ cours.category ?? '' }}">
+                    {% if categoryInvalid %}
+                        <div class="invalid-feedback">
+                            {% for err in errors %}
+                                {% if err.propertyPath == 'category' %}
+                                    {{ err.message }}{% if not loop.last %}<br>{% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if isEdit %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Votre cours doit être approuvé par un administrateur.
+                    </div>
+                {% endif %}
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> {{ isEdit ? 'Mettre à jour' : 'Créer' }}
+                    </button>
+                    <a href="{{ path('instructor_cours_index') }}" class="btn btn-light">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
