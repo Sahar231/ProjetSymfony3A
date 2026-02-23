@@ -1,0 +1,261 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-2">Tableau de Bord Étudiant</h1>
+            <p class="text-muted">Bienvenue, suivez votre progression et gérez vos apprentissages</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('student_cours_index') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Explorez les Cours
+            </a>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% if app.flashes %}
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type == 'success' ? 'success' : 'info' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <!-- Total Courses -->
+        <div class="col-sm-6 col-lg-3 mb-3 mb-lg-0">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <span class="display-6 lh-1 mb-0"><i class="fas fa-tv fa-fw"></i></span>
+                        <div class="ms-4">
+                            <h5 class="mb-0 fw-bold">9</h5>
+                            <p class="mb-0 h6 fw-light">Mes Cours</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Lessons -->
+        <div class="col-sm-6 col-lg-3 mb-3 mb-lg-0">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <span class="display-6 lh-1 mb-0"><i class="fas fa-clipboard-check fa-fw"></i></span>
+                        <div class="ms-4">
+                            <h5 class="mb-0 fw-bold">52</h5>
+                            <p class="mb-0 h6 fw-light">Leçons Complétées</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificates -->
+        <div class="col-sm-6 col-lg-3 mb-3 mb-lg-0">
+            <div class="card bg-warning text-dark h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <span class="display-6 lh-1 mb-0"><i class="fas fa-medal fa-fw"></i></span>
+                        <div class="ms-4">
+                            <h5 class="mb-0 fw-bold">8</h5>
+                            <p class="mb-0 h6 fw-light">Certificats</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Points -->
+        <div class="col-sm-6 col-lg-3 mb-3 mb-lg-0">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <span class="display-6 lh-1 mb-0"><i class="fas fa-star fa-fw"></i></span>
+                        <div class="ms-4">
+                            <h5 class="mb-0 fw-bold">255</h5>
+                            <p class="mb-0 h6 fw-light">Points</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <div class="card bg-dark text-white border rounded-3">
+                <div class="card-body p-0">
+                    <!-- Profile Menu -->
+                    <div class="list-group list-group-dark list-group-borderless">
+                        <div class="list-group-item px-4 py-3 bg-primary">
+                            <h6 class="mb-0">Mon Profil</h6>
+                        </div>
+                        <a class="list-group-item" href="{{ path('student_dashboard') }}">
+                            <i class="bi bi-ui-checks-grid fa-fw me-2"></i>Tableau de Bord
+                        </a>
+                        <a class="list-group-item" href="{{ path('student_cours_index') }}">
+                            <i class="bi bi-basket fa-fw me-2"></i>Mes Cours
+                        </a>
+                        <a class="list-group-item" href="{{ path('student_quiz') }}">
+                            <i class="bi bi-question-diamond fa-fw me-2"></i>Quiz
+                        </a>
+                        <a class="list-group-item" href="{{ path('student_bookmarks') }}">
+                            <i class="bi bi-bookmark fa-fw me-2"></i>Favoris
+                        </a>
+                        <div class="list-group-item px-4 py-3 border-top bg-secondary">
+                            <h6 class="mb-0">Paramètres</h6>
+                        </div>
+                        <a class="list-group-item" href="#">
+                            <i class="bi bi-person-circle fa-fw me-2"></i>Profil
+                        </a>
+                        <a class="list-group-item" href="#">
+                            <i class="bi bi-gear fa-fw me-2"></i>Paramètres
+                        </a>
+                        <a class="list-group-item text-danger" href="#">
+                            <i class="bi bi-box-arrow-right fa-fw me-2"></i>Déconnexion
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <!-- Active Courses Section -->
+            <div class="card mb-4 border rounded-3">
+                <div class="card-header bg-light border-bottom">
+                    <h5 class="mb-0">
+                        <i class="bi bi-play-circle me-2"></i>Cours Actifs
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Course Card 1 -->
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title">Développement Web Avancé</h6>
+                                    <p class="card-text text-muted small">Par: Jean Dupont</p>
+                                    <div class="mb-3">
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-success" style="width: 65%"></div>
+                                        </div>
+                                        <small class="text-muted">65% complété</small>
+                                    </div>
+                                    <a href="{{ path('student_cours_show', {id: 1}) }}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-play"></i> Continuer
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Course Card 2 -->
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title">Python pour Débutants</h6>
+                                    <p class="card-text text-muted small">Par: Marie Martin</p>
+                                    <div class="mb-3">
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-warning" style="width: 40%"></div>
+                                        </div>
+                                        <small class="text-muted">40% complété</small>
+                                    </div>
+                                    <a href="{{ path('student_cours_show', {id: 2}) }}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-play"></i> Continuer
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="{{ path('student_cours_index') }}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-arrow-right"></i> Voir tous mes cours
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommended Courses Section -->
+            <div class="card border rounded-3">
+                <div class="card-header bg-light border-bottom">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightbulb me-2"></i>Cours Recommandés
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Recommended Course 1 -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border shadow-sm">
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <span class="badge bg-success">Populaire</span>
+                                    </div>
+                                    <h6 class="card-title">JavaScript Avancé</h6>
+                                    <p class="card-text text-muted small">Par: Luc Moreau</p>
+                                    <p class="card-text small">Maîtrisez les concepts avancés de JavaScript.</p>
+                                    <button class="btn btn-sm btn-outline-primary w-100 mt-3">
+                                        <i class="bi bi-plus"></i> S'inscrire
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recommended Course 2 -->
+                        <div class="col-md-6">
+                            <div class="card h-100 border shadow-sm">
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <span class="badge bg-info">Nouveau</span>
+                                    </div>
+                                    <h6 class="card-title">Docker & Kubernetes</h6>
+                                    <p class="card-text text-muted small">Par: Thomas Renault</p>
+                                    <p class="card-text small">Déployez vos applications avec Docker.</p>
+                                    <button class="btn btn-sm btn-outline-primary w-100 mt-3">
+                                        <i class="bi bi-plus"></i> S'inscrire
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+        transform: translateY(-2px);
+    }
+
+    .list-group-item {
+        transition: all 0.3s ease;
+    }
+
+    .list-group-item:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        padding-left: 1.5rem !important;
+    }
+</style>
+{% endblock %}
