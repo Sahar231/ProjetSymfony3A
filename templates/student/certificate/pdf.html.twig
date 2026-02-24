@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ certificate.formation.title }} - Certificate PDF{% endblock %}
+
+{% block body %}
+<div class="container-fluid p-5" style="background-color: #f5f5f5;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Certificate Document -->
+            <div class="card border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 600px; display: flex; align-items: center; justify-content: center;">
+                <div class="card-body p-5 text-white text-center">
+                    <!-- Certificate Border -->
+                    <div class="border-3 border-white rounded p-5">
+                        <!-- Badge Icon -->
+                        <div class="mb-5">
+                            <i class="fas fa-medal" style="font-size: 6rem;"></i>
+                        </div>
+
+                        <!-- Certificate Title -->
+                        <h1 class="mb-4" style="font-size: 2.5rem; font-weight: 300;">
+                            Certificate of Completion
+                        </h1>
+                        <p class="mb-4" style="font-size: 1.1rem;">This certifies that</p>
+
+                        <!-- Student Name -->
+                        <h2 class="mb-5" style="font-size: 2.5rem; font-weight: 300; border-bottom: 2px solid white; padding-bottom: 15px;">
+                            {{ app.user.fullName }}
+                        </h2>
+
+                        <!-- Achievement Text -->
+                        <p class="mb-3" style="font-size: 1.1rem;">has successfully completed the professional training program</p>
+
+                        <!-- Formation Name -->
+                        <h3 class="mb-5" style="font-size: 2rem; font-weight: 300; border-bottom: 2px solid white; padding-bottom: 15px;">
+                            {{ certificate.formation.title }}
+                        </h3>
+
+                        <!-- Details Grid -->
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-4">
+                                <small style="font-size: 0.9rem;">Level</small>
+                                <p class="mb-0" style="font-size: 1.2rem;"><strong>{{ certificate.formation.level ?? 'Standard' }}</strong></p>
+                            </div>
+                            <div class="col-md-4">
+                                <small style="font-size: 0.9rem;">Duration</small>
+                                <p class="mb-0" style="font-size: 1.2rem;">
+                                    <strong>
+                                        {% if certificate.formation.duration %}
+                                            {{ certificate.formation.duration }} {% if certificate.formation.duration == 1 %}week{% else %}weeks{% endif %}
+                                        {% else %}
+                                            Self-paced
+                                        {% endif %}
+                                    </strong>
+                                </p>
+                            </div>
+                            <div class="col-md-4">
+                                <small style="font-size: 0.9rem;">Score Achieved</small>
+                                <p class="mb-0" style="font-size: 1.2rem;"><strong>{{ certificate.score|round(2) }}%</strong></p>
+                            </div>
+                        </div>
+
+                        <!-- Signature and Date -->
+                        <div class="row g-5 mt-5">
+                            <div class="col-md-6 text-center">
+                                <p style="border-top: 2px solid white; padding-top: 15px; font-size: 0.9rem; margin-bottom: 0;">
+                                    <strong>Authorized Signature</strong>
+                                </p>
+                            </div>
+                            <div class="col-md-6 text-center">
+                                <p style="border-top: 2px solid white; padding-top: 15px; font-size: 0.9rem; margin-bottom: 0;">
+                                    <strong>{{ certificate.awardedAt|date('F d, Y') }}</strong><br>
+                                    <small>Date Awarded</small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Print Buttons -->
+            <div class="text-center mt-4">
+                <button class="btn btn-primary me-2" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>Print Certificate
+                </button>
+                <button class="btn btn-secondary" onclick="downloadPDF()">
+                    <i class="fas fa-download me-2"></i>Download as PDF
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function downloadPDF() {
+    // This would require a PDF generation library like DOMPDF
+    // For now, we'll show the print dialog which users can save as PDF
+    window.print();
+}
+</script>
+
+<style>
+    @media print {
+        body {
+            background-color: white;
+        }
+        .btn {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}

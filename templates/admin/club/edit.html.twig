@@ -1,0 +1,105 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Edit Club - Admin{% endblock %}
+
+{% block body %}
+<!-- Page content START -->
+<div class="page-content">
+	<!-- Top bar START -->
+	<nav class="navbar top-bar navbar-light border-bottom py-0 py-xl-3">
+		<div class="container-fluid p-0">
+			<div class="d-flex align-items-center w-100">
+				<div class="d-flex align-items-center d-xl-none">
+					<a class="navbar-brand" href="">
+						<img class="light-mode-item navbar-brand-item h-30px" src="{{ asset('assets/images/logo-mobile.svg') }}" alt="">
+						<img class="dark-mode-item navbar-brand-item h-30px" src="{{ asset('assets/images/logo-mobile-light.svg') }}" alt="">
+					</a>
+				</div>
+				<div class="navbar-expand-xl sidebar-offcanvas-menu">
+					<button class="navbar-toggler me-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar" aria-expanded="false" aria-label="Toggle navigation" data-bs-auto-close="outside">
+						<i class="bi bi-text-right fa-fw h2 lh-0 mb-0 rtl-flip"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+	</nav>
+	<!-- Top bar END -->
+
+	<!-- Page main content START -->
+	<div class="page-content-wrapper border">
+		<!-- Title -->
+		<div class="row">
+			<div class="col-12 mb-3">
+				<h1 class="h3 mb-0"><i class="fas fa-edit me-2"></i>Edit Club</h1>
+			</div>
+		</div>
+
+		<!-- Breadcrumb -->
+		<div class="row mb-3">
+			<div class="col-12">
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb bg-light p-3 rounded">
+						<li class="breadcrumb-item"><a href="{{ path('admin_dashboard') }}">Admin Dashboard</a></li>
+						<li class="breadcrumb-item"><a href="{{ path('admin_club_list') }}">Clubs</a></li>
+						<li class="breadcrumb-item active" aria-current="page">Edit {{ club.name }}</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+
+		<!-- Form -->
+		<div class="row">
+			<div class="col-lg-8 mx-auto">
+				<div class="card">
+					<div class="card-body p-4">
+						<form method="POST" class="row g-3">
+							<div class="col-12">
+								<label for="name" class="form-label">Club Name <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" id="name" name="name" value="{{ club.name }}" required placeholder="Enter club name">
+								<small class="text-muted">Min 3 characters</small>
+							</div>
+
+							<div class="col-12">
+								<label for="description" class="form-label">Description</label>
+								<textarea class="form-control" id="description" name="description" rows="5" placeholder="Describe your club...">{{ club.description }}</textarea>
+							</div>
+
+							<div class="col-12">
+								<label for="status" class="form-label">Status</label>
+								<select class="form-select" id="status" name="status" disabled>
+									<option value="PENDING" {% if club.status == 'PENDING' %}selected{% endif %}>Pending</option>
+									<option value="APPROVED" {% if club.status == 'APPROVED' %}selected{% endif %}>Approved</option>
+									<option value="REJECTED" {% if club.status == 'REJECTED' %}selected{% endif %}>Rejected</option>
+								</select>
+								<small class="text-muted">Status is managed through Approve/Reject actions</small>
+							</div>
+
+							<div class="col-12">
+								<div class="d-flex gap-2">
+									<button type="submit" class="btn btn-primary">
+										<i class="fas fa-save me-2"></i>Save Changes
+									</button>
+									<a href="{{ path('admin_club_show', {'id': club.id}) }}" class="btn btn-secondary">
+										<i class="fas fa-times me-2"></i>Cancel
+									</a>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Return Button -->
+		<div class="row mt-4">
+			<div class="col-12">
+				<a href="{{ path('admin_club_list') }}" class="btn btn-secondary">
+					<i class="fas fa-arrow-left me-2"></i>Back to Clubs List
+				</a>
+			</div>
+		</div>
+	</div>
+	<!-- Page main content END -->
+</div>
+<!-- Page content END -->
+{% endblock %}
