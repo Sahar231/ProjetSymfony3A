@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Event;
 use App\Entity\Club;
+use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Repository\ClubRepository;
 use App\Service\PdfService;
@@ -53,7 +54,7 @@ class EventController extends AbstractController
 
         // Apply search filter
         if ($search) {
-            $qb->andWhere('e.title LIKE :search OR e.description LIKE :search OR creator.username LIKE :search')
+            $qb->andWhere('e.title LIKE :search OR e.description LIKE :search OR creator.fullName LIKE :search')
                ->setParameter('search', "%$search%");
         }
 
@@ -90,6 +91,29 @@ class EventController extends AbstractController
             'totalEvents' => $totalCount,
             'pendingEvents' => $pendingCount,
             'approvedEvents' => $approvedCount,
+        ]);
+    }
+
+    #[Route('/add', name: 'add', methods: ['GET', 'POST'])]
+    public function add(Request $request): Response
+    {
+        $event = new Event();
+        $form = $this->createForm(EventType::class, $event);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $event->setCreator($this->getUser());
+            $event->setStatus(Event::STATUS_APPROVED);
+
+            $this->em->persist($event);
+            $this->em->flush();
+
+            $this->addFlash('success', 'Événement créé avec succès !');
+            return $this->redirectToRoute('admin_event_list');
+        }
+
+        return $this->render('admin/event/add.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 

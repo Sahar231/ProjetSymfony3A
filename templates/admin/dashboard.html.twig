@@ -285,6 +285,30 @@
 							</a>
 						</li>
 					</ul>
+
+					<hr class="my-3">
+
+					<h6 class="mb-3"><i class="fas fa-user-plus me-2"></i>Join Requests Approval</h6>
+					<ul class="list-unstyled">
+						<li class="mb-2">
+							<a href="{{ path('admin_join_request_list', {status: 'PENDING'}) }}" class="btn btn-sm btn-outline-warning w-100 text-start">
+								<i class="bi bi-hourglass-split me-2"></i>Pending
+								<span class="badge bg-warning float-end">{{ pendingJoinCount }}</span>
+							</a>
+						</li>
+						<li class="mb-2">
+							<a href="{{ path('admin_join_request_list', {status: 'APPROVED'}) }}" class="btn btn-sm btn-outline-success w-100 text-start">
+								<i class="bi bi-check-circle me-2"></i>Approved
+								<span class="badge bg-success float-end">{{ approvedJoinCount }}</span>
+							</a>
+						</li>
+						<li class="mb-0">
+							<a href="{{ path('admin_join_request_list') }}" class="btn btn-sm btn-outline-primary w-100 text-start">
+								<i class="fas fa-user-plus me-2"></i>All Requests
+								<span class="badge bg-primary float-end">{{ totalJoinCount }}</span>
+							</a>
+						</li>
+					</ul>
 				</div>
 			</div>
 			<!-- Sidebar END -->
@@ -347,6 +371,93 @@
 									<small class="text-warning"><i class="bi bi-hourglass-split me-1"></i>{{ pendingEventsCount }} pending</small>
 								</div>
 							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Join Request Summary & Latest Pending -->
+				<div class="row g-4 mb-4">
+					<div class="col-12">
+						<div class="card shadow">
+							<!-- Card header -->
+							<div class="card-header border-bottom d-flex justify-content-between align-items-center bg-primary bg-opacity-10">
+								<h5 class="card-header-title mb-0"><i class="fas fa-hand-holding-heart me-2"></i>Join Requests Management</h5>
+								<div class="d-flex align-items-center">
+									<span class="badge {% if pendingJoinCount > 0 %}bg-danger{% else %}bg-success{% endif %} me-3">{{ pendingJoinCount }} PENDING</span>
+									<a href="{{ path('admin_join_request_list', {status: 'PENDING'}) }}" class="btn btn-sm btn-primary mb-0">Voir les demandes</a>
+								</div>
+							</div>
+
+							<!-- Card body START -->
+							<div class="card-body">
+								<div class="row g-4 mb-4">
+									<div class="col-md-4">
+										<div class="card card-body border-bottom border-warning border-3 shadow-none bg-light">
+											<h4 class="mb-0 text-warning">{{ pendingJoinCount }}</h4>
+											<p class="mb-0 small text-muted">Pending Requests</p>
+										</div>
+									</div>
+									<div class="col-md-4">
+										<div class="card card-body border-bottom border-success border-3 shadow-none bg-light">
+											<h4 class="mb-0 text-success">{{ approvedJoinCount }}</h4>
+											<p class="mb-0 small text-muted">Approved Requests</p>
+										</div>
+									</div>
+									<div class="col-md-4">
+										<div class="card card-body border-bottom border-primary border-3 shadow-none bg-light">
+											<h4 class="mb-0 text-primary">{{ totalJoinCount }}</h4>
+											<p class="mb-0 small text-muted">Total Requests</p>
+										</div>
+									</div>
+								</div>
+
+								<h6 class="mb-3">Latest 5 Pending Requests</h6>
+								{% if latestPendingJoinRequests|length > 0 %}
+									<div class="table-responsive border-0">
+										<table class="table align-middle p-4 mb-0 table-hover">
+											<thead class="table-light">
+												<tr>
+													<th scope="col" class="border-0 rounded-start">Student</th>
+													<th scope="col" class="border-0">Club</th>
+													<th scope="col" class="border-0">Date</th>
+													<th scope="col" class="border-0 rounded-end">Action</th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for jr in latestPendingJoinRequests %}
+													<tr>
+														<td>
+															<h6 class="mb-0">{{ jr.user.fullName }}</h6>
+															<small class="text-muted">{{ jr.user.email }}</small>
+														</td>
+														<td>
+															<h6 class="mb-0">{{ jr.club.name }}</h6>
+														</td>
+														<td>{{ jr.requestedAt|date('d/m/Y H:i') }}</td>
+														<td>
+															<div class="d-flex gap-2">
+																<form method="POST" action="{{ path('admin_join_request_approve', {'id': jr.id}) }}" onsubmit="return confirm('Approve this request?')">
+																	<input type="hidden" name="_token" value="{{ csrf_token('approve' ~ jr.id) }}">
+																	<button type="submit" class="btn btn-success btn-sm mb-0">✅</button>
+																</form>
+																<form method="POST" action="{{ path('admin_join_request_reject', {'id': jr.id}) }}" onsubmit="return confirm('Reject this request?')">
+																	<input type="hidden" name="_token" value="{{ csrf_token('reject' ~ jr.id) }}">
+																	<button type="submit" class="btn btn-danger btn-sm mb-0">❌</button>
+																</form>
+															</div>
+														</td>
+													</tr>
+												{% endfor %}
+											</tbody>
+										</table>
+									</div>
+								{% else %}
+									<div class="alert alert-info mb-0">
+										<i class="bi bi-info-circle me-2"></i>No pending join requests
+									</div>
+								{% endif %}
+							</div>
+							<!-- Card body END -->
 						</div>
 					</div>
 				</div>
@@ -503,7 +614,7 @@
 											<tr>
 												<td>{{ event.title }}</td>
 												<td>{{ event.club.name }}</td>
-												<td>{{ event.creator.firstName }} {{ event.creator.lastName }}</td>
+												<td>{{ event.creator.fullName }}</td>
 												<td>{{ event.eventDate|date('d/m/Y H:i') }}</td>
 												<td>
 													<a href="{{ path('admin_event_show', {id: event.id}) }}" class="btn btn-sm btn-primary">

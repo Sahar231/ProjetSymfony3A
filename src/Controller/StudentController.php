@@ -34,12 +34,13 @@ class StudentController extends AbstractController
             return !$formation->isArchived();
         });
 
-        // Get clubs the user is a member of (approved clubs only)
+        // Get clubs where the user is either a member OR the creator (approved only)
         $myClubs = $clubRepository->createQueryBuilder('c')
-            ->join('c.members', 'm')
-            ->where('m.id = :userId')
+            ->leftJoin('c.members', 'm')
+            ->where('m.id = :userId OR c.creator = :user')
             ->andWhere('c.status = :status')
             ->setParameter('userId', $user->getId())
+            ->setParameter('user', $user)
             ->setParameter('status', Club::STATUS_APPROVED)
             ->getQuery()
             ->getResult();

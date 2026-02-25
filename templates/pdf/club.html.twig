@@ -132,7 +132,7 @@
         <div class="info-grid">
             <div class="info-row">
                 <div class="info-label">Creator:</div>
-                <div class="info-value">{{ club.creator.firstName }} {{ club.creator.lastName }} ({{ club.creator.email }})</div>
+                <div class="info-value">{{ club.creator.fullName }} ({{ club.creator.email }})</div>
             </div>
             <div class="info-row">
                 <div class="info-label">Created Date:</div>
@@ -168,7 +168,7 @@
                 <tbody>
                     {% for member in club.members %}
                         <tr>
-                            <td>{{ member.firstName }} {{ member.lastName }}</td>
+                            <td>{{ member.fullName }}</td>
                             <td>{{ member.email }}</td>
                             <td>
                                 {% if member.id == club.creator.id %}

@@ -183,10 +183,56 @@
 									<small class="form-text text-muted">First letter must be uppercase</small>
 								</div>
 								<div class="mb-3">
-									<label class="form-label">Description <span class="text-danger">*</span></label>
+									<div class="d-flex justify-content-between align-items-center mb-2">
+										<label class="form-label mb-0">Description <span class="text-danger">*</span></label>
+										<button type="button" class="btn btn-sm btn-purple mb-0" id="btn-gen-ai-form-adm">
+											<i class="fas fa-magic me-2"></i>✨ Générer une description
+										</button>
+									</div>
 									<textarea class="form-control" id="formationDescription" name="description" rows="4" required></textarea>
 									<small class="form-text text-muted">Must contain at least 4 words</small>
 								</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const genBtn = document.getElementById('btn-gen-ai-form-adm');
+    if (genBtn) {
+        genBtn.addEventListener('click', async () => {
+            const titleInput = document.getElementById('formationTitle');
+            const descTextarea = document.getElementById('formationDescription');
+            
+            if (!titleInput || !titleInput.value.trim()) {
+                alert('Veuillez d\'abord saisir un titre.');
+                return;
+            }
+
+            genBtn.disabled = true;
+            genBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Génération...';
+
+            try {
+                const response = await fetch('{{ path("api_generate_description") }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ clubName: titleInput.value })
+                });
+
+                const data = await response.json();
+                if (data.description) {
+                    descTextarea.value = data.description;
+                } else {
+                    alert('Erreur: ' + (data.error || 'Impossible de générer la description.'));
+                }
+            } catch (error) {
+                console.error('AI Error:', error);
+                alert('Une erreur est survenue.');
+            } finally {
+                genBtn.disabled = false;
+                genBtn.innerHTML = '<i class="fas fa-magic me-2"></i>✨ Générer une description';
+            }
+        });
+    }
+});
+</script>
 								<div class="row">
 									<div class="col-md-6">
 										<div class="mb-3">

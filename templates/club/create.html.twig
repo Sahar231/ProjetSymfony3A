@@ -2,6 +2,19 @@
 
 {% block title %}Create Club{% endblock %}
 
+{% block stylesheets %}
+<style>
+    .form-error-messages ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        color: #dc3545;
+        font-size: 0.875em;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
 <main>
 <section class="bg-dark align-items-center d-flex" style="background: url({{ asset('assets/images/pattern/04.png') }}) no-repeat center center; background-size: cover;">
@@ -33,37 +46,46 @@
 							Create a club for your group, interests, or activities. Your club will be pending approval from administrators.
 						</p>
 
-						<form method="POST" class="row g-3">
+						{{ form_start(form, {'action': path('club_create'), 'attr': {'class': 'row g-3'}}) }}
 							<div class="col-12">
-								<label for="name" class="form-label">Club Name <span class="text-danger">*</span></label>
-								<input type="text" class="form-control" id="name" name="name" required placeholder="Enter your club name">
-								<small class="form-text text-muted">Minimum 3 characters</small>
+								{{ form_label(form.name, null, {'label_attr': {'class': 'form-label'}}) }}
+								<div class="form-error-messages">
+									{{ form_errors(form.name) }}
+								</div>
+								{{ form_widget(form.name) }}
+								<small class="form-text text-muted">Minimum 3 caractères</small>
 							</div>
 
 							<div class="col-12">
-								<label for="description" class="form-label">Description <span class="text-danger">*</span></label>
-								<textarea class="form-control" id="description" name="description" rows="5" required placeholder="Describe your club, its goals, and what members can expect..."></textarea>
-								<small class="form-text text-muted">Give a detailed description of your club</small>
+								{{ form_label(form.description, null, {'label_attr': {'class': 'form-label'}}) }}
+								<div class="form-error-messages">
+									{{ form_errors(form.description) }}
+								</div>
+								{{ form_widget(form.description, {attr: {class: 'form-control', rows: 6}}) }}
+								<button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="generateDescription(this)">
+									✨ Générer une description
+								</button>
+								<small class="form-text text-muted d-block mt-2">Donnez une description détaillée de votre club</small>
 							</div>
 
 							<div class="col-12">
 								<div class="alert alert-info">
 									<i class="fas fa-info-circle me-2"></i>
-									<strong>Note:</strong> Your club will be in a <strong>pending status</strong> until approved by an administrator.
+									<strong>Note :</strong> Votre club sera en <strong>statut en attente</strong> jusqu'à ce qu'il soit approuvé par un administrateur.
 								</div>
 							</div>
 
 							<div class="col-12">
 								<div class="d-grid gap-2 d-sm-flex">
 									<button type="submit" class="btn btn-primary btn-lg">
-										<i class="fas fa-check me-2"></i>Create Club
+										<i class="fas fa-check me-2"></i>Créer le Club
 									</button>
 									<a href="{{ path('club_list') }}" class="btn btn-secondary btn-lg">
-										<i class="fas fa-times me-2"></i>Cancel
+										<i class="fas fa-times me-2"></i>Annuler
 									</a>
 								</div>
 							</div>
-						</form>
+						{{ form_end(form) }}
 					</div>
 				</div>
 			</div>
@@ -71,4 +93,46 @@
 	</div>
 </section>
 </main>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+async function generateDescription(btn) {
+    const form = btn.closest('form');
+    // Find name field (could be 'name' or 'title' depending on the form field name)
+    const nameField = form.querySelector('input[name*="name"], input[name*="title"]');
+    const descField = form.querySelector('textarea[name*="description"]');
+    const nameValue = nameField ? nameField.value : '';
+    
+    if (!nameValue.trim()) {
+        alert('Veuillez remplir le nom en premier !');
+        return;
+    }
+    
+    btn.disabled = true;
+    const originalContent = btn.innerHTML;
+    btn.innerHTML = '⏳ Génération en cours...';
+    
+    try {
+        const response = await fetch('/api/generate-description', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: nameValue, type: 'club' })
+        });
+        
+        const data = await response.json();
+        
+        if (data.description) {
+            descField.value = data.description;
+        } else if (data.error) {
+            alert('Erreur: ' + data.error);
+        }
+    } catch(e) {
+        alert('Erreur lors de la génération');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalContent;
+    }
+}
+</script>
 {% endblock %}

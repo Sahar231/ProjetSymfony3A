@@ -23,11 +23,21 @@ class Club
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Club name is required')]
-    #[Assert\Length(min: 3, max: 255)]
+    #[Assert\NotBlank(message: 'Le nom du club est obligatoire.')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'Le nom du club doit comporter au moins {{ limit }} caractères.',
+        maxMessage: 'Le nom du club ne peut pas dépasser {{ limit }} caractères.'
+    )]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\NotBlank(message: 'La description du club est obligatoire.')]
+    #[Assert\Length(
+        min: 10,
+        minMessage: 'La description doit comporter au moins {{ limit }} caractères.'
+    )]
     private ?string $description = null;
 
     #[ORM\Column(length: 50)]

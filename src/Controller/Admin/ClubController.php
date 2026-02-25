@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Club;
+use App\Form\ClubType;
 use App\Repository\ClubRepository;
 use App\Service\PdfService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -41,7 +42,7 @@ class ClubController extends AbstractController
 
         // Apply search filter
         if ($search) {
-            $qb->andWhere('c.name LIKE :search OR c.description LIKE :search OR creator.username LIKE :search')
+            $qb->andWhere('c.name LIKE :search OR c.description LIKE :search OR creator.fullName LIKE :search')
                ->setParameter('search', "%$search%");
         }
 
@@ -83,21 +84,24 @@ class ClubController extends AbstractController
     #[Route('/add', name: 'add', methods: ['GET', 'POST'])]
     public function add(Request $request): Response
     {
-        if ($request->isMethod('POST')) {
-            $club = new Club();
-            $club->setName($request->request->get('name'));
-            $club->setDescription($request->request->get('description'));
+        $club = new Club();
+        $form = $this->createForm(ClubType::class, $club);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
             $club->setCreator($this->getUser());
             $club->setStatus(Club::STATUS_APPROVED);
 
             $this->em->persist($club);
             $this->em->flush();
 
-            $this->addFlash('success', 'Club created successfully!');
+            $this->addFlash('success', 'Club créé avec succès !');
             return $this->redirectToRoute('admin_club_list');
         }
 
-        return $this->render('admin/club/add.html.twig');
+        return $this->render('admin/club/add.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
     #[Route('/export-list', name: 'export_list', methods: ['GET'])]
@@ -118,18 +122,19 @@ class ClubController extends AbstractController
     #[Route('/{id<\d+>}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Club $club): Response
     {
-        if ($request->isMethod('POST')) {
-            $club->setName($request->request->get('name'));
-            $club->setDescription($request->request->get('description'));
-            $club->setUpdatedAt(new \DateTimeImmutable());
+        $form = $this->createForm(ClubType::class, $club);
+        $form->handleRequest($request);
 
+        if ($form->isSubmitted() && $form->isValid()) {
+            $club->setUpdatedAt(new \DateTimeImmutable());
             $this->em->flush();
-            $this->addFlash('success', 'Club updated successfully!');
+            $this->addFlash('success', 'Club mis à jour avec succès !');
             return $this->redirectToRoute('admin_club_show', ['id' => $club->getId()]);
         }
 
         return $this->render('admin/club/edit.html.twig', [
             'club' => $club,
+            'form' => $form->createView(),
         ]);
     }
 

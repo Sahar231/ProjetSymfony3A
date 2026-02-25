@@ -21,18 +21,28 @@ class Event
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Event title is required')]
-    #[Assert\Length(min: 3, max: 255)]
+    #[Assert\NotBlank(message: 'Le titre de l\'événement est obligatoire.')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'Le titre doit comporter au moins {{ limit }} caractères.',
+        maxMessage: 'Le titre ne peut pas dépasser {{ limit }} caractères.'
+    )]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\NotBlank(message: 'La description est obligatoire.')]
+    #[Assert\Length(min: 10, minMessage: 'La description doit comporter au moins {{ limit }} caractères.')]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    #[Assert\NotBlank(message: 'Event date is required')]
+    #[Assert\NotBlank(message: 'La date de l\'événement est obligatoire.')]
+    #[Assert\Type(type: \DateTimeImmutable::class, message: 'La date doit être au format valide.')]
+    #[Assert\GreaterThanOrEqual('today', message: 'La date ne peut pas être dans le passé.')]
     private ?\DateTimeImmutable $eventDate = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank(message: 'Le lieu est obligatoire.')]
     private ?string $location = null;
 
     #[ORM\Column(length: 50)]

@@ -94,11 +94,6 @@ class InstructorController extends AbstractController
         return $this->render('instructor/instructor-studentlist.html.twig');
     }
 
-    #[Route('/edit-profile', name: 'edit_profile')]
-    public function editProfile(): Response
-    {
-        return $this->render('instructor/instructor-edit-profile.html.twig');
-    }
 
     #[Route('/settings', name: 'settings')]
     public function settings(): Response

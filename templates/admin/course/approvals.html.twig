@@ -88,7 +88,7 @@
 								{% for cours in courses %}
 									<tr>
 										<td><strong>{{ cours.title }}</strong></td>
-										<td>{{ cours.creator.username }}</td>
+										<td>{{ cours.creator.fullName }}</td>
 										<td>{{ cours.createdAt|date('Y-m-d H:i') }}</td>
 										<td>
 											<span class="badge bg-info">{{ cours.chapitres|length }}</span>

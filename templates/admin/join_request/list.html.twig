@@ -112,7 +112,7 @@
 											</td>
 											<td>
 												<div>
-													<h6 class="mb-0">{{ jr.user.firstName }} {{ jr.user.lastName }}</h6>
+													<h6 class="mb-0">{{ jr.user.fullName }}</h6>
 													<small class="text-muted">{{ jr.user.email }}</small>
 												</div>
 											</td>
@@ -129,20 +129,22 @@
 												<small>{{ jr.requestedAt|date('d/m/Y H:i') }}</small>
 											</td>
 											<td>
-												<div class="btn-group btn-group-sm" role="group">
+												<div class="d-flex gap-2">
 													{% if jr.status == 'PENDING' %}
-														<form method="POST" action="{{ path('admin_join_request_approve', {'id': jr.id}) }}" class="d-inline" onsubmit="return confirm('Approve this request?')">
-															<button type="submit" class="btn btn-outline-success" data-bs-toggle="tooltip" title="Approve">
-																<i class="fas fa-check"></i>
+														<form method="POST" action="{{ path('admin_join_request_approve', {'id': jr.id}) }}" onsubmit="return confirm('Approve this request?')">
+															<input type="hidden" name="_token" value="{{ csrf_token('approve' ~ jr.id) }}">
+															<button type="submit" class="btn btn-success btn-sm">
+																✅ Accepter
 															</button>
 														</form>
-														<form method="POST" action="{{ path('admin_join_request_reject', {'id': jr.id}) }}" class="d-inline" onsubmit="return confirm('Reject this request?')">
-															<button type="submit" class="btn btn-outline-danger" data-bs-toggle="tooltip" title="Reject">
-																<i class="fas fa-times"></i>
+														<form method="POST" action="{{ path('admin_join_request_reject', {'id': jr.id}) }}" onsubmit="return confirm('Reject this request?')">
+															<input type="hidden" name="_token" value="{{ csrf_token('reject' ~ jr.id) }}">
+															<button type="submit" class="btn btn-danger btn-sm">
+																❌ Refuser
 															</button>
 														</form>
 													{% else %}
-														<span class="text-muted small">No actions</span>
+														<span class="text-muted small">Aucune action</span>
 													{% endif %}
 												</div>
 											</td>

@@ -135,6 +135,13 @@
 				<!-- Menu item 3 -->
 				<li class="nav-item"> <a class="nav-link" href="admin-student-list.html"><i class="fas fa-user-graduate fa-fw me-2"></i>Students</a></li>
 
+				<!-- Menu item 3.5: Join Requests -->
+				<li class="nav-item"> 
+					<a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_join_request' ? 'active' : '' }}" href="{{ path('admin_join_request_list') }}">
+						<i class="fas fa-hand-paper fa-fw me-2"></i>Join Requests
+					</a>
+				</li>
+
 				<!-- Menu item 4 -->
 				<li class="nav-item">
 					<a class="nav-link" data-bs-toggle="collapse" href="#collapseinstructors" role="button" aria-expanded="false" aria-controls="collapseinstructors">

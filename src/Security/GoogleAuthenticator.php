@@ -16,18 +16,17 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationEntryPointInterface
 {
-    private $clientRegistry;
-    private $entityManager;
-    private $router;
 
-    public function __construct(ClientRegistry $clientRegistry, EntityManagerInterface $entityManager, RouterInterface $router)
-    {
-        $this->clientRegistry = $clientRegistry;
-        $this->entityManager = $entityManager;
-        $this->router = $router;
+    public function __construct(
+        private ClientRegistry $clientRegistry,
+        private EntityManagerInterface $entityManager,
+        private RouterInterface $router,
+        private Security $security
+    ) {
     }
 
     public function supports(Request $request): ?bool
@@ -127,11 +126,11 @@ class GoogleAuthenticator extends OAuth2Authenticator implements AuthenticationE
             return $response;
         }
 
-        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             $response = new RedirectResponse($this->router->generate('admin_dashboard'));
-        } elseif (in_array('ROLE_INSTRUCTOR', $user->getRoles(), true)) {
+        } elseif ($this->security->isGranted('ROLE_INSTRUCTOR')) {
             $response = new RedirectResponse($this->router->generate('instructor_dashboard'));
-        } elseif (in_array('ROLE_STUDENT', $user->getRoles(), true)) {
+        } elseif ($this->security->isGranted('ROLE_STUDENT')) {
             $response = new RedirectResponse($this->router->generate('student_dashboard'));
         } else {
             $response = new RedirectResponse($this->router->generate('app_home'));

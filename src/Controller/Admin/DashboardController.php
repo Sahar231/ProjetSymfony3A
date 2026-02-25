@@ -12,6 +12,8 @@ use App\Repository\FormationRepository;
 use App\Repository\CoursRepository;
 use App\Repository\ClubRepository;
 use App\Repository\EventRepository;
+use App\Entity\JoinRequest;
+use App\Repository\JoinRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +25,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DashboardController extends AbstractController
 {
     #[Route('', name: 'admin_dashboard', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager, UserRepository $userRepository): Response
+    public function index(
+        EntityManagerInterface $entityManager, 
+        UserRepository $userRepository,
+        JoinRequestRepository $joinRequestRepository
+    ): Response
     {
         $qb = $entityManager->createQueryBuilder();
         
@@ -194,6 +200,23 @@ class DashboardController extends AbstractController
             ->getQuery()
             ->getResult();
 
+        // Get latest 5 pending join requests
+        $latestPendingJoinRequests = $joinRequestRepository->createQueryBuilder('jr')
+            ->leftJoin('jr.club', 'club')
+            ->leftJoin('jr.user', 'user')
+            ->addSelect('club', 'user')
+            ->where('jr.status = :status')
+            ->setParameter('status', JoinRequest::STATUS_PENDING)
+            ->orderBy('jr.requestedAt', 'DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+
+        // Get count of pending join requests
+        $pendingJoinCount = $joinRequestRepository->count(['status' => JoinRequest::STATUS_PENDING]);
+        $approvedJoinCount = $joinRequestRepository->count(['status' => JoinRequest::STATUS_APPROVED]);
+        $totalJoinCount = $joinRequestRepository->count([]);
+
         return $this->render('admin/dashboard.html.twig', [
             'pendingFormations' => $pendingFormations,
             'approvedFormations' => $approvedFormations,
@@ -227,6 +250,10 @@ class DashboardController extends AbstractController
             'totalInstructorsCount' => $userRepository->countByRole('ROLE_INSTRUCTOR'),
             'pendingStudentsCount' => $userRepository->countPending('ROLE_STUDENT'),
             'pendingInstructorsCount' => $userRepository->countPending('ROLE_INSTRUCTOR'),
+            'latestPendingJoinRequests' => $latestPendingJoinRequests,
+            'pendingJoinCount' => $pendingJoinCount,
+            'approvedJoinCount' => $approvedJoinCount,
+            'totalJoinCount' => $totalJoinCount,
         ]);
     }
 

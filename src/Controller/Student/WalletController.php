@@ -38,30 +38,10 @@ class WalletController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
-            $firstName = $request->request->get('firstName');
-            $lastName = $request->request->get('lastName');
-
-            // Validate form data
-            $errors = [];
-            if (empty($firstName)) {
-                $errors[] = 'First name is required.';
-            }
-            if (empty($lastName)) {
-                $errors[] = 'Last name is required.';
-            }
-
-            if (!empty($errors)) {
-                foreach ($errors as $error) {
-                    $this->addFlash('error', $error);
-                }
-                return $this->redirectToRoute('student_wallet_create');
-            }
 
             // Create new wallet with 100 credits for first-time creation
             $wallet = new Wallet();
             $wallet->setUser($user);
-            $wallet->setFirstName($firstName);
-            $wallet->setLastName($lastName);
             $wallet->setBalance(100); // First-time bonus of 100 credits
 
             $entityManager->persist($wallet);
@@ -84,27 +64,6 @@ class WalletController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
-            $firstName = $request->request->get('firstName');
-            $lastName = $request->request->get('lastName');
-
-            // Validate form data
-            $errors = [];
-            if (empty($firstName)) {
-                $errors[] = 'First name is required.';
-            }
-            if (empty($lastName)) {
-                $errors[] = 'Last name is required.';
-            }
-
-            if (!empty($errors)) {
-                foreach ($errors as $error) {
-                    $this->addFlash('error', $error);
-                }
-                return $this->redirectToRoute('student_wallet_edit', ['id' => $wallet->getId()]);
-            }
-
-            $wallet->setFirstName($firstName);
-            $wallet->setLastName($lastName);
             $entityManager->flush();
 
             $this->addFlash('success', 'Wallet information updated successfully!');

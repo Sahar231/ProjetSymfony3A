@@ -24,6 +24,26 @@
 
 <section class="py-5">
 	<div class="container">
+		<!-- Back Buttons START -->
+		<div class="row mb-4">
+			<div class="col-12 d-flex gap-2">
+				<a href="{{ path('club_list') }}" class="btn btn-outline-secondary">
+					<i class="fas fa-arrow-left me-2"></i>Retour aux clubs
+				</a>
+				{% if is_granted('ROLE_ADMIN') %}
+					{% set dashboard_path = path('admin_dashboard') %}
+				{% elseif is_granted('ROLE_INSTRUCTOR') %}
+					{% set dashboard_path = path('instructor_dashboard') %}
+				{% else %}
+					{% set dashboard_path = path('student_dashboard') %}
+				{% endif %}
+				<a href="{{ dashboard_path }}" class="btn btn-secondary">
+					<i class="fas fa-columns me-2"></i>Retour au dashboard
+				</a>
+			</div>
+		</div>
+		<!-- Back Buttons END -->
+
 		<!-- Create Event Button -->
 		{% if app.user and app.user.id == club.creator.id %}
 			<div class="row mb-4">
@@ -43,16 +63,16 @@
 					<form method="GET" class="row g-2 align-items-end">
 						<div class="col-md-5">
 							<label for="search" class="form-label">Search Event</label>
-							<input type="text" class="form-control" id="search" name="search" placeholder="Title or description..." value="{{ request.query.get('search') }}">
+							<input type="text" class="form-control" id="search" name="search" placeholder="Title or description..." value="{{ search }}">
 						</div>
 
 						<div class="col-md-4">
-							<label for="sortBy" class="form-label">Sort by</label>
-							<select class="form-select" id="sortBy" name="sortBy">
-								<option value="newest" {% if request.query.get('sortBy') == 'newest' %}selected{% endif %}>Newest First</option>
-								<option value="oldest" {% if request.query.get('sortBy') == 'oldest' %}selected{% endif %}>Oldest First</option>
-								<option value="date" {% if request.query.get('sortBy') == 'date' %}selected{% endif %}>Event Date</option>
-								<option value="a-z" {% if request.query.get('sortBy') == 'a-z' %}selected{% endif %}>A-Z</option>
+							<label for="sort" class="form-label">Sort by</label>
+							<select class="form-select" id="sort" name="sort">
+								<option value="date_desc" {% if sort == 'date_desc' %}selected{% endif %}>Newest First</option>
+								<option value="date_asc" {% if sort == 'date_asc' %}selected{% endif %}>Oldest First</option>
+								<option value="title_asc" {% if sort == 'title_asc' %}selected{% endif %}>Name (A-Z)</option>
+								<option value="title_desc" {% if sort == 'title_desc' %}selected{% endif %}>Name (Z-A)</option>
 							</select>
 						</div>
 
@@ -91,7 +111,7 @@
 									<br>
 									<small class="text-muted">
 										<i class="fas fa-user me-1"></i>
-										By {{ event.creator.firstName }} {{ event.creator.lastName }}
+										By {{ event.creator.fullName }}
 									</small>
 								</div>
 
@@ -120,7 +140,7 @@
 					<div class="text-center py-5">
 						<i class="fas fa-inbox text-muted" style="font-size: 3rem;"></i>
 						<p class="text-muted mt-3">
-							{% if request.query.has('search') or request.query.has('sortBy') %}
+							{% if search or sort != 'date_asc' %}
 								No events match your search criteria
 							{% else %}
 								No events yet. 

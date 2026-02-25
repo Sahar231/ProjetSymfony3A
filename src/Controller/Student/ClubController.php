@@ -2,7 +2,11 @@
 
 namespace App\Controller\Student;
 
+use App\Entity\Club;
+use App\Entity\JoinRequest;
 use App\Repository\ClubRepository;
+use App\Repository\JoinRequestRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -11,9 +15,19 @@ use Symfony\Component\Routing\Attribute\Route;
 class ClubController extends AbstractController
 {
     #[Route('', name: 'student_club_list', methods: ['GET'])]
-    public function list(): Response
+    public function list(ClubRepository $clubRepository): Response
     {
-        return $this->render('student/club/list.html.twig');
+        $user = $this->getUser();
+        $myClubs = $clubRepository->createQueryBuilder('c')
+            ->join('c.members', 'm')
+            ->where('m.id = :userId')
+            ->setParameter('userId', $user->getId())
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('student/club/list.html.twig', [
+            'myClubs' => $myClubs,
+        ]);
     }
 
     #[Route('/join', name: 'student_club_join', methods: ['GET', 'POST'])]
@@ -34,5 +48,41 @@ class ClubController extends AbstractController
         return $this->render('student/club/show.html.twig', [
             'club' => $club,
         ]);
+    }
+
+    #[Route('/{id}/leave', name: 'student_club_leave', methods: ['POST'])]
+    public function leave(int $id, ClubRepository $clubRepository, JoinRequestRepository $joinRequestRepository, EntityManagerInterface $em, \Symfony\Component\HttpFoundation\Request $request): Response
+    {
+        $club = $clubRepository->find($id);
+        $user = $this->getUser();
+
+        if (!$club) {
+            throw $this->createNotFoundException('Club not found');
+        }
+
+        if (!$this->isCsrfTokenValid('leave_club' . $club->getId(), $request->request->get('_token'))) {
+            $this->addFlash('error', 'Invalid CSRF token.');
+            return $this->redirectToRoute('student_dashboard');
+        }
+
+        // Remove user from club members
+        $club->removeMember($user);
+
+        // Find and remove the approved join request
+        $joinRequest = $joinRequestRepository->findOneBy([
+            'club' => $club,
+            'user' => $user,
+            'status' => JoinRequest::STATUS_APPROVED
+        ]);
+
+        if ($joinRequest) {
+            $em->remove($joinRequest);
+        }
+
+        $em->flush();
+
+        $this->addFlash('success', 'Vous avez quitté le club ' . $club->getName());
+
+        return $this->redirectToRoute('student_dashboard');
     }
 }

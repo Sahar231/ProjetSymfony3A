@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Club;
 use App\Entity\JoinRequest;
+use App\Form\ClubType;
 use App\Repository\ClubRepository;
 use App\Repository\JoinRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,7 +37,7 @@ class ClubController extends AbstractController
 
         // Apply search filter
         if ($search) {
-            $qb->andWhere('c.name LIKE :search OR c.description LIKE :search OR creator.username LIKE :search')
+            $qb->andWhere('c.name LIKE :search OR c.description LIKE :search OR creator.fullName LIKE :search')
                ->setParameter('search', "%$search%");
         }
 
@@ -97,21 +98,24 @@ class ClubController extends AbstractController
     #[IsGranted('ROLE_STUDENT')] // Students and Instructors can create clubs
     public function create(Request $request): Response
     {
-        if ($request->isMethod('POST')) {
-            $club = new Club();
-            $club->setName($request->request->get('name'));
-            $club->setDescription($request->request->get('description'));
+        $club = new Club();
+        $form = $this->createForm(ClubType::class, $club);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
             $club->setCreator($this->getUser());
             $club->setStatus(Club::STATUS_PENDING);
 
             $this->em->persist($club);
             $this->em->flush();
 
-            $this->addFlash('success', 'Club created successfully! Awaiting admin approval.');
+            $this->addFlash('success', 'Club créé avec succès ! En attente de l\'approbation des administrateurs.');
             return $this->redirectToRoute('club_list');
         }
 
-        return $this->render('club/club-create.html.twig');
+        return $this->render('club/create.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
@@ -120,21 +124,22 @@ class ClubController extends AbstractController
     {
         // Check permissions: creator and club must be approved
         if ($club->getCreator() !== $this->getUser() || !$club->isApproved()) {
-            throw $this->createAccessDeniedException('You can only edit approved clubs you created.');
+            throw $this->createAccessDeniedException('Vous ne pouvez modifier que les clubs approuvés que vous avez créés.');
         }
 
-        if ($request->isMethod('POST')) {
-            $club->setName($request->request->get('name'));
-            $club->setDescription($request->request->get('description'));
-            $club->setUpdatedAt(new \DateTimeImmutable());
+        $form = $this->createForm(ClubType::class, $club);
+        $form->handleRequest($request);
 
+        if ($form->isSubmitted() && $form->isValid()) {
+            $club->setUpdatedAt(new \DateTimeImmutable());
             $this->em->flush();
-            $this->addFlash('success', 'Club updated successfully!');
+            $this->addFlash('success', 'Club mis à jour avec succès !');
             return $this->redirectToRoute('club_detail', ['id' => $club->getId()]);
         }
 
-        return $this->render('club/club-edit.html.twig', [
+        return $this->render('club/edit.html.twig', [
             'club' => $club,
+            'form' => $form->createView(),
         ]);
     }
 

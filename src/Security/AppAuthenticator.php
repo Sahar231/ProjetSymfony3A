@@ -15,6 +15,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class AppAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -22,8 +23,10 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator)
-    {
+    public function __construct(
+        private UrlGeneratorInterface $urlGenerator,
+        private Security $security
+    ) {
     }
 
     public function authenticate(Request $request): Passport
@@ -60,20 +63,20 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
         /** @var \App\Entity\User $user */
         $user = $token->getUser();
 
-        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             return new RedirectResponse($this->urlGenerator->generate('admin_dashboard'));
+        }
+
+        if ($this->security->isGranted('ROLE_INSTRUCTOR')) {
+            return new RedirectResponse($this->urlGenerator->generate('instructor_dashboard'));
+        }
+
+        if ($this->security->isGranted('ROLE_STUDENT')) {
+            return new RedirectResponse($this->urlGenerator->generate('student_dashboard'));
         }
 
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
-        }
-
-        if (in_array('ROLE_INSTRUCTOR', $user->getRoles(), true)) {
-            return new RedirectResponse($this->urlGenerator->generate('instructor_dashboard'));
-        }
-
-        if (in_array('ROLE_STUDENT', $user->getRoles(), true)) {
-            return new RedirectResponse($this->urlGenerator->generate('student_dashboard'));
         }
 
         return new RedirectResponse($this->urlGenerator->generate('app_home'));

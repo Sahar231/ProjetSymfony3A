@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Club;
 use App\Entity\Event;
 use App\Repository\EventRepository;
+use App\Repository\ClubRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,15 +18,16 @@ class EventController extends AbstractController
 {
     public function __construct(
         private EventRepository $eventRepository,
+        private ClubRepository $clubRepository,
         private EntityManagerInterface $em
     ) {}
 
     #[Route('/', name: 'list', methods: ['GET'])]
-    public function list(Club $club, Request $request): Response
+    public function list(int $clubId, Request $request): Response
     {
-        // Only show approved clubs
-        if ($club->getStatus() !== Club::STATUS_APPROVED) {
-            throw $this->createAccessDeniedException();
+        $club = $this->clubRepository->find($clubId);
+        if (!$club || $club->getStatus() !== Club::STATUS_APPROVED) {
+            throw $this->createNotFoundException('Club not found or not approved.');
         }
 
         $search = $request->query->get('search', '');
@@ -63,7 +65,7 @@ class EventController extends AbstractController
 
         $events = $qb->getQuery()->getResult();
 
-        return $this->render('event/event-list.html.twig', [
+        return $this->render('event/list.html.twig', [
             'club' => $club,
             'events' => $events,
             'search' => $search,
@@ -71,29 +73,15 @@ class EventController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'detail', methods: ['GET'])]
-    public function detail(Club $club, Event $event): Response
-    {
-        // Verify event belongs to the club
-        if ($event->getClub() !== $club) {
-            throw $this->createAccessDeniedException();
-        }
-
-        // Only show approved events to public
-        if ($event->getStatus() !== Event::STATUS_APPROVED) {
-            throw $this->createAccessDeniedException();
-        }
-
-        return $this->render('event/event-detail.html.twig', [
-            'club' => $club,
-            'event' => $event,
-        ]);
-    }
-
     #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_STUDENT')]
-    public function create(Club $club, Request $request): Response
+    public function create(int $clubId, Request $request): Response
     {
+        $club = $this->clubRepository->find($clubId);
+        if (!$club) {
+            throw $this->createNotFoundException('Club not found.');
+        }
+
         // Only club creator can create events
         if ($club->getCreator() !== $this->getUser()) {
             throw $this->createAccessDeniedException('Only the club creator can add events.');
@@ -116,18 +104,43 @@ class EventController extends AbstractController
             return $this->redirectToRoute('event_list', ['clubId' => $club->getId()]);
         }
 
-        return $this->render('event/event-create.html.twig', [
+        return $this->render('event/create.html.twig', [
             'club' => $club,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'detail', methods: ['GET'])]
+    public function detail(int $clubId, int $id): Response
+    {
+        $club = $this->clubRepository->find($clubId);
+        $event = $this->eventRepository->find($id);
+
+        // Verify entities exist and event belongs to the club
+        if (!$club || !$event || $event->getClub() !== $club) {
+            throw $this->createNotFoundException('Event or Club not found.');
+        }
+
+        // Only show approved events to public
+        if ($event->getStatus() !== Event::STATUS_APPROVED) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return $this->render('event/detail.html.twig', [
+            'club' => $club,
+            'event' => $event,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_STUDENT')]
-    public function edit(Club $club, Event $event, Request $request): Response
+    public function edit(int $clubId, int $id, Request $request): Response
     {
-        // Verify event belongs to club
-        if ($event->getClub() !== $club) {
-            throw $this->createAccessDeniedException();
+        $club = $this->clubRepository->find($clubId);
+        $event = $this->eventRepository->find($id);
+
+        // Verify entities exist and event belongs to club
+        if (!$club || !$event || $event->getClub() !== $club) {
+            throw $this->createNotFoundException('Event or Club not found.');
         }
 
         // Check permissions: creator and event must be approved
@@ -147,7 +160,7 @@ class EventController extends AbstractController
             return $this->redirectToRoute('event_detail', ['clubId' => $club->getId(), 'id' => $event->getId()]);
         }
 
-        return $this->render('event/event-edit.html.twig', [
+        return $this->render('event/edit.html.twig', [
             'club' => $club,
             'event' => $event,
         ]);
@@ -155,11 +168,14 @@ class EventController extends AbstractController
 
     #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]
     #[IsGranted('ROLE_STUDENT')]
-    public function delete(Club $club, Event $event, Request $request): Response
+    public function delete(int $clubId, int $id, Request $request): Response
     {
-        // Verify event belongs to club
-        if ($event->getClub() !== $club) {
-            throw $this->createAccessDeniedException();
+        $club = $this->clubRepository->find($clubId);
+        $event = $this->eventRepository->find($id);
+
+        // Verify entities exist and event belongs to club
+        if (!$club || !$event || $event->getClub() !== $club) {
+            throw $this->createNotFoundException('Event or Club not found.');
         }
 
         // Check permissions

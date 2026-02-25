@@ -52,10 +52,7 @@ class ClubController extends AbstractController
             $club->setName($name);
             $club->setDescription($description);
             $club->setCreator($this->getUser());
-            
-            // Map status
-            $clubStatus = $status === 'inactive' ? Club::STATUS_PENDING : Club::STATUS_APPROVED;
-            $club->setStatus($clubStatus);
+            $club->setStatus(Club::STATUS_PENDING);
 
             // Save to database
             $this->em->persist($club);

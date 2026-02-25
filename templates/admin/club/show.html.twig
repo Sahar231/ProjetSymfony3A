@@ -121,7 +121,7 @@
 								{% if club.members|length > 0 %}
 									{% for member in club.members %}
 										<tr>
-											<td>{{ member.firstName }} {{ member.lastName }}</td>
+											<td>{{ member.fullName }}</td>
 											<td>{{ member.email }}</td>
 											<td>
 												{% if member.id == club.creator.id %}
@@ -163,6 +163,7 @@
 
 							{% if club.status != 'APPROVED' %}
 								<form method="POST" action="{{ path('admin_club_approve', {'id': club.id}) }}" class="d-inline" onsubmit="return confirm('Approve this club?')">
+									<input type="hidden" name="_token" value="{{ csrf_token('approve' ~ club.id) }}">
 									<button type="submit" class="btn btn-success w-100">
 										<i class="fas fa-check me-2"></i>Approve
 									</button>
@@ -171,6 +172,7 @@
 
 							{% if club.status != 'REJECTED' %}
 								<form method="POST" action="{{ path('admin_club_reject', {'id': club.id}) }}" class="d-inline" onsubmit="return confirm('Reject this club?')">
+									<input type="hidden" name="_token" value="{{ csrf_token('reject' ~ club.id) }}">
 									<button type="submit" class="btn btn-warning w-100">
 										<i class="fas fa-times me-2"></i>Reject
 									</button>
@@ -178,6 +180,7 @@
 							{% endif %}
 
 							<form method="POST" action="{{ path('admin_club_delete', {'id': club.id}) }}" class="d-inline" onsubmit="return confirm('Delete this club? This action cannot be undone.')">
+								<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ club.id) }}">
 								<button type="submit" class="btn btn-danger w-100">
 									<i class="fas fa-trash me-2"></i>Delete
 								</button>

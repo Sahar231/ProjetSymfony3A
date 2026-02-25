@@ -126,32 +126,37 @@
 						<!-- Clubs & Events Section -->
 						<div class="row mt-4 mb-4 g-4">
 							<div class="col-md-6">
-								<div class="card">
-									<div class="card-header bg-light">
-										<h5 class="mb-0"><i class="fas fa-users me-2"></i>My Clubs</h5>
+								<div class="card shadow-sm border-0 h-100">
+									<div class="card-header bg-light d-flex justify-content-between align-items-center">
+										<h5 class="mb-0"><i class="fas fa-users me-2 text-primary"></i>My Clubs</h5>
+										<a href="{{ path('instructor_club_create') }}" class="btn btn-sm btn-primary">Créer un club</a>
 									</div>
 									<div class="card-body">
 										{% if instructorClubs|length > 0 %}
-											<ul class="list-unstyled">
-												{% for club in instructorClubs|slice(0, 5) %}
-													<li class="mb-2 pb-2 border-bottom">
-														<div class="d-flex justify-content-between align-items-start">
-															<div>
-																<h6 class="mb-1"><a href="{{ path('instructor_club_show', {id: club.id}) }}">{{ club.name }}</a></h6>
-																<small class="text-muted">{{ club.members|length }} members</small>
-															</div>
-															<span class="badge {% if club.status == 'APPROVED' %}bg-success{% elseif club.status == 'PENDING' %}bg-warning{% else %}bg-danger{% endif %}">
-																{{ club.status|lower }}
+											<ul class="list-unstyled mb-0">
+												{% for club in instructorClubs %}
+													<li class="mb-3 pb-3 border-bottom last-child-border-0">
+														<div class="d-flex justify-content-between align-items-start mb-2">
+															<h6 class="mb-0"><a href="{{ path('club_detail', {id: club.id}) }}">{{ club.name }}</a></h6>
+															<span class="badge {% if club.status == 'APPROVED' %}bg-success{% elseif club.status == 'PENDING' %}bg-warning{% else %}bg-danger{% endif %} text-uppercase">
+																{{ club.status }}
 															</span>
+														</div>
+														<div class="d-flex justify-content-between align-items-center">
+															<small class="text-muted"><i class="fas fa-users me-1"></i>{{ club.members|length }} membres</small>
+															<div class="d-flex gap-2">
+																<a href="{{ path('club_detail', {id: club.id}) }}" class="btn btn-sm btn-outline-primary py-0 px-2">Voir</a>
+																<a href="{{ path('club_edit', {id: club.id}) }}" class="btn btn-sm btn-outline-info py-0 px-2">Modifier</a>
+															</div>
 														</div>
 													</li>
 												{% endfor %}
 											</ul>
-											{% if instructorClubs|length > 5 %}
-												<a href="{{ path('instructor_club_list') }}" class="btn btn-sm btn-outline-primary w-100 mt-2">View All ({{ instructorClubs|length }})</a>
-											{% endif %}
 										{% else %}
-											<p class="text-muted mb-0">You haven't created any clubs yet.</p>
+											<div class="text-center py-4">
+												<p class="text-muted mb-3">Vous n'avez créé aucun club.</p>
+												<a href="{{ path('instructor_club_create') }}" class="btn btn-sm btn-primary">Créer mon premier club</a>
+											</div>
 										{% endif %}
 									</div>
 								</div>

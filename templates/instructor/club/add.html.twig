@@ -177,9 +177,60 @@
 								<input type="text" class="form-control" id="clubName" name="clubName" placeholder="Enter club name" required>
 							</div>
 							<div class="mb-3">
-								<label class="form-label" for="clubDesc">Description *</label>
+								<div class="d-flex justify-content-between align-items-center mb-1">
+									<label class="form-label mb-0" for="clubDesc">Description *</label>
+									<button type="button" id="btnGenAi" class="btn btn-sm btn-purple mb-0">
+										<i class="fas fa-magic me-2"></i>Générer description avec IA
+									</button>
+								</div>
 								<textarea class="form-control" id="clubDesc" name="clubDesc" rows="4" placeholder="Enter club description" required></textarea>
+								<div id="aiLoading" class="small text-primary mt-1" style="display:none;">
+									<div class="spinner-border spinner-border-sm me-1" role="status"></div>
+									Génération en cours...
+								</div>
 							</div>
+
+							<script>
+							document.getElementById('btnGenAi').addEventListener('click', async () => {
+								const title = document.getElementById('clubName').value;
+								const descField = document.getElementById('clubDesc');
+								const loading = document.getElementById('aiLoading');
+								const btn = document.getElementById('btnGenAi');
+
+								if (!title) {
+									alert('Veuillez d\'abord saisir le nom du club.');
+									return;
+								}
+
+								loading.style.display = 'block';
+								btn.disabled = true;
+
+								try {
+									const response = await fetch('{{ path("api_generate_description") }}', {
+										method: 'POST',
+										headers: {
+											'Content-Type': 'application/json',
+										},
+										body: JSON.stringify({
+											title: title
+										})
+									});
+
+									const data = await response.json();
+									if (data.description) {
+										descField.value = data.description;
+									} else if (data.error) {
+										alert(data.error);
+									}
+								} catch (error) {
+									console.error('Error:', error);
+									alert('Erreur lors de la génération de la description.');
+								} finally {
+									loading.style.display = 'none';
+									btn.disabled = false;
+								}
+							});
+							</script>
 							<div class="mb-3">
 								<label class="form-label" for="clubCategory">Category *</label>
 								<select class="form-select" id="clubCategory" name="clubCategory" required>

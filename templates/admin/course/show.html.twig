@@ -56,7 +56,7 @@
 						<div class="d-flex justify-content-between align-items-start mb-3">
 							<div>
 								<p class="text-muted mb-2">
-									<i class="fas fa-user"></i> <strong>Creator:</strong> {{ cours.creator.username }}
+									<i class="fas fa-user"></i> <strong>Creator:</strong> {{ cours.creator.fullName }}
 								</p>
 								<p class="text-muted mb-2">
 									<i class="fas fa-calendar"></i> <strong>Created:</strong> {{ cours.createdAt|date('Y-m-d H:i') }}
@@ -230,7 +230,7 @@
 									</div>
 									<div class="card-footer bg-white">
 										<small class="text-muted">
-											<strong>Author:</strong> {{ chapter.creator.username }}
+											<strong>Author:</strong> {{ chapter.creator.fullName }}
 										</small>
 									</div>
 								</div>

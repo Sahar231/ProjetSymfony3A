@@ -155,18 +155,27 @@
 														<i class="fas fa-edit"></i>
 													</a>
 													{% if club.status != 'APPROVED' %}
-														<a href="{{ path('admin_club_approve', {'id': club.id}) }}" class="btn btn-outline-success" data-bs-toggle="tooltip" title="Approve" onclick="return confirm('Approve this club?')">
-															<i class="fas fa-check"></i>
-														</a>
+														<form method="POST" action="{{ path('admin_club_approve', {'id': club.id}) }}" class="d-inline" onsubmit="return confirm('Approve this club?')">
+															<input type="hidden" name="_token" value="{{ csrf_token('approve' ~ club.id) }}">
+															<button type="submit" class="btn btn-outline-success" data-bs-toggle="tooltip" title="Approve">
+																<i class="fas fa-check"></i>
+															</button>
+														</form>
 													{% endif %}
 													{% if club.status != 'REJECTED' %}
-														<a href="{{ path('admin_club_reject', {'id': club.id}) }}" class="btn btn-outline-danger" data-bs-toggle="tooltip" title="Reject" onclick="return confirm('Reject this club?')">
-															<i class="fas fa-times"></i>
-														</a>
+														<form method="POST" action="{{ path('admin_club_reject', {'id': club.id}) }}" class="d-inline" onsubmit="return confirm('Reject this club?')">
+															<input type="hidden" name="_token" value="{{ csrf_token('reject' ~ club.id) }}">
+															<button type="submit" class="btn btn-outline-danger" data-bs-toggle="tooltip" title="Reject">
+																<i class="fas fa-times"></i>
+															</button>
+														</form>
 													{% endif %}
-													<a href="{{ path('admin_club_delete', {'id': club.id}) }}" class="btn btn-outline-danger" data-bs-toggle="tooltip" title="Delete" onclick="return confirm('Delete this club? This action cannot be undone.')">
-														<i class="fas fa-trash"></i>
-													</a>
+													<form method="POST" action="{{ path('admin_club_delete', {'id': club.id}) }}" class="d-inline" onsubmit="return confirm('Delete this club? This action cannot be undone.')">
+														<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ club.id) }}">
+														<button type="submit" class="btn btn-outline-danger" data-bs-toggle="tooltip" title="Delete">
+															<i class="fas fa-trash"></i>
+														</button>
+													</form>
 												</div>
 											</td>
 										</tr>

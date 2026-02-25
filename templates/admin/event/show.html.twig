@@ -133,6 +133,7 @@
 
 							{% if event.status != 'APPROVED' %}
 								<form method="POST" action="{{ path('admin_event_approve', {'id': event.id}) }}" class="d-inline" onsubmit="return confirm('Approve this event?')">
+									<input type="hidden" name="_token" value="{{ csrf_token('approve' ~ event.id) }}">
 									<button type="submit" class="btn btn-success w-100">
 										<i class="fas fa-check me-2"></i>Approve
 									</button>
@@ -141,6 +142,7 @@
 
 							{% if event.status != 'REJECTED' %}
 								<form method="POST" action="{{ path('admin_event_reject', {'id': event.id}) }}" class="d-inline" onsubmit="return confirm('Reject this event?')">
+									<input type="hidden" name="_token" value="{{ csrf_token('reject' ~ event.id) }}">
 									<button type="submit" class="btn btn-warning w-100">
 										<i class="fas fa-times me-2"></i>Reject
 									</button>
@@ -148,6 +150,7 @@
 							{% endif %}
 
 							<form method="POST" action="{{ path('admin_event_delete', {'id': event.id}) }}" class="d-inline" onsubmit="return confirm('Delete this event?')">
+								<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
 								<button type="submit" class="btn btn-danger w-100">
 									<i class="fas fa-trash me-2"></i>Delete
 								</button>

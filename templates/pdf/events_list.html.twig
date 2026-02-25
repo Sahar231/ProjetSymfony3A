@@ -105,7 +105,7 @@
                         <td>{{ event.club.name }}</td>
                         <td>{{ event.eventDate|date('d/m/Y H:i') }}</td>
                         <td>{{ event.location }}</td>
-                        <td>{{ event.creator.firstName }} {{ event.creator.lastName }}</td>
+                        <td>{{ event.creator.fullName }}</td>
                         <td>
                             {% if event.status == 'PENDING' %}
                                 <span class="badge badge-pending">Pending</span>
