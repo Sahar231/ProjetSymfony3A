@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.connexion3a36.Controller.AjouterQuestionController">
+  <children>
+    <VBox spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10">
+      <Label text="Ajouter Question" styleClass="page-title" />
+      <HBox spacing="8">
+        <Label fx:id="alertSuccess" styleClass="alert-success" visible="false" managed="false" />
+        <Label fx:id="alertError" styleClass="alert-error" visible="false" managed="false" />
+      </HBox>
+      <GridPane hgap="10" vgap="10">
+        <children>
+          <Label text="Question:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+          <TextArea fx:id="questionTA" prefRowCount="3" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+          <Label text="Réponse correcte:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+          <TextField fx:id="correctAnswerTF" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+          <Label text="Score:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+          <TextField fx:id="scoreTF" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+          <Label text="Type:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+          <ChoiceBox fx:id="typeChoice" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+        </children>
+      </GridPane>
+
+      <HBox spacing="10">
+        <Button text="Enregistrer" fx:id="saveButton" onAction="#ajouterQuestion" />
+        <Button text="Annuler" fx:id="cancelButton" onAction="#handleBack" />
+        <Button text="Retour" fx:id="backButton" onAction="#handleBack" />
+      </HBox>
+    </VBox>
+  </children>
+</AnchorPane>

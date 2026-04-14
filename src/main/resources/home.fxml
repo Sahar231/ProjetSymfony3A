@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.connexion3a36.Controller.HomeController">
+  <center>
+    <VBox spacing="24" alignment="CENTER" styleClass="section-card home-card">
+      <Label text="Gestion des évaluations" styleClass="page-title" />
+      <Label text="Administration des quizzes, questions et résultats" styleClass="page-subtitle" />
+      <HBox spacing="24" alignment="CENTER">
+        <Button text="Quiz" onAction="#openQuizList" styleClass="primary-button large-button" />
+        <Button text="Questions" onAction="#openQuestionList" styleClass="secondary-button large-button" />
+        <Button text="Résultats" onAction="#openResultatList" styleClass="secondary-button large-button" />
+      </HBox>
+    </VBox>
+  </center>
+</BorderPane>

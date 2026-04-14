@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.connexion3a36.Controller.ModifierResultatController">
+  <center>
+    <VBox spacing="10">
+      <HBox spacing="8">
+        <Label fx:id="alertSuccess" styleClass="alert-success" visible="false" managed="false" />
+        <Label fx:id="alertError" styleClass="alert-error" visible="false" managed="false" />
+      </HBox>
+      <TableView fx:id="resultatTable">
+        <columns>
+          <TableColumn fx:id="idCol" text="ID" />
+          <TableColumn fx:id="scoreCol" text="Score" />
+          <TableColumn fx:id="createdAtCol" text="Créé le" />
+        </columns>
+      </TableView>
+
+      <GridPane hgap="10" vgap="10">
+        <children>
+          <Label text="Score:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+          <TextField fx:id="scoreTF" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+          <Label text="CreatedAt (ISO):" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+          <TextField fx:id="createdAtTF" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+        </children>
+      </GridPane>
+
+      <HBox spacing="10">
+        <Button text="Modifier" onAction="#modifierResultat" />
+        <Button text="Retour" onAction="#handleBack" />
+      </HBox>
+    </VBox>
+  </center>
+</BorderPane>

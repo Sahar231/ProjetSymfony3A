@@ -1,0 +1,85 @@
+package edu.connexion3a36.entities;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+public class Quiz {
+
+    private int idQuiz;
+    private String titre;
+    private String statut;
+    private List<Question> questions = new ArrayList<>();
+
+    public Quiz() {
+    }
+
+    public Quiz(String titre, String statut) {
+        this.titre = titre;
+        this.statut = statut;
+    }
+
+    public Quiz(int idQuiz, String titre, String statut) {
+        this.idQuiz = idQuiz;
+        this.titre = titre;
+        this.statut = statut;
+    }
+
+    public int getIdQuiz() {
+        return idQuiz;
+    }
+
+    public void setIdQuiz(int idQuiz) {
+        this.idQuiz = idQuiz;
+    }
+
+    public String getTitre() {
+        return titre;
+    }
+
+    public void setTitre(String titre) {
+        this.titre = titre;
+    }
+
+    public String getStatut() {
+        return statut;
+    }
+
+    public void setStatut(String statut) {
+        this.statut = statut;
+    }
+
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
+
+    public void addQuestion(Question question) {
+        this.questions.add(question);
+    }
+
+    @Override
+    public String toString() {
+        return "Quiz{" +
+                "idQuiz=" + idQuiz +
+                ", titre='" + titre + '\'' +
+                ", statut='" + statut + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Quiz quiz = (Quiz) o;
+        return idQuiz == quiz.idQuiz;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idQuiz);
+    }
+}
